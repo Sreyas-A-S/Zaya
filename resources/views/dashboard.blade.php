@@ -213,6 +213,32 @@
         </div>
 
         @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']))
+        
+        @if(isset($pendingReferralRequests) && $pendingReferralRequests->isNotEmpty())
+        <!-- Referral Requests -->
+        <div id="section-referral-requests" class="bg-white rounded-2xl p-5 md:p-6 border border-amber-100 shadow-sm shadow-amber-50/50">
+            <h2 class="text-xl font-sans! font-medium text-secondary mb-6 flex items-center gap-2">
+                <i class="ri-user-shared-2-line text-amber-500"></i> Pending Referral Requests
+            </h2>
+            <div class="space-y-4">
+                @foreach($pendingReferralRequests as $req)
+                <div class="p-4 bg-amber-50/30 rounded-2xl border border-amber-50 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-amber-600 shadow-sm">
+                            <i class="ri-history-line"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-800">{{ $req->booking->user->name }}</p>
+                            <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Requested by: {{ $req->requester->name }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('bookings.consultation-form.show', $req->booking_id) }}" class="px-4 py-1.5 bg-secondary text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-primary transition-all">Review</a>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
         <!-- Practitioner Referrals -->
         <div id="section-referrals" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
             <h2 class="text-xl font-sans! font-medium text-secondary mb-6 flex items-center gap-2">

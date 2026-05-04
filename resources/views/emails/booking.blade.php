@@ -111,8 +111,6 @@
             <div style="text-align: center;">
                 @if($type === 'client' && $booking->invoice_no)
                     <a href="{{ route('invoice.show', $booking->invoice_no) }}" class="button">View Online Invoice</a>
-                @elseif($type !== 'client')
-                    <a href="{{ route('admin.invoices.index') }}" class="button">View Invoices List</a>
                 @endif
             </div>
         </div>

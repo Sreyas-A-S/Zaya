@@ -83,7 +83,7 @@ class RegisterController extends Controller
 
             $registrationFee = (float) ($financeSettings['practitioner_registration_fee'] ?? 0);
             $registrationFeeEnabled = filter_var($financeSettings['practitioner_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
-            $registrationCurrency = strtoupper($financeSettings['practitioner_registration_fee_currency'] ?? config('currencies.default', 'EUR'));
+            $registrationCurrency = strtoupper($financeSettings['practitioner_registration_fee_currency'] ?? config('currencies.default', 'INR'));
 
             return view('auth.register_practitioner', compact(
                 'languages', 'wellnessConsultations', 'bodyTherapies', 'practitionerModalities', 
@@ -96,7 +96,7 @@ class RegisterController extends Controller
             
             $registrationFee = (float) ($financeSettings['client_registration_fee'] ?? 0);
             $registrationFeeEnabled = filter_var($financeSettings['client_registration_fee_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN);
-            $registrationCurrency = strtoupper($financeSettings['client_registration_fee_currency'] ?? config('currencies.default', 'EUR'));
+            $registrationCurrency = strtoupper($financeSettings['client_registration_fee_currency'] ?? config('currencies.default', 'INR'));
 
             return view('auth.register_patient', compact(
                 'languages', 'currencies', 'countries', 'registrationFee', 'registrationFeeEnabled', 'registrationCurrency', 'countryToCurrency'
@@ -201,30 +201,6 @@ class RegisterController extends Controller
                     $user->userPromoCodes()->firstOrCreate([
                         'promo_code' => $promoCode
                     ]);
-                }
-            }
-
-            // Award referral coins if applicable
-            if ($user->referred_by) {
-                $referrer = \App\Models\User::find($user->referred_by);
-                if ($referrer) {
-                    $referrerCurrency = $referrer->profile ? $referrer->profile->payout_currency : config('currencies.default', 'INR');
-                    $coinSetting = \App\Models\CoinSetting::where('currency_code', $referrerCurrency)->where('status', true)->first();
-                    if ($coinSetting && $coinSetting->referral_coins > 0) {
-                        $referrer->increment('coins', $coinSetting->referral_coins);
-                        
-                        // Create a coin transaction record for the referral bonus
-                        \App\Models\CoinTransaction::create([
-                            'user_id' => $referrer->id,
-                            'amount' => $coinSetting->referral_coins,
-                            'type' => 'referral_bonus',
-                            'description' => 'Referral bonus for inviting ' . $user->name,
-                            'metadata' => [
-                                'referred_user_id' => $user->id,
-                                'referred_user_name' => $user->name,
-                            ]
-                        ]);
-                    }
                 }
             }
 
@@ -354,7 +330,7 @@ class RegisterController extends Controller
             if ($request->wantsJson()) {
                 return response()->json(['success' => 'Registration successful!'], 201);
             }
-            return redirect($this->redirectPath());
+            return redirect()->intended($this->redirectPath());
         } catch (ValidationException $e) {
             DB::rollBack();
             throw $e;
@@ -447,7 +423,7 @@ class RegisterController extends Controller
 
         // Check currency for fixed promo codes
         if ($promo->type === 'fixed') {
-            $expectedCurrency = $request->input('registration_fee_currency', 'EUR');
+            $expectedCurrency = $request->input('registration_fee_currency', 'INR');
             if ($promo->currency && strtoupper($promo->currency) !== strtoupper($expectedCurrency)) {
                 return [null, []];
             }
@@ -1158,7 +1134,7 @@ class RegisterController extends Controller
             'password' => Hash::make($rawPassword),
             'role' => $data['role'],
             'open_register_link_id' => !empty($data['open_register_token']) ? \App\Models\OpenRegisterLink::where('token', $data['open_register_token'])->value('id') : null,
-            'referred_by' => session('referral_code') ? \App\Models\User::where('referral_token', session('referral_code'))->value('id') : null,
+            'referred_by' => ($data['referral_code'] ?? session('referral_code')) ? \App\Models\User::where('referral_token', ($data['referral_code'] ?? session('referral_code')))->value('id') : null,
         ]);
     }
     /**

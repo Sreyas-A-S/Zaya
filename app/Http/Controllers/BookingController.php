@@ -38,7 +38,10 @@ class BookingController extends Controller
             'promo_code' => 'nullable|string|exists:promo_codes,code',
             'discount_amount' => 'nullable|numeric|min:0',
             'coins_applied' => 'nullable|boolean',
-            'test_mode' => 'nullable|boolean'
+            'test_mode' => 'nullable|boolean',
+            'need_translator' => 'nullable|boolean',
+            'from_language' => 'nullable|string',
+            'to_language' => 'nullable|string',
         ]);
 
         $practitioner = Practitioner::with('user')->findOrFail($request->practitioner_id);
@@ -186,6 +189,10 @@ class BookingController extends Controller
                 'currency' => $currency,
                 'status' => 'confirmed',
                 'razorpay_payment_id' => 'ZERO_PAYMENT',
+                'need_translator' => $request->need_translator ?? false,
+                'from_language' => $request->from_language,
+                'to_language' => $request->to_language,
+                'language_id' => $request->language_id,
                 'additional_info' => $request->additional_info,
             ]);
 
@@ -223,6 +230,9 @@ class BookingController extends Controller
                 'coin_discount' => $coinDiscount,
             ]);
 
+            // Award Referral Bonus Coins to the Referrer (Scenario 2)
+            $this->awardReferralBonus($booking->user);
+
             try {
                 \Illuminate\Support\Facades\Mail::to($booking->user->email)->send(new \App\Mail\BookingMail($booking, 'client'));
                 if ($booking->practitioner && $booking->practitioner->user) {
@@ -235,6 +245,7 @@ class BookingController extends Controller
                 \Log::error('Zero-Pay Booking Confirmation Email Error: ' . $e->getMessage());
             }
 
+            session()->flash('status', 'Booking confirmed successfully!');
             return response()->json([
                 'success' => true,
                 'message' => 'Booking confirmed! (Discount applied)',
@@ -268,6 +279,10 @@ class BookingController extends Controller
                 'coin_discount' => $coinDiscount,
                 'currency' => $currency,
                 'is_test' => $isTestMode,
+                'need_translator' => $request->need_translator ?? false,
+                'from_language' => $request->from_language,
+                'to_language' => $request->to_language,
+                'language_id' => $request->language_id,
                 'additional_info' => $request->additional_info,
             ]
         ]);
@@ -402,6 +417,10 @@ class BookingController extends Controller
             'currency' => $bookingData['currency'],
             'status' => 'confirmed',
             'is_test' => $bookingData['is_test'] ?? false,
+            'need_translator' => $bookingData['need_translator'] ?? false,
+            'from_language' => $bookingData['from_language'] ?? null,
+            'to_language' => $bookingData['to_language'] ?? null,
+            'language_id' => $bookingData['language_id'] ?? null,
             'razorpay_order_id' => $paymentLinkId,
             'razorpay_payment_id' => $paymentId,
             'additional_info' => $bookingData['additional_info'] ?? null,
@@ -450,6 +469,9 @@ class BookingController extends Controller
                 'coin_discount' => $booking->coin_discount,
             ]);
 
+            // Award Referral Bonus Coins to the Referrer (Scenario 2)
+            $this->awardReferralBonus($booking->user);
+
             try {
                 \Illuminate\Support\Facades\Mail::to($booking->user->email)->send(new \App\Mail\BookingMail($booking, 'client'));
                 if ($booking->practitioner && $booking->practitioner->user) {
@@ -485,6 +507,9 @@ class BookingController extends Controller
                 'currency' => $bookingData['currency'],
                 'status' => 'pending_reschedule', // Special status
                 'is_test' => $bookingData['is_test'] ?? false,
+                'need_translator' => $bookingData['need_translator'] ?? false,
+                'from_language' => $bookingData['from_language'] ?? null,
+                'to_language' => $bookingData['to_language'] ?? null,
                 'razorpay_order_id' => $paymentLinkId,
                 'razorpay_payment_id' => $paymentId,
                 'additional_info' => $bookingData['additional_info'] ?? null,
@@ -569,9 +594,17 @@ class BookingController extends Controller
         }
         $matchCriteria = array_unique(array_filter($matchCriteria));
 
+        $alreadyReferredIds = [];
+        if ($booking) {
+            $alreadyReferredIds = \App\Models\Referral::where('booking_id', $booking->id)
+                ->pluck('referred_to_id')
+                ->toArray();
+        }
+
         $users = $usersQuery->get(); // Fetch all for sorting, or we can use a more complex query
 
-        $results = $users->map(function ($u) use ($booking, $matchCriteria) {
+        $results = $users->map(function ($u) use ($booking, $matchCriteria, $alreadyReferredIds) {
+            $isAlreadyReferred = in_array($u->id, $alreadyReferredIds);
             $handlesAllServices = false;
             $serviceFee = 0;
             $isRecommended = false;
@@ -624,15 +657,25 @@ class BookingController extends Controller
                 'handles_service' => $handlesAllServices,
                 'missing_services' => $missingServices,
                 'service_fee' => $serviceFee,
+                'currency' => $this->resolveProfessionalCurrency($u),
                 'is_recommended' => $isRecommended,
+                'is_already_referred' => $isAlreadyReferred,
                 'matched_expertises' => $matchedExpertises,
                 'profile_pic' => $u->profile_pic ? (str_starts_with($u->profile_pic, 'http') ? $u->profile_pic : asset('storage/' . $u->profile_pic)) : asset('frontend/assets/profile-dummy-img.png'),
                 'profile_url' => $u->profile_url,
             ];
         });
 
-        // Sort: Recommended first
-        $results = $results->sortByDesc('is_recommended')->values();
+        // Sort: Recommended first, then by service handling capability
+        $results = $results->sort(function ($a, $b) {
+            if ($b['is_recommended'] && !$a['is_recommended']) return 1;
+            if (!$b['is_recommended'] && $a['is_recommended']) return -1;
+            
+            if ($b['handles_service'] && !$a['handles_service']) return 1;
+            if (!$b['handles_service'] && $a['handles_service']) return -1;
+            
+            return 0;
+        })->values();
 
         return response()->json($results->take(10));
     }
@@ -705,6 +748,26 @@ class BookingController extends Controller
             'conditions' => $conditions,
             'services' => $services,
         ]);
+    }
+
+    private function resolveProfessionalCurrency($user)
+    {
+        // 1. Try to get currency from their services first
+        $service = \App\Models\UserService::where('user_id', $user->id)
+            ->whereNotNull('currency')
+            ->first();
+            
+        if ($service && $service->currency) {
+            return $service->currency;
+        }
+
+        // 2. Fallback to profile payout currency
+        $profile = $user->profile;
+        if ($profile && isset($profile->payout_currency) && $profile->payout_currency) {
+            return $profile->payout_currency;
+        }
+
+        return 'EUR'; // Ultimate fallback
     }
 
     private function firstNonEmptyProfileArray($profile, array $keys): array

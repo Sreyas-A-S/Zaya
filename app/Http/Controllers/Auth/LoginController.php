@@ -174,15 +174,56 @@ class LoginController extends Controller
                 }
             }
 
-            return redirect($redirectUrl);
+            return redirect()->intended($redirectUrl);
         }
 
-        return redirect()->route('dashboard');
+        return redirect()->intended(route('dashboard'));
     }
 
-    protected function loggedOut(Request $request)
+    /**
+     * Log the user out of the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function logout(Request $request)
     {
-        if ($request->is('admin/*') || $request->routeIs('admin.*')) {
+        $isAdmin = false;
+        
+        // Capture the user's role before logging out
+        if (auth()->check()) {
+            $userRole = strtolower(trim(auth()->user()->role ?? ''));
+            $adminRoles = [
+                'admin', 'super-admin', 'country-admin', 
+                'financial-manager', 'finance-manager', 
+                'financial_manager', 'finance_manager',
+                'financialmanager', 'financemanager',
+                'content-manager', 'user-manager',
+                'content_manager', 'user_manager'
+            ];
+            
+            // If the role matches any admin role and is not a known non-admin role
+            if (in_array($userRole, $adminRoles) || str_contains($userRole, 'admin') || str_contains($userRole, 'manager')) {
+                $nonAdminRoles = ['doctor', 'practitioner', 'mindfulness-practitioner', 'yoga-therapist', 'client', 'patient', 'translator'];
+                if (!in_array($userRole, $nonAdminRoles)) {
+                    $isAdmin = true;
+                }
+            }
+        }
+
+        // Also check if they are logging out from an admin path or referer
+        $referer = $request->headers->get('referer', '');
+        if (str_contains($referer, '/admin') || $request->is('admin/*') || $request->routeIs('admin.*')) {
+            $isAdmin = true;
+        }
+
+        $this->guard()->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        if ($isAdmin) {
             return redirect()->route('admin.login');
         }
 

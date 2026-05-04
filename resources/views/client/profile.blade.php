@@ -247,7 +247,7 @@
                 </div>
                 <div>
                     <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Email</p>
-                    <p class="text-lg font-normal text-gray-800">{{ $email }}</p>
+                    <p class="text-lg font-normal text-gray-800 break-all">{{ $email }}</p>
                 </div>
 
                 <div class="md:col-span-3">

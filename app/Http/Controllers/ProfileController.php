@@ -141,9 +141,15 @@ class ProfileController extends Controller
                 ->latest()
                 ->take(5)
                 ->get();
+
+            $pendingReferralRequests = \App\Models\ReferralRequest::with(['requester', 'booking.user'])
+                ->where('recipient_id', $user->id)
+                ->where('status', 'pending')
+                ->latest()
+                ->get();
         }
 
-        return view('dashboard', compact('user', 'upcomingBookings', 'completedBookings', 'reviews', 'invoices', 'allServices', 'clinicalDocuments', 'referrals', 'dataAccessRequests'));
+        return view('dashboard', compact('user', 'upcomingBookings', 'completedBookings', 'reviews', 'invoices', 'allServices', 'clinicalDocuments', 'referrals', 'dataAccessRequests', 'pendingReferralRequests'));
     }
 
     public function uploadDocument(Request $request)
@@ -308,8 +314,9 @@ class ProfileController extends Controller
     public function showConsultationForm(Request $request, $id)
     {
         $user = Auth::user();
-        $booking = Booking::with(['practitioner.user', 'user', 'translator.user', 'consultationForms.doctor'])->findOrFail($id);
-
+        $booking = Booking::findOrFail($id);
+        $booking->load(['practitioner.user', 'user', 'translator.user', 'consultationForms.doctor', 'referralRequests.requester']);
+        
         $isPractitioner = ($booking->practitioner && $booking->practitioner->user_id === $user->id);
         $isTranslator = ($booking->translator && $booking->translator->user_id === $user->id);
         $isClient = ($booking->user_id === $user->id);
@@ -319,12 +326,17 @@ class ProfileController extends Controller
         $isReferredTo = Referral::where('referral_no', $booking->invoice_no)->where('referred_to_id', $user->id)->exists();
 
         // Check for OTP-verified data access
-        $hasOTPAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
+        $hasOTPAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id, $booking->id);
 
-        $canEdit = ($isPractitioner || $isTranslator) && $request->query('view') != '1';
-        $canView = $canEdit || $isClient || $isReferrer || $isReferredTo || $hasOTPAccess || $request->query('view') == '1';
+        $canEdit = ($isPractitioner || $isTranslator || $isReferredTo) && $hasOTPAccess && $request->query('view') != '1';
+        
+        // Referred experts and practitioners now require additional OTP verification
+        $canView = $isClient || $isReferrer || $hasOTPAccess || $request->query('view') == '1';
 
         if (!$canView) {
+            if ($isPractitioner || $isTranslator || $isReferredTo) {
+                return view('consultation-form-locked', compact('user', 'booking'));
+            }
             abort(403, 'You do not have permission to access this consultation form.');
         }
 
@@ -358,6 +370,7 @@ class ProfileController extends Controller
         $formId = $request->query('form_id');
         $isNew = $request->query('new');
         $allForms = $booking->consultationForms()->latest()->get();
+        $referralRequests = $booking->referralRequests()->latest()->get();
         
         $existingForm = null;
         if ($formId) {
@@ -380,16 +393,9 @@ class ProfileController extends Controller
         }
 
         return view('consultation-form', compact(
-            'user',
-            'booking',
-            'consultationSchema',
-            'consultationPayload',
-            'existingForm',
-            'allForms',
-            'roleForSchema',
-            'canEdit',
-            'canView',
-            'isMinimal'
+            'user', 'booking', 'isPractitioner', 'isTranslator', 'isClient', 'isReferrer', 'isReferredTo',
+            'canEdit', 'isMinimal', 'consultationSchema', 'allForms', 'existingForm', 'isNew', 
+            'referralRequests', 'consultationPayload', 'roleForSchema'
         ));
     }
 
@@ -420,15 +426,67 @@ class ProfileController extends Controller
             $form = ConsultationForm::create([
                 'booking_id' => $booking->id,
                 'doctor_id' => $user->id,
-                'title' => $title ?: 'Consultation ' . (ConsultationForm::where('booking_id', $booking->id)->count() + 1),
+                'title' => $title ?: 'Prescription #' . (ConsultationForm::where('booking_id', $booking->id)->count() + 1),
                 'payload' => $payload,
             ]);
-            $msg = 'New consultation follow-up saved successfully.';
+            $msg = 'New prescription saved successfully.';
+        }
+
+        $params = ['id' => $booking->id, 'form_id' => $form->id];
+        if ($request->input('minimal') === '1') {
+            $params['minimal'] = '1';
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'form_id' => $form->id,
+                'params' => $params
+            ]);
         }
 
         return redirect()
-            ->route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $form->id])
+            ->route('bookings.consultation-form.show', $params)
             ->with('status', $msg);
+    }
+
+    public function rescheduleBooking(Request $request, $id)
+    {
+        $request->validate([
+            'booking_date' => 'required|date|after_or_equal:today',
+            'booking_time' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+        $booking = Booking::with(['practitioner.user'])->findOrFail($id);
+
+        // Authorization: Only the practitioner assigned to the booking can reschedule
+        $isPractitioner = ($booking->practitioner && $booking->practitioner->user_id === $user->id);
+        
+        if (!$isPractitioner) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized. Only assigned professionals can reschedule.'], 403);
+        }
+
+        // Save original datetime if it's the first reschedule
+        if (!$booking->original_booking_date) {
+            $booking->original_booking_date = $booking->booking_date;
+            $booking->original_booking_time = $booking->booking_time;
+        }
+
+        // Update with new values
+        $booking->booking_date = $request->booking_date;
+        $booking->booking_time = $request->booking_time;
+        $booking->rescheduled_at = now();
+        $booking->rescheduled_by = $user->role;
+        $booking->save();
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Consultation rescheduled successfully.',
+            'new_date' => $booking->booking_date->format('M d, Y'),
+            'new_time' => $booking->booking_time
+        ]);
     }
 
     public function deleteConsultationForm($id, $form_id)
@@ -553,7 +611,12 @@ class ProfileController extends Controller
             ->get()
             ->unique('requester_id');
 
-        return view('health-journey', compact('user', 'clinicalDocuments', 'consultations', 'dataAccessRequests', 'allServices'));
+        $prescriptions = \App\Models\Prescription::where('user_id', $user->id)
+            ->with(['practitioner.user', 'booking'])
+            ->latest()
+            ->get();
+
+        return view('health-journey', compact('user', 'clinicalDocuments', 'consultations', 'dataAccessRequests', 'allServices', 'prescriptions'));
     }
 
     public function bookings(Request $request)
@@ -587,7 +650,8 @@ class ProfileController extends Controller
             return view('partials.bookings-table', compact('user', 'bookings', 'allServices'))->render();
         }
 
-        return view('bookings', compact('user', 'bookings', 'search', 'allServices'));
+        $languages = \App\Models\Language::all();
+        return view('bookings', compact('user', 'bookings', 'search', 'allServices', 'languages'));
     }
 
     public function conferences(Request $request)
@@ -623,7 +687,7 @@ class ProfileController extends Controller
 
         if (!$isParticipant) {
             // Check if this is a practitioner with OTP-verified access to this client
-            $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
+            $hasAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id, $booking->id);
             if (!$hasAccess) {
                 abort(403);
             }
@@ -665,7 +729,7 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $booking = $this->getBookingQuery($user)
-            ->with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo', 'transactions', 'consultationForms'])
+            ->with(['user', 'practitioner.user', 'language', 'translator.user', 'referral.referredBy', 'referralsFromThisSession.referredTo', 'transactions', 'consultationForms', 'prescriptions.practitioner.user'])
             ->findOrFail($id);
 
         // Permissions check for sensitive data
@@ -674,7 +738,7 @@ class ProfileController extends Controller
                          ($booking->translator && $booking->translator->user_id === $user->id);
 
         // Consent Status (Checked against the CURRENT viewer)
-        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id);
+        $hasConsent = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id, $booking->id);
 
         $serviceIds = is_array($booking->service_ids) ? $booking->service_ids : [];
         $services = Service::whereIn('id', $serviceIds)->get();
@@ -751,7 +815,8 @@ class ProfileController extends Controller
             }
         }
 
-        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner', 'userTransaction', 'shareAmount', 'referredServiceIds', 'isDirectParticipant'));
+        $languages = \App\Models\Language::all();
+        return view('bookings.details', compact('user', 'booking', 'services', 'referralChain', 'hasConsent', 'firstPractitioner', 'userTransaction', 'shareAmount', 'referredServiceIds', 'isDirectParticipant', 'languages'));
     }
 
     public function viewClientProfile($id)
@@ -782,6 +847,12 @@ class ProfileController extends Controller
             $query->where('user_id', $client->id);
         })->with(['booking'])->latest()->get();
 
+        // Get prescriptions for this client
+        $prescriptions = \App\Models\Prescription::where('user_id', $client->id)
+            ->with(['booking', 'practitioner.user'])
+            ->latest()
+            ->get();
+
         // Get client concerns (from their bookings)
         $concerns = Booking::where('user_id', $client->id)
             ->whereNotNull('conditions')
@@ -809,7 +880,7 @@ class ProfileController extends Controller
 
         $user = Auth::user();
 
-        return view('practitioner.client-profile', compact('user', 'client', 'recordings', 'bookings', 'documents', 'consultationForms', 'concerns'));
+        return view('practitioner.client-profile', compact('user', 'client', 'recordings', 'bookings', 'documents', 'consultationForms', 'concerns', 'prescriptions'));
     }
 
     public function myServices()
@@ -887,11 +958,52 @@ class ProfileController extends Controller
         ]);
     }
 
+    public function getBookingDetails($id)
+    {
+        $booking = Booking::with(['language', 'practitioner', 'user.patient'])->findOrFail($id);
+        
+        $fromLang = $booking->from_language;
+        $toLang = $booking->to_language;
+
+        // Fallback for Source Language
+        if (!$fromLang) {
+            $patient = $booking->user->patient ?? null;
+            if ($patient && !empty($patient->languages_spoken) && is_array($patient->languages_spoken)) {
+                $fromLang = $patient->languages_spoken[0];
+            } else {
+                $fromLang = $booking->language ? $booking->language->display_name : 'English';
+            }
+        }
+
+        // Fallback for Target Language
+        if (!$toLang || strtolower($toLang) === 'any') {
+            if ($booking->language) {
+                $toLang = $booking->language->display_name;
+            } else {
+                $practitioner = $booking->practitioner;
+                if ($practitioner && !empty($practitioner->languages_spoken) && is_array($practitioner->languages_spoken)) {
+                    $toLang = $practitioner->languages_spoken[0];
+                }
+            }
+        }
+
+        if (!$toLang) $toLang = 'Any';
+
+        return response()->json([
+            'id' => $booking->id,
+            'from_language' => $fromLang,
+            'to_language' => $toLang,
+            'need_translator' => $booking->need_translator
+        ]);
+    }
+
     public function fetchAvailableTranslators(Request $request)
     {
         $query = $request->query('query');
         $fromLang = $request->query('from_lang');
         $toLang = $request->query('to_lang');
+
+        $ignoreLanguages = $request->query('ignore_languages') === 'true';
 
         $translatorsQuery = \App\Models\Translator::with('user')
             ->where('status', 'active');
@@ -900,19 +1012,62 @@ class ProfileController extends Controller
             $translatorsQuery->where('full_name', 'LIKE', "%{$query}%");
         }
 
-        if ($fromLang && $toLang) {
-            $translatorsQuery->where(function ($q) use ($fromLang, $toLang) {
-                // Translator should handle both languages in their source/target pairs
-                // Or handle from_lang as source and to_lang as target
-                $q->where(function ($sub) use ($fromLang, $toLang) {
-                    $sub->whereJsonContains('source_languages', $fromLang)
-                        ->whereJsonContains('target_languages', $toLang);
-                })->orWhere(function ($sub) use ($fromLang, $toLang) {
-                    // Also check reverse if applicable (some translators work both ways)
-                    $sub->whereJsonContains('source_languages', $toLang)
-                        ->whereJsonContains('target_languages', $fromLang);
+        if (!$ignoreLanguages) {
+            if ($fromLang && $toLang && strtolower($toLang) !== 'any') {
+                $translatorsQuery->where(function ($q) use ($fromLang, $toLang) {
+                    $baseFrom = explode(' (', $fromLang)[0];
+                    $baseTo = explode(' (', $toLang)[0];
+
+                    // Match translators who support both languages in any capacity
+                    $q->where(function ($sub) use ($fromLang, $baseFrom) {
+                        $sub->whereJsonContains('source_languages', $fromLang)
+                            ->orWhereJsonContains('target_languages', $fromLang)
+                            ->orWhereJsonContains('additional_languages', $fromLang)
+                            ->orWhere('native_language', 'LIKE', $fromLang)
+                            ->orWhereJsonContains('source_languages', $baseFrom)
+                            ->orWhereJsonContains('target_languages', $baseFrom)
+                            ->orWhereJsonContains('additional_languages', $baseFrom)
+                            ->orWhere('native_language', 'LIKE', $baseFrom)
+                            // Also match any variant of the base language
+                            ->orWhere('source_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
+                            ->orWhere('target_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
+                            ->orWhere('additional_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
+                            ->orWhere('native_language', 'LIKE', $baseFrom . ' (%');
+                    })->where(function ($sub) use ($toLang, $baseTo) {
+                        $sub->whereJsonContains('source_languages', $toLang)
+                            ->orWhereJsonContains('target_languages', $toLang)
+                            ->orWhereJsonContains('additional_languages', $toLang)
+                            ->orWhere('native_language', 'LIKE', $toLang)
+                            ->orWhereJsonContains('source_languages', $baseTo)
+                            ->orWhereJsonContains('target_languages', $baseTo)
+                            ->orWhereJsonContains('additional_languages', $baseTo)
+                            ->orWhere('native_language', 'LIKE', $baseTo)
+                            // Also match any variant of the base language
+                            ->orWhere('source_languages', 'LIKE', '%"' . $baseTo . ' (%"')
+                            ->orWhere('target_languages', 'LIKE', '%"' . $baseTo . ' (%"')
+                            ->orWhere('additional_languages', 'LIKE', '%"' . $baseTo . ' (%"')
+                            ->orWhere('native_language', 'LIKE', $baseTo . ' (%');
+                    });
                 });
-            });
+            } elseif ($fromLang) {
+                // Only match fromLang
+                $translatorsQuery->where(function ($q) use ($fromLang) {
+                    $baseFrom = explode(' (', $fromLang)[0];
+                    $q->whereJsonContains('source_languages', $fromLang)
+                      ->orWhereJsonContains('target_languages', $fromLang)
+                      ->orWhereJsonContains('additional_languages', $fromLang)
+                      ->orWhere('native_language', 'LIKE', $fromLang)
+                      ->orWhereJsonContains('source_languages', $baseFrom)
+                      ->orWhereJsonContains('target_languages', $baseFrom)
+                      ->orWhereJsonContains('additional_languages', $baseFrom)
+                      ->orWhere('native_language', 'LIKE', $baseFrom)
+                      // Also match any variant of the base language
+                      ->orWhere('source_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
+                      ->orWhere('target_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
+                      ->orWhere('additional_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
+                      ->orWhere('native_language', 'LIKE', $baseFrom . ' (%');
+                });
+            }
         }
 
         $translators = $translatorsQuery->get()->map(function ($t) {
@@ -934,6 +1089,8 @@ class ProfileController extends Controller
     {
         $request->validate([
             'translator_id' => 'required|exists:translators,id',
+            'from_language' => 'nullable|string',
+            'to_language' => 'nullable|string',
         ]);
 
         $user = Auth::user();
@@ -947,11 +1104,20 @@ class ProfileController extends Controller
             }
         }
 
-        $booking->update([
+        $updateData = [
             'translator_id' => $request->translator_id,
             'need_translator' => true,
-            'status' => 'confirmed' // Optional: move from pending to confirmed if needed
-        ]);
+            'status' => 'confirmed'
+        ];
+
+        if ($request->filled('from_language')) {
+            $updateData['from_language'] = $request->from_language;
+        }
+        if ($request->filled('to_language')) {
+            $updateData['to_language'] = $request->to_language;
+        }
+
+        $booking->update($updateData);
 
         // Reload booking with translator info to send mail
         $booking->load('translator.user');
@@ -2039,11 +2205,44 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        // Reviews written by this user
-        $myReviews = PractitionerReview::with('practitioner.user')
+        // Reviews written by this user (Both Professional and Zaya Reviews)
+        $practitionerReviews = PractitionerReview::with('practitioner.user')
             ->where('user_id', $user->id)
-            ->latest()
-            ->paginate(10, ['*'], 'my_page');
+            ->get()
+            ->map(function($r) {
+                $r->review_type = 'Professional Review';
+                $r->target_name = $r->practitioner->user->name ?? 'N/A';
+                $r->target_role = str_replace('_', ' ', $r->practitioner->user->role);
+                $r->target_pic = $r->practitioner->profile_photo_path ? asset('storage/' . $r->practitioner->profile_photo_path) : asset('frontend/assets/profile-dummy-img.png');
+                $r->display_status = $r->status ? 'approved' : 'pending';
+                return $r;
+            });
+
+        $zayaReviews = collect();
+        if (\Illuminate\Support\Facades\Schema::hasColumn('testimonials', 'user_id')) {
+            $zayaReviews = \App\Models\Testimonial::where('user_id', $user->id)
+                ->get()
+                ->map(function($t) {
+                    $t->review_type = 'Zaya Review';
+                    $t->target_name = 'Zaya Wellness';
+                    $t->target_role = 'Platform';
+                    $t->target_pic = asset('frontend/assets/logo-icon.png');
+                    $t->review = $t->message;
+                    $t->display_status = $t->status;
+                    return $t;
+                });
+        }
+
+        $myReviews = $practitionerReviews->concat($zayaReviews)->sortByDesc('created_at');
+        
+        // Manual pagination for combined results
+        $currentPage = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage('my_page');
+        $perPage = 10;
+        $currentItems = $myReviews->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        $myReviews = new \Illuminate\Pagination\LengthAwarePaginator($currentItems, $myReviews->count(), $perPage, $currentPage, [
+            'path' => \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => 'my_page',
+        ]);
 
         // Reviews received by this user (if they are a professional)
         if ($user->profile_id && in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'])) {
@@ -2081,10 +2280,13 @@ class ProfileController extends Controller
         // Optional: Check if they actually had a session
         $hadSession = Booking::where('user_id', $user->id)
             ->where('profile_id', $request->practitioner_id)
-            ->where('status', 'completed')
+            ->whereIn('status', ['paid', 'completed'])
             ->exists();
 
         if (!$hadSession) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'You can only review professionals you have had a completed session with.'], 403);
+            }
             return back()->with('error', 'You can only review professionals you have had a completed session with.');
         }
 
@@ -2093,7 +2295,7 @@ class ProfileController extends Controller
             'practitioner_id' => $request->practitioner_id,
             'rating' => $request->rating,
             'review' => $request->review,
-            'status' => true, // Auto-approve for now or set to false for moderation
+            'status' => false, // Default to pending for moderation
         ]);
 
         if ($request->ajax()) {
@@ -2107,18 +2309,24 @@ class ProfileController extends Controller
     {
         $request->validate([
             'message' => 'required|string|max:2000',
+            'rating' => 'required|integer|min:1|max:5',
         ]);
 
         $user = Auth::user();
 
         \App\Models\Testimonial::create([
+            'user_id' => $user->id,
             'name' => $user->name,
             'role' => str_replace('_', ' ', ucfirst($user->role)),
             'message' => $request->message,
-            'rating' => 5,
+            'rating' => $request->rating,
             'image' => $user->profile_pic,
             'status' => 'pending' // Default to pending for moderation
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Thank you for your feedback! Your story has been submitted for review.']);
+        }
 
         return back()->with('status', 'Thank you for your feedback! Your story has been submitted for review.');
     }

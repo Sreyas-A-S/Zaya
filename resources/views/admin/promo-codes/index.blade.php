@@ -300,10 +300,12 @@
             if (type === 'percentage') {
                 $('#reward-addon').text('%');
                 $('#currency-selection-wrapper').addClass('d-none');
+                $('#promo-code-reward').attr('max', 100);
             } else {
                 const currency = $('#promo-code-currency').val();
                 $('#reward-addon').text(currencySymbols[currency] || currency);
                 $('#currency-selection-wrapper').removeClass('d-none');
+                $('#promo-code-reward').removeAttr('max');
             }
         }
 

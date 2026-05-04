@@ -33,6 +33,7 @@ class DataAccessController extends Controller
             [
                 'requester_id' => $practitioner->id,
                 'client_id' => $client->id,
+                'booking_id' => $request->booking_id,
                 'type' => $type,
             ],
             [
@@ -73,6 +74,9 @@ class DataAccessController extends Controller
         $practitioner = Auth::user();
         $accessRequest = DataAccessRequest::where('requester_id', $practitioner->id)
             ->where('client_id', $request->client_id)
+            ->when($request->booking_id, function($q) use ($request) {
+                $q->where('booking_id', $request->booking_id);
+            })
             ->where('type', $type)
             ->where('status', 'pending')
             ->first();
@@ -126,12 +130,13 @@ class DataAccessController extends Controller
     /**
      * Internal helper to grant access without OTP (e.g. upon referral confirmation).
      */
-    public static function grantAccess($practitionerId, $clientId, $type = 'access')
+    public static function grantAccess($practitionerId, $clientId, $bookingId = null, $type = 'access')
     {
         return DataAccessRequest::updateOrCreate(
             [
                 'requester_id' => $practitionerId,
                 'client_id' => $clientId,
+                'booking_id' => $bookingId,
                 'type' => $type,
             ],
             [
@@ -145,13 +150,17 @@ class DataAccessController extends Controller
     /**
      * Check if practitioner has access to client data.
      */
-    public static function hasAccess($practitionerId, $clientId, $type = null)
+    public static function hasAccess($practitionerId, $clientId, $bookingId = null, $type = null)
     {
         // 1. Check for specific approved request first (Overrides global switch if explicitly granted via OTP)
         $accessQuery = DataAccessRequest::where('requester_id', $practitionerId)
             ->where('client_id', $clientId)
             ->where('status', 'approved');
             
+        if ($bookingId) {
+            $accessQuery->where('booking_id', $bookingId);
+        }
+
         if ($type) {
             $accessQuery->where('type', $type);
         }
@@ -164,15 +173,6 @@ class DataAccessController extends Controller
         $client = User::find($clientId);
         if ($client && $client->patient && !$client->patient->data_sharing_consent) {
             return false;
-        }
-
-        // 3. Fallback: If we were looking for a specific type, check if ANY approved access exists
-        // This ensures that once verified for one thing (e.g. referral), they have general access.
-        if ($type) {
-            return DataAccessRequest::where('requester_id', $practitionerId)
-                ->where('client_id', $clientId)
-                ->where('status', 'approved')
-                ->exists();
         }
 
         return false;

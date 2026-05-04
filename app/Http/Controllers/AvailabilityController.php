@@ -258,25 +258,8 @@ class AvailabilityController extends Controller
         }
 
         try {
-            // Get only truly booked slots
-            $query = Booking::where('booking_date', $date)
-                ->whereIn('status', ['confirmed', 'paid', 'completed']);
-
-            if ($p instanceof Translator) {
-                // For translators, we check both if they are the main professional 
-                // OR if they are assigned as a translator to another professional's session
-                $query->where(function($q) use ($p) {
-                    $q->where(function($sq) use ($p) {
-                        $sq->where('profile_id', $p->id)
-                           ->where('practitioner_type', 'translator');
-                    })->orWhere('translator_id', $p->id);
-                });
-            } else {
-                $query->where('profile_id', $p->id)
-                      ->where('practitioner_type', $p->getMorphClass());
-            }
-
-            $bookedSlots = $query->pluck('booking_time')->toArray();
+            $service = new PractitionerAvailabilityService();
+            $bookedSlots = $service->getBusySlots($p, $date);
 
             return response()->json([
                 'date' => $date,

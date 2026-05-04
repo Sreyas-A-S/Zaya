@@ -23,6 +23,10 @@ class Referral extends Model
         'booking_time',
         'note',
         'status',
+        'promo_code',
+        'discount_amount',
+        'coins_used',
+        'coin_discount',
         'razorpay_order_id',
         'razorpay_payment_id',
     ];

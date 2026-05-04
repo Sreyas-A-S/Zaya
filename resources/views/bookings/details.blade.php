@@ -26,12 +26,17 @@
             <h1 class="text-2xl md:text-3xl font-black text-secondary tracking-tight">Session #{{ $booking->invoice_no }}</h1>
         </div>
         <div class="flex items-center gap-3">
-            @if($booking->status === 'confirmed')
+            @php
+                $status = $booking->effective_status;
+            @endphp
+            @if($status === 'confirmed')
                 <span class="px-4 py-2 bg-emerald-50 text-emerald-600 text-[11px] font-black uppercase tracking-widest rounded-full border border-emerald-100">Confirmed</span>
-            @elseif($booking->status === 'completed')
+            @elseif($status === 'completed')
                 <span class="px-4 py-2 bg-blue-50 text-blue-600 text-[11px] font-black uppercase tracking-widest rounded-full border border-blue-100">Completed</span>
+            @elseif($status === 'missed')
+                <span class="px-4 py-2 bg-red-50 text-red-600 text-[11px] font-black uppercase tracking-widest rounded-full border border-red-100">Missed</span>
             @else
-                <span class="px-4 py-2 bg-gray-50 text-gray-500 text-[11px] font-black uppercase tracking-widest rounded-full border border-gray-100">{{ ucfirst($booking->status) }}</span>
+                <span class="px-4 py-2 bg-gray-50 text-gray-500 text-[11px] font-black uppercase tracking-widest rounded-full border border-gray-100">{{ ucfirst($status) }}</span>
             @endif
         </div>
     </div>
@@ -72,14 +77,57 @@
                             @forelse($services as $service)
                             @php
                                 $isAssignedToMe = !empty($referredServiceIds) && in_array($service->id, $referredServiceIds);
+                                $sessionDate = null;
+                                $sessionTime = null;
+                                if (!empty($booking->additional_info['sessions'])) {
+                                    foreach ($booking->additional_info['sessions'] as $sess) {
+                                        if (isset($sess['service_id']) && $sess['service_id'] == $service->id) {
+                                            if (!empty($sess['date'])) {
+                                                try {
+                                                    $sessionDate = \Carbon\Carbon::parse($sess['date'])->format('M d, Y');
+                                                } catch(\Exception $e) {
+                                                    $sessionDate = $sess['date'];
+                                                }
+                                            }
+                                            if (!empty($sess['time'])) {
+                                                $sessionTime = $sess['time'];
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
                             @endphp
                             <div class="flex items-center justify-between p-4 {{ $isAssignedToMe ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/10' : 'bg-[#F9FBF9] border-[#2E4B3D]/12' }} border rounded-2xl hover:border-secondary/20 transition-all group">
                                 <div class="flex items-center gap-3">
                                     <div class="w-2 h-2 rounded-full {{ $isAssignedToMe ? 'bg-primary animate-pulse' : 'bg-secondary' }}"></div>
-                                    <span class="text-sm font-bold {{ $isAssignedToMe ? 'text-primary' : 'text-secondary' }}">{{ $service->title }}</span>
-                                    @if($isAssignedToMe)
-                                        <span class="ml-2 text-[8px] font-black uppercase tracking-widest bg-primary text-white px-2 py-0.5 rounded-full">Your Assignment</span>
-                                    @endif
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sm font-bold {{ $isAssignedToMe ? 'text-primary' : 'text-secondary' }}">{{ $service->title }}</span>
+                                            @if($isAssignedToMe)
+                                                <span class="ml-2 text-[8px] font-black uppercase tracking-widest bg-primary text-white px-2 py-0.5 rounded-full">Your Assignment</span>
+                                            @endif
+                                            
+                                            @php
+                                                $sessObj = null;
+                                                if (!empty($booking->additional_info['sessions'])) {
+                                                    foreach ($booking->additional_info['sessions'] as $sess) {
+                                                        if (isset($sess['service_id']) && $sess['service_id'] == $service->id) {
+                                                            $sessObj = $sess;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                $isSessPassed = $booking->isSessionPassed($sessObj, derive_timezone_from_user($booking->practitioner->user ?? null));
+                                            @endphp
+                                            
+                                            @if($isSessPassed && $booking->status !== 'completed' && $booking->status !== 'cancelled')
+                                                <span class="ml-2 text-[8px] font-black uppercase tracking-widest bg-red-100 text-red-600 px-2 py-0.5 rounded-full border border-red-200">Missed</span>
+                                            @endif
+                                        </div>
+                                        @if($sessionDate || $sessionTime)
+                                            <p class="text-[10px] text-gray-500 font-medium mt-1"><i class="ri-time-line mr-1"></i> {{ $sessionDate ?? 'TBD' }} • {{ $sessionTime ?? 'TBD' }}</p>
+                                        @endif
+                                    </div>
                                 </div>
                                 @if(in_array($user->role, ['client', 'patient']))
                                 <span class="text-[11px] font-black text-secondary/60">{{ get_currency_symbol($booking->currency) }}{{ number_format($service->price ?? 0, 2) }}</span>
@@ -403,6 +451,53 @@
                 </div>
             </div>
             @endif
+
+            <!-- Prescriptions Section -->
+            <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 overflow-hidden shadow-sm p-5 md:p-8">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Digital Prescriptions</h3>
+                        <p class="text-[10px] text-gray-400 font-bold mt-1">Medical prescriptions issued during/after session</p>
+                    </div>
+                    @if($isExpert && ($hasConsent || $booking->profile_id === $user->profile_id))
+                    <a href="{{ route('prescriptions.create', $booking->id) }}" class="w-10 h-10 rounded-full bg-secondary/5 text-secondary flex items-center justify-center hover:bg-secondary hover:text-white transition-all">
+                        <i class="ri-add-line text-xl"></i>
+                    </a>
+                    @endif
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @forelse($booking->prescriptions ?? [] as $rx)
+                    <div class="flex flex-col p-5 rounded-2xl border border-gray-50 bg-[#F9FBF9] hover:border-secondary/20 hover:bg-white transition-all group shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform">
+                                    <i class="ri-capsule-line"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-secondary">{{ $rx->title }}</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{{ $rx->prescription_date->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 mt-auto">
+                            <a href="{{ route('prescriptions.show', $rx->id) }}" 
+                               class="flex-1 py-2 px-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-secondary uppercase tracking-widest hover:bg-secondary hover:text-white transition-all text-center">
+                                <i class="ri-eye-line mr-1"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="col-span-full py-8 text-center bg-gray-50/50 rounded-3xl border border-dashed border-gray-200">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">No prescriptions issued yet</p>
+                        @if($isExpert && ($hasConsent || $booking->profile_id === $user->profile_id))
+                            <a href="{{ route('prescriptions.create', $booking->id) }}" class="inline-block mt-4 text-xs font-black text-secondary hover:underline">Issue First Prescription →</a>
+                        @endif
+                    </div>
+                    @endforelse
+                </div>
+            </div>
         </div>
 
         <!-- Sidebar Info -->
@@ -497,7 +592,7 @@
                             <i class="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
                         </a>
                     @else
-                        <button onclick="requestDataAccess({{ $booking->user_id }})" class="w-full py-4 bg-orange-500 text-white rounded-2xl font-black text-[10px] hover:bg-orange-600 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg shadow-orange-200">
+                        <button onclick="requestDataAccess({{ $booking->user_id }}, {{ $booking->id }})" class="w-full py-4 bg-orange-500 text-white rounded-2xl font-black text-[10px] hover:bg-orange-600 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg shadow-orange-200">
                             <i class="ri-lock-unlock-line"></i>
                             Unlock Data Access
                         </button>
@@ -537,7 +632,7 @@
 
                 @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
                     @if(!$booking->translator_id)
-                        <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language ?: 'English' }}', '{{ $booking->to_language ?: 'Any' }}')" class="w-full py-5 bg-blue-600 text-white rounded-[1.5rem] font-black text-sm hover:bg-blue-700 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-lg shadow-blue-200">
+                        <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language }}', '{{ $booking->to_language }}')" class="w-full py-5 bg-blue-600 text-white rounded-[1.5rem] font-black text-sm hover:bg-blue-700 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-lg shadow-blue-200">
                             <i class="ri-translate text-lg"></i>
                             {{ $booking->need_translator ? 'Assign Translator' : 'Request Translator' }}
                         </button>
@@ -574,8 +669,8 @@
 @include('partials.refer-modal-scripts')
 
 <script>
-    function requestDataAccess(clientId) {
-        openDataAccessRequestModal(clientId);
+    function requestDataAccess(clientId, bookingId) {
+        openDataAccessRequestModal(clientId, bookingId);
     }
 </script>
 

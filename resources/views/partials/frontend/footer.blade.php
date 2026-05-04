@@ -189,6 +189,130 @@
 
     </div>
 
+    <style>
+        /* Hide ALL native Tawk.to UI elements across all states */
+        .tawk-min-container,
+        .tawk-bubble-container,
+        .tawk-tooltip,
+        .tawk-custom-color,
+        #tawkchat-container > iframe:not([title="chat window"]),
+        iframe[title="chat widget"],
+        iframe[title="1jnb8ik6a"], /* Specific ID fallback */
+        [id^="tawk-"] { 
+            display: none !important; 
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+        
+        /* Ensure ONLY the main chat window iframe is allowed to show */
+        iframe[title="chat window"] {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+
+        #zaya-chat-widget {
+            display: flex !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            z-index: 100000 !important;
+            /* Default bottom position */
+            bottom: 24px;
+            transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Position when announcement is present */
+        #zaya-chat-widget.has-announcement {
+            bottom: 112px; /* Standard height above the bar */
+        }
+
+        @media (min-width: 768px) {
+            #zaya-chat-widget.has-announcement {
+                bottom: 150px;
+            }
+        }
+
+        .zaya-chat-hidden {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+    </style>
+
+    <!-- Custom Chat Widget -->
+    <div id="zaya-chat-widget" class="fixed right-6">
+        <button onclick="openZayaChat()" class="relative group">
+            <div class="absolute inset-0 bg-[#183126] rounded-full animate-ping opacity-20 group-hover:opacity-30"></div>
+            <div class="relative w-14 h-14 md:w-16 md:h-16 bg-[#183126] rounded-full shadow-2xl flex items-center justify-center border-2 border-white/20 hover:scale-110 transition-transform duration-300">
+                <i class="ri-chat-smile-3-line text-white text-2xl md:text-3xl"></i>
+                <div class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
+            </div>
+            <div class="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded-xl shadow-xl border border-gray-100 whitespace-nowrap opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300 pointer-events-none hidden md:block">
+                <p class="text-[11px] font-black text-secondary uppercase tracking-widest">Chat with us</p>
+                <div class="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-white border-r border-t border-gray-100 rotate-45"></div>
+            </div>
+        </button>
+    </div>
+
+    <!-- Tawk.to Logic -->
+    <script type="text/javascript">
+        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+        
+        Tawk_API.onLoad = function() {
+            Tawk_API.hideWidget();
+        };
+
+        Tawk_API.onChatMaximized = function() {
+            document.getElementById('zaya-chat-widget').classList.add('zaya-chat-hidden');
+        };
+
+        Tawk_API.onChatMinimized = function() {
+            document.getElementById('zaya-chat-widget').classList.remove('zaya-chat-hidden');
+        };
+
+        function openZayaChat() {
+            if (typeof Tawk_API !== 'undefined' && Tawk_API.maximize) {
+                Tawk_API.maximize();
+            }
+        }
+
+        // Dynamic positioning & Visibility Guard
+        function updateWidgetPosition() {
+            const widget = document.getElementById('zaya-chat-widget');
+            const announcement = document.getElementById('announcement-card');
+            
+            if (widget) {
+                // If announcement exists and is visible (not hidden by opacity-0)
+                if (announcement && announcement.classList.contains('opacity-100')) {
+                    widget.classList.add('has-announcement');
+                } else {
+                    widget.classList.remove('has-announcement');
+                }
+
+                // Force visibility
+                if (!widget.classList.contains('zaya-chat-hidden')) {
+                    if (window.getComputedStyle(widget).display === 'none' || window.getComputedStyle(widget).opacity === '0') {
+                        widget.style.setProperty('display', 'flex', 'important');
+                        widget.style.setProperty('opacity', '1', 'important');
+                    }
+                }
+            }
+        }
+
+        setInterval(updateWidgetPosition, 500);
+
+        (function() {
+            var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = '{{ config('services.tawk_to.src') }}';
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s0.parentNode.insertBefore(s1, s0);
+        })();
+    </script>
+
     <script>
         const conditionsMenu = document.getElementById('conditions-menu');
         const defaultConditionsHtml = `

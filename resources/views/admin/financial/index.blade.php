@@ -81,9 +81,12 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="card">
-                <div class="card-header">
-                    <h5>Transaction History</h5>
-                    <span>Breakdown of all payments based on commission rates at the time of transaction.</span>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5>Transaction History</h5>
+                        <span>Breakdown of all payments based on commission rates at the time of transaction.</span>
+                    </div>
+                    <a href="{{ route('admin.financial.export') }}" class="btn btn-primary"><i class="fa fa-file-excel-o"></i> Export to Excel</a>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

@@ -4,6 +4,7 @@
 
 @section('content')
 
+@if(!in_array($user->role, ['client', 'patient']))
 <!-- Summary Card -->
 <div class="mb-8">
     <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-8 shadow-sm relative overflow-hidden group">
@@ -23,6 +24,8 @@
         <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-[#F9FBF9] rounded-full opacity-50 group-hover:scale-125 transition-transform duration-700"></div>
     </div>
 </div>
+@endif
+
 
 <!-- Transactions Content -->
 <div id="table-wrapper" class="transition-opacity duration-300">

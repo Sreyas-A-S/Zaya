@@ -164,6 +164,31 @@
                     </div>
                 </div>
 
+                <!-- Prescriptions -->
+                <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
+                    <h3 class="text-lg font-bold text-secondary mb-6 flex items-center gap-2">
+                        <i class="ri-capsule-line text-primary"></i>
+                        Digital Prescriptions
+                    </h3>
+                    <div class="space-y-3">
+                        @forelse($prescriptions as $rx)
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
+                            <div class="overflow-hidden">
+                                <p class="text-xs font-bold text-secondary truncate">{{ $rx->title }}</p>
+                                <p class="text-[10px] text-gray-400 uppercase font-black">{{ $rx->prescription_date->format('M d, Y') }}</p>
+                            </div>
+                            <a href="{{ route('prescriptions.show', $rx->id) }}" class="px-3 py-1 bg-white text-primary text-[10px] font-black rounded-lg shadow-sm uppercase tracking-wider hover:bg-primary hover:text-white transition-all">
+                                View
+                            </a>
+                        </div>
+                        @empty
+                        <div class="text-center py-6">
+                            <p class="text-xs text-gray-400 italic">No prescriptions issued.</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+
                 <!-- Clinical Documents -->
                 <div class="bg-white rounded-[32px] p-8 border border-[#2E4B3D]/12 shadow-sm">
                     <h3 class="text-lg font-bold text-secondary mb-6 flex items-center gap-2">

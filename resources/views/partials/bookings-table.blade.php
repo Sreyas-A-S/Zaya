@@ -111,8 +111,14 @@
                                 $uniqueDates = collect($sessions)->pluck('day')->unique()->filter(fn($d) => !empty($d) && $d !== 'Day');
                                 $hasMultiple = $uniqueTimes->count() > 1 || $uniqueDates->count() > 1;
                             @endphp
-                            <div class="text-sm text-secondary">{{ $booking->booking_date->format('M d, Y') }}</div>
+                            @if($booking->original_booking_date)
+                                <div class="text-[10px] text-amber-600 font-black uppercase tracking-widest line-through opacity-40 mb-0.5">{{ $booking->original_booking_date->format('M d, Y') }}</div>
+                            @endif
+                            <div class="text-sm text-secondary font-bold">{{ $booking->booking_date->format('M d, Y') }}</div>
                             <div class="text-xs text-gray-400 flex items-center gap-1">
+                                @if($booking->original_booking_time)
+                                    <span class="line-through opacity-40 mr-1 font-medium">{{ $booking->original_booking_time }}</span>
+                                @endif
                                 {{ $booking->booking_time }}
                                 @if($hasMultiple)
                                     <span class="bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded text-[9px] font-bold border border-amber-100">+ More</span>
@@ -169,16 +175,19 @@
                         @endif
                         <td class="px-6 py-4">
                             @php
+                                $status = $booking->effective_status;
                                 $statusClasses = [
                                     'pending' => 'bg-yellow-50 text-yellow-600',
                                     'confirmed' => 'bg-green-50 text-green-600',
                                     'cancelled' => 'bg-red-50 text-red-600',
                                     'paid' => 'bg-green-50 text-green-600',
+                                    'completed' => 'bg-blue-50 text-blue-600',
+                                    'missed' => 'bg-red-50 text-red-600 border border-red-100',
                                 ];
-                                $class = $statusClasses[$booking->status] ?? 'bg-gray-50 text-gray-600';
+                                $class = $statusClasses[$status] ?? 'bg-gray-50 text-gray-600';
                             @endphp
                             <span class="px-3 py-1 inline-flex text-[10px] leading-5 font-bold rounded-full uppercase {{ $class }}">
-                                {{ $booking->status }}
+                                {{ $status }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right text-sm font-medium">
@@ -209,10 +218,22 @@
                                         </a>
 
                                         @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+                                        <button onclick="openRescheduleModal({{ $booking->id }}, '{{ $booking->booking_date->toDateString() }}', '{{ $booking->booking_time }}', {{ $booking->profile_id }})" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors text-left">
+                                            <i class="ri-calendar-event-line mr-3 text-lg text-amber-500"></i>
+                                            Reschedule
+                                        </button>
+
+                                        @if($user->role === 'practitioner')
                                         <button onclick="openReferModal({{ $booking->id }}, {{ $booking->user_id }})" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors text-left">
                                             <i class="ri-user-shared-line mr-3 text-lg text-orange-500"></i>
                                             Refer
                                         </button>
+                                        @else
+                                        <button onclick="openRequestReferralModal({{ $booking->id }})" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors text-left">
+                                            <i class="ri-user-received-2-line mr-3 text-lg text-orange-500"></i>
+                                            Request Referral
+                                        </button>
+                                        @endif
 
                                         @if(!$booking->translator_id)
                                         <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language ?: 'English' }}', '{{ $booking->to_language ?: 'Any' }}')" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors text-left">

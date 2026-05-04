@@ -109,15 +109,6 @@
             </li>
             @endif
 
-            @if(auth()->user()->hasPermission('testimonials-view'))
-            <li class="sidebar-list"> <a class="sidebar-link" href="{{ route('admin.testimonials.index') }}">
-                    <svg class="stroke-icon">
-                        <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#Chat') }}"></use>
-                    </svg>
-                    <h6 class="f-w-600">{{ $adminPanelSettings['admin_panel_sidebar_testimonials'] ?? 'Testimonials' }}</h6>
-                </a>
-            </li>
-            @endif
 
             @if(auth()->user()->hasPermission('services-view'))
             <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
@@ -168,15 +159,13 @@
             @endif
 
             @if(auth()->user()->hasPermission('practitioner-reviews-view'))
-            <li class="sidebar-list"> <a class="sidebar-link" href="javascript:void(0)">
+            <li class="sidebar-list"> 
+                <a class="sidebar-link" href="{{ route('admin.reviews.index') }}">
                     <svg class="stroke-icon">
                         <use href="{{ asset('admiro/assets/svg/iconly-sprite.svg#star') }}"></use>
                     </svg>
-                    <h6 class="f-w-600">{{ $adminPanelSettings['admin_panel_sidebar_reviews'] ?? 'Reviews' }}</h6><i class="iconly-Arrow-Right-2 icli"> </i>
+                    <h6 class="f-w-600">Zaya Reviews</h6>
                 </a>
-                <ul class="sidebar-submenu">
-                    <li> <a href="{{ route('admin.reviews.practitioners.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_practitioner_reviews'] ?? 'Practitioner' }}</a></li>
-                </ul>
             </li>
             @endif
 

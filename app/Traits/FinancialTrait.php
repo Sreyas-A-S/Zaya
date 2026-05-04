@@ -225,4 +225,48 @@ trait FinancialTrait
 
         return null;
     }
+
+    /**
+     * Award referral bonus coins to the referrer of the given user.
+     * Aligned with Scenario 2: awarded on first confirmed booking.
+     */
+    public function awardReferralBonus(User $referredUser)
+    {
+        if (!$referredUser->referred_by) {
+            return;
+        }
+
+        $referrer = User::find($referredUser->referred_by);
+        if (!$referrer) {
+            return;
+        }
+
+        // Check if bonus already awarded for this referred user (prevent multiple bonuses)
+        $alreadyAwarded = \App\Models\CoinTransaction::where('user_id', $referrer->id)
+            ->where('type', 'referral_bonus')
+            ->where('metadata->referred_user_id', $referredUser->id)
+            ->exists();
+
+        if ($alreadyAwarded) {
+            return;
+        }
+
+        $referrerCurrency = $referrer->profile ? $referrer->profile->payout_currency : config('currencies.default', 'INR');
+        $coinSetting = \App\Models\CoinSetting::where('currency_code', $referrerCurrency)->where('status', true)->first();
+
+        if ($coinSetting && $coinSetting->referral_coins > 0) {
+            $referrer->increment('coins', $coinSetting->referral_coins);
+
+            \App\Models\CoinTransaction::create([
+                'user_id' => $referrer->id,
+                'amount' => $coinSetting->referral_coins,
+                'type' => 'referral_bonus',
+                'description' => 'Referral bonus for ' . $referredUser->name . ' (Confirmed Booking)',
+                'metadata' => [
+                    'referred_user_id' => $referredUser->id,
+                    'referred_user_name' => $referredUser->name,
+                ]
+            ]);
+        }
+    }
 }

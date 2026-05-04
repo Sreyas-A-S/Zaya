@@ -16,15 +16,19 @@ class SessionReminderMail extends Mailable
     public $booking;
     public $type;
     public $videoLink;
+    public $session;
+    public $isMissed;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Booking $booking, string $type, string $videoLink)
+    public function __construct(Booking $booking, string $type, string $videoLink, array $session = null, bool $isMissed = false)
     {
         $this->booking = $booking;
         $this->type = $type;
         $this->videoLink = $videoLink;
+        $this->session = $session;
+        $this->isMissed = $isMissed;
         $this->mailer('info');
     }
 
@@ -33,8 +37,15 @@ class SessionReminderMail extends Mailable
      */
     public function envelope(): Envelope
     {
+        $sessionStr = '';
+        if ($this->session) {
+            $sessionStr = " (" . ($this->session['day'] ?? '') . " " . ($this->session['time'] ?? '') . ")";
+        }
+
+        $subjectPrefix = $this->isMissed ? 'MISSED SESSION: ' : 'Join Your Upcoming Session - ';
+
         return new Envelope(
-            subject: 'Join Your Upcoming Session - ' . $this->booking->invoice_no,
+            subject: $subjectPrefix . $this->booking->invoice_no . $sessionStr,
         );
     }
 
@@ -45,8 +56,10 @@ class SessionReminderMail extends Mailable
     {
         $timezone = derive_timezone_from_user($this->booking->user);
 
-        $title = 'Time to join your session!';
-        $intro = 'Your online session is about to start. Please use the button below to join the video conference.';
+        $title = $this->isMissed ? 'You have missed a session' : 'Time to join your session!';
+        $intro = $this->isMissed 
+            ? 'We apologize for the technical issue with our previous notification. It seems your scheduled session has already passed.' 
+            : 'Your online session is about to start. Please use the button below to join the video conference.';
 
         return new Content(
             view: 'emails.session-reminder',
@@ -57,6 +70,8 @@ class SessionReminderMail extends Mailable
                 'type' => $this->type,
                 'videoLink' => $this->videoLink,
                 'timezone' => $timezone,
+                'session' => $this->session,
+                'isMissed' => $this->isMissed,
             ],
         );
     }

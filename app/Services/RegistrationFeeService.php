@@ -26,13 +26,13 @@ class RegistrationFeeService
         $countryCode = $this->deriveCountryCodeFromUser($user);
         $settings = HomepageSetting::getSectionValues('finance', $language, $countryCode);
 
-        $fee = (float) ($settings[$map[$role]['fee']] ?? 0);
+        $fee = (float) ($settings[$map[$role]['fee']] ?? 0.0);
         if (is_numeric($amountOverride)) {
             $fee = max(0.0, (float) $amountOverride);
         }
 
         $currencyKey = $map[$role]['fee'] . '_currency';
-        $feeCurrency = strtoupper($settings[$currencyKey] ?? config('currencies.default', 'EUR'));
+        $feeCurrency = strtoupper($settings[$currencyKey] ?? config('currencies.default', 'INR'));
         $enabled = filter_var($settings[$map[$role]['enabled']] ?? '1', FILTER_VALIDATE_BOOLEAN);
 
         return [

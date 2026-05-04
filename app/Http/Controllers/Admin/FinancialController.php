@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\TransactionsExport;
 
 class FinancialController extends Controller
 {
@@ -82,6 +84,14 @@ class FinancialController extends Controller
         )->groupBy('currency')->get();
 
         return view('admin.financial.index', compact('balances'));
+    }
+
+    /**
+     * Export transactions as Excel.
+     */
+    public function export()
+    {
+        return Excel::download(new TransactionsExport, 'transactions.xlsx');
     }
 
     /**

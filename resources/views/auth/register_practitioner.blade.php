@@ -48,6 +48,7 @@
                                     <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data" id="practitionerRegForm" class="theme-form">
                                         @csrf
                                         <input type="hidden" name="role" value="practitioner">
+                                        <input type="hidden" name="referral_code" value="{{ session('referral_code') }}">
                                         <input type="hidden" name="registration_fee" id="registration_fee_input" value="{{ $registrationFee }}">
                                         <input type="hidden" name="registration_fee_actual" id="registration_fee_actual_input" value="{{ $registrationFee }}">
                                         <input type="hidden" name="registration_currency" id="registration_currency_input" value="{{ $registrationCurrency }}">
@@ -296,7 +297,7 @@
                                                                                 <select class="form-select border-end-0" name="languages[]">
                                                                                     <option value="">Select Language</option>
                                                                                     @foreach($languages as $lang)
-                                                                                    <option value="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->name }} ({{ $lang->native_name }})</option>
+                                                                                    <option value="{{ $lang->native_name }}">{{ $lang->flag }} {{ $lang->native_name }} ({{ $lang->name }})</option>
                                                                                     @endforeach
                                                                                 </select>
                                                                                 <span class="input-group-text bg-white border-start-0">
@@ -774,10 +775,13 @@
             countrySelect.addEventListener('change', function() {
                 updateRegistrationFee(this.value);
             });
-            // Initial check
-            if (countrySelect.value) {
-                updateRegistrationFee(countrySelect.value);
-            }
+            // Initial check with small delay to ensure TomSelect is ready
+            setTimeout(() => {
+                const currentVal = countrySelect.value;
+                if (currentVal) {
+                    updateRegistrationFee(currentVal);
+                }
+            }, 200);
         }
     });
 

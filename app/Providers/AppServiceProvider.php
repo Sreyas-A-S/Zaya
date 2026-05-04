@@ -114,6 +114,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with([
                 'site_settings' => $settings,
                 'available_languages' => $availableLanguages,
+                'languages' => \App\Models\Language::all(),
                 'current_locale' => $language,
                 'user_balance' => $userBalance,
                 'active_promo_codes' => $activePromoCodes,

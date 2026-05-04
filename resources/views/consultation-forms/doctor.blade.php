@@ -67,7 +67,7 @@
                 </button>
                 <button type="button" class="consultation-tab-button" data-tab="plan" aria-controls="tab-plan" aria-selected="false">
                     <span class="consultation-tab-title">Plan & Advice</span>
-                    <span class="consultation-tab-subtitle">Treatment, lifestyle, follow-up</span>
+                    <span class="consultation-tab-subtitle">Treatment, lifestyle, prescription</span>
                 </button>
             </div>
         </div>
@@ -841,7 +841,7 @@
         </section>
 
             <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-3">
-            <h2 class="text-lg font-semibold text-secondary mb-3">Follow-Up Plan</h2>
+            <h2 class="text-lg font-semibold text-secondary mb-3">Prescription Plan</h2>
             <div class="grid md:grid-cols-3 gap-3">
                 <input class="border rounded px-3 py-2" type="text" name="follow_up_plan[next_review_dates]" value="{{ $oldOrPayload('follow_up_plan.next_review_dates') }}" placeholder="Next review date(s)" @readonly(!$canEdit)>
                 <textarea class="border rounded px-3 py-2" rows="3" name="follow_up_plan[therapy_adjustments]" placeholder="Therapy adjustments" @readonly(!$canEdit)>{{ $oldOrPayload('follow_up_plan.therapy_adjustments') }}</textarea>

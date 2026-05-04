@@ -226,6 +226,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
 
     // Financial Tracking
     Route::get('financial/transactions', [\App\Http\Controllers\Admin\FinancialController::class, 'index'])->name('financial.index');
+    Route::get('financial/transactions/export', [\App\Http\Controllers\Admin\FinancialController::class, 'export'])->name('financial.export');
     Route::get('financial/transactions/{id}', [\App\Http\Controllers\Admin\FinancialController::class, 'show'])->name('financial.show');
     Route::get('financial/transactions/{id}/download', [\App\Http\Controllers\Admin\FinancialController::class, 'downloadPdf'])->name('financial.download');
     Route::get('financial/practitioner-balances', [\App\Http\Controllers\Admin\FinancialController::class, 'practitionerBalances'])->name('financial.practitioners');
@@ -241,9 +242,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::post('doctors/delete-certificate/{id}', [DoctorController::class, 'deleteCertificate'])->name('doctors.delete-certificate');
 
     // Reviews
-    Route::get('reviews/practitioners', [\App\Http\Controllers\Admin\PractitionerReviewController::class, 'index'])->name('reviews.practitioners.index');
-    Route::delete('reviews/practitioners/{id}', [\App\Http\Controllers\Admin\PractitionerReviewController::class, 'destroy'])->name('reviews.practitioners.destroy');
-    Route::post('reviews/practitioners/{id}/status', [\App\Http\Controllers\Admin\PractitionerReviewController::class, 'updateStatus'])->name('reviews.practitioners.status');
+    Route::get('zaya-reviews', [\App\Http\Controllers\Admin\ZayaReviewController::class, 'index'])->name('reviews.index');
+    Route::delete('zaya-reviews/{id}/{type}', [\App\Http\Controllers\Admin\ZayaReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::post('zaya-reviews/{id}/status/{type}', [\App\Http\Controllers\Admin\ZayaReviewController::class, 'updateStatus'])->name('reviews.status');
 
     // Master Data
     Route::get('master-data/{type}', [MasterDataController::class, 'index'])->name('master-data.index');
@@ -400,8 +401,21 @@ Route::get('/schedule-run', function (Request $request) {
     }
 
     set_time_limit(300);
-    Artisan::call('schedule:run');
-    return '<pre>' . Artisan::output() . '</pre>';
+    
+    $output = "Scheduler triggered directly via web route.\n\n";
+
+    // 1. Run the every-minute reminders
+    Artisan::call('sessions:send-reminders');
+    $output .= "sessions:send-reminders:\n" . Artisan::output() . "\n";
+
+    // 2. Run the monthly revenue report ONLY on the 1st of the month at exactly 09:00
+    // This assumes the web cron service hits exactly at minute 0.
+    if (now()->format('d H:i') === '01 09:00') {
+        Artisan::call('reports:monthly-revenue');
+        $output .= "reports:monthly-revenue:\n" . Artisan::output() . "\n";
+    }
+
+    return '<pre>' . $output . '</pre>';
 });
 
 

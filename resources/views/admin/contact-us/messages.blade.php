@@ -50,7 +50,7 @@
                                     <td>{{ $message->phone }}</td>
                                     <td>
                                         @if($message->user_type)
-                                            @foreach($message->user_type as $type)
+                                            @foreach((array)$message->user_type as $type)
                                                 <span class="badge badge-primary">{{ ucfirst($type) }}</span>
                                             @endforeach
                                         @endif
@@ -113,7 +113,8 @@
             if (message) {
                 let userTypes = '';
                 if (message.user_type) {
-                    message.user_type.forEach(type => {
+                    const types = Array.isArray(message.user_type) ? message.user_type : [message.user_type];
+                    types.forEach(type => {
                         userTypes += `<span class="badge badge-primary me-1">${type.charAt(0).toUpperCase() + type.slice(1)}</span>`;
                     });
                 }

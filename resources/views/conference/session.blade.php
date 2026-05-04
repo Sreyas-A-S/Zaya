@@ -225,19 +225,28 @@
                             </p>
 
                             <div class="grid grid-cols-2 gap-3 mb-6 md:mb-8">
-                               <a href="{{ route('conferences.index') }}"
+                               <a href="{{ route('consultations.index') }}"
                                    class="flex flex-col items-center gap-2 p-3 md:p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
                                    <i
                                        class="ri-history-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>
                                    <span
                                        class="text-[10px] font-black uppercase tracking-widest text-gray-600">History</span>
                                </a>
-                               <a href="{{ route('book-session') }}"
+                               @php
+                                   $prescriptionUrl = route('prescriptions.index');
+                                   if ($booking) {
+                                       $isExpert = in_array(auth()->user()->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']);
+                                       if ($isExpert) {
+                                           $prescriptionUrl = route('prescriptions.create', $booking->id);
+                                       }
+                                   }
+                               @endphp
+                               <a href="{{ $prescriptionUrl }}"
                                    class="flex flex-col items-center gap-2 p-3 md:p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-secondary/20 hover:bg-secondary/5 transition-all group">
                                    <i
-                                       class="ri-calendar-check-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>
+                                       class="ri-file-list-3-line text-lg md:text-xl text-gray-400 group-hover:text-secondary"></i>
                                    <span
-                                       class="text-[10px] font-black uppercase tracking-widest text-gray-600">Follow-up</span>
+                                       class="text-[10px] font-black uppercase tracking-widest text-gray-600">Prescriptions</span>
                                </a>
                             </div>
 

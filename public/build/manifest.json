@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-CgWw_Tvp.css",
+    "file": "assets/app-CJkfwHnE.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -36,7 +36,7 @@
     ]
   },
   "resources/js/country-selector.js": {
-    "file": "assets/country-selector-BL-aQ4Ge.js",
+    "file": "assets/country-selector-DNrpSmm2.js",
     "name": "country-selector",
     "src": "resources/js/country-selector.js",
     "isEntry": true

@@ -1054,11 +1054,11 @@ class WebController extends Controller
 
         if (!$currency && $countryCode !== 'all') {
             $countryToCurrency = config('currencies.country_to_currency', []);
-            $currency = $countryToCurrency[$countryCode] ?? 'EUR';
+            $currency = $countryToCurrency[$countryCode] ?? 'INR';
         }
 
         if (!$currency) {
-            $currency = 'EUR';
+            $currency = 'INR';
         }
 
         // Override with token currency if available
@@ -1407,6 +1407,10 @@ class WebController extends Controller
             'user_type' => 'nullable|string|in:client,practitioner',
             'message' => 'required|string|min:10|max:2000',
         ]);
+
+        if ($request->filled('user_type')) {
+            $validatedData['user_type'] = (array) $request->user_type;
+        }
 
         $message = ContactUs::create($validatedData);
 

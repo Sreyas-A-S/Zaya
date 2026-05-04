@@ -6,16 +6,19 @@
             <p class="text-sm text-gray-400">{{ $booking->booking_date->format('M d, Y') }} at {{ $booking->booking_time }}</p>
         </div>
         @php
+            $status = $booking->effective_status;
             $statusClasses = [
                 'pending' => 'bg-yellow-50 text-yellow-600',
                 'confirmed' => 'bg-green-50 text-green-600',
                 'cancelled' => 'bg-red-50 text-red-600',
                 'paid' => 'bg-green-50 text-green-600',
+                'completed' => 'bg-blue-50 text-blue-600',
+                'missed' => 'bg-red-50 text-red-600 border border-red-100',
             ];
-            $class = $statusClasses[$booking->status] ?? 'bg-gray-50 text-gray-600';
+            $class = $statusClasses[$status] ?? 'bg-gray-50 text-gray-600';
         @endphp
         <span class="px-3 py-1 inline-flex text-[10px] leading-5 font-bold rounded-full uppercase {{ $class }}">
-            {{ $booking->status }}
+            {{ $status }}
         </span>
     </div>
 
@@ -77,6 +80,12 @@
                         <span class="text-sm font-bold {{ $isAssignedToMe ? 'text-primary' : 'text-gray-700' }}">{{ $service->title }}</span>
                         @if($isAssignedToMe)
                             <span class="text-[8px] font-black uppercase tracking-widest bg-primary text-white px-1.5 py-0.5 rounded">Assigned</span>
+                        @endif
+                        @php
+                            $isSessPassed = $booking->isSessionPassed($sessionInfo, derive_timezone_from_user($booking->practitioner->user ?? null));
+                        @endphp
+                        @if($isSessPassed && $booking->status !== 'completed' && $booking->status !== 'cancelled')
+                            <span class="text-[8px] font-black uppercase tracking-widest bg-red-100 text-red-600 px-1.5 py-0.5 rounded border border-red-200">Missed</span>
                         @endif
                     </div>
                     <span class="text-[10px] text-gray-400 uppercase font-black tracking-widest">{{ $booking->mode }}</span>

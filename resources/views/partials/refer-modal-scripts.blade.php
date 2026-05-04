@@ -114,14 +114,46 @@
                     <form id="translator-form">
                         <input type="hidden" id="translator-booking-id">
                         
+                        <!-- Language Selection -->
+                        <div class="mb-6 grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-secondary uppercase tracking-[0.15em] mb-2 opacity-60">Source Language</label>
+                                <select id="translator-from-lang" onchange="updateTranslatorLanguages()" class="w-full px-4 py-3 rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-xs font-bold transition-all shadow-sm">
+                                    <option value="">Select Source</option>
+                                    @foreach($languages as $lang)
+                                        <option value="{{ $lang->display_name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-secondary uppercase tracking-[0.15em] mb-2 opacity-60">Target Language</label>
+                                <select id="translator-to-lang" onchange="updateTranslatorLanguages()" class="w-full px-4 py-3 rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-xs font-bold transition-all shadow-sm">
+                                    <option value="Any">Any</option>
+                                    @foreach($languages as $lang)
+                                        <option value="{{ $lang->display_name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        
                         <!-- Search & Filter -->
-                        <div class="mb-6">
-                            <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">Find Professional Translator</label>
-                            <div class="relative">
-                                <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                <input type="text" id="translator-search" placeholder="Search by name..." 
-                                    oninput="debouncedFetchTranslators()"
-                                    class="w-full pl-11 pr-4 py-4 rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-sm transition-all shadow-sm">
+                        <div class="mb-6 space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">Find Professional Translator</label>
+                                <div class="relative">
+                                    <i class="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" id="translator-search" placeholder="Search by name..." 
+                                        oninput="debouncedFetchTranslators()"
+                                        class="w-full pl-11 pr-4 py-4 rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-sm transition-all shadow-sm">
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 px-1">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="translator-ignore-langs" class="sr-only peer" onchange="fetchTranslators()">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+                                </label>
+                                <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Show all translators (Ignore language filter)</span>
                             </div>
                         </div>
 
@@ -172,208 +204,46 @@
     </div>
 </div>
 
-<!-- Data Access Request Modal -->
-<div id="data-access-request-modal" class="fixed inset-0 z-[999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeDataAccessRequestModal()"></div>
+<!-- Request Referral Modal -->
+<div id="request-referral-modal" class="fixed inset-0 z-[1000] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeRequestReferralModal()"></div>
+
     <div class="fixed inset-0 z-10 overflow-y-auto">
         <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
-            <div class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-[2rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-[#2E4B3D]/12">
-                <div class="px-8 py-8 text-center">
-                    <div class="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i class="ri-shield-user-line text-4xl text-orange-500"></i>
+            <div class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-[2rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-[#2E4B3D]/12">
+                <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <div>
+                        <h3 class="text-xl font-black text-secondary tracking-tight">Request Referral</h3>
+                        <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1">Submit request to practitioner</p>
                     </div>
-                    <h3 class="text-xl font-black text-secondary tracking-tight mb-4">Authorize Data Access</h3>
-                    <p class="text-sm text-gray-500 leading-relaxed mb-8">
-                        This will send a secure OTP to the client to authorize your access to their health journey and historical records.
-                    </p>
-                    <div class="flex flex-col gap-3">
-                        <button type="button" id="data-access-confirm-btn" onclick="executeDataAccessRequest()" class="w-full py-4 bg-secondary text-white rounded-2xl font-black text-sm hover:bg-primary transition-all shadow-lg uppercase tracking-widest">
-                            Proceed & Send OTP
+                    <button onclick="closeRequestReferralModal()" class="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-all shadow-sm">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                <div class="px-8 py-8">
+                    <form id="request-referral-form">
+                        <input type="hidden" id="request-referral-booking-id">
+                        
+                        <div class="mb-8">
+                            <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">Referral Notes</label>
+                            <textarea id="request-referral-note" rows="5" placeholder="Explain why you are requesting a referral for this client..." 
+                                class="w-full px-4 py-4 rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-sm transition-all shadow-sm bg-gray-50/30"></textarea>
+                        </div>
+
+                        <button type="button" id="request-referral-submit-btn" onclick="submitReferralRequest()" class="w-full py-5 bg-secondary text-white rounded-[1.5rem] font-black text-sm hover:bg-primary transition-all shadow-2xl shadow-secondary/30 uppercase tracking-[0.2em]">
+                            Submit Request
                         </button>
-                        <button type="button" onclick="closeDataAccessRequestModal()" class="w-full py-4 bg-gray-50 text-gray-500 rounded-2xl font-bold text-sm hover:bg-gray-100 transition-all uppercase tracking-widest">
-                            Cancel
-                        </button>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Data Access OTP Modal -->
-<div id="data-access-otp-modal" class="fixed inset-0 z-[999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeDataAccessOTPModal()"></div>
-    <div class="fixed inset-0 z-10 overflow-y-auto">
-        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
-            <div class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-[2rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-[#2E4B3D]/12">
-                <div class="px-8 py-8 text-center">
-                    <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i class="ri-key-2-line text-4xl text-blue-500"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-secondary tracking-tight mb-2">Verify Access OTP</h3>
-                    <p id="data-access-otp-message" class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-6">Enter the 6-digit code</p>
-                    
-                    <div class="mb-8">
-                        <input type="text" id="data-access-otp-input" maxlength="6" placeholder="000000" 
-                            class="w-full text-center text-3xl font-black tracking-[0.5em] py-4 rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 transition-all bg-gray-50/50">
-                    </div>
-
-                    <div class="flex flex-col gap-3">
-                        <button type="button" id="data-access-verify-btn" onclick="executeDataAccessVerify()" class="w-full py-4 bg-secondary text-white rounded-2xl font-black text-sm hover:bg-primary transition-all shadow-lg uppercase tracking-widest">
-                            Verify & Grant Access
-                        </button>
-                        <button type="button" onclick="closeDataAccessOTPModal()" class="w-full py-4 bg-gray-50 text-gray-500 rounded-2xl font-bold text-sm hover:bg-gray-100 transition-all uppercase tracking-widest">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-    .time-slots-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-    }
-    .time-slot {
-        padding: 6px 2px;
-        text-align: center;
-        font-size: 10px;
-        color: #555;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-        user-select: none;
-        border: 1px solid #E5E7EB;
-        font-weight: 700;
-        background: #F9FAFB;
-    }
-    .time-slot:hover:not(.booked):not(.selected) {
-        background-color: #F3F4F6;
-        border-color: #D1D5DB;
-    }
-    .time-slot.selected {
-        background-color: #2E4B3D;
-        color: #fff;
-        border-color: #2E4B3D;
-        box-shadow: 0 4px 12px rgba(46, 75, 61, 0.2);
-    }
-    .time-slot.booked {
-        background-color: #FEE2E2 !important;
-        color: #991B1B !important;
-        border-color: #FECACA !important;
-        cursor: not-allowed !important;
-        opacity: 0.6;
-    }
-</style>
+@include('partials.data-access-modals')
 
 @push('scripts')
-
 <script>
-    let currentDataAccessClientId = null;
-
-    function openDataAccessRequestModal(clientId) {
-        currentDataAccessClientId = clientId;
-        document.getElementById('data-access-request-modal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeDataAccessRequestModal() {
-        document.getElementById('data-access-request-modal').classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }
-
-    function closeDataAccessOTPModal() {
-        document.getElementById('data-access-otp-modal').classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }
-
-    async function executeDataAccessRequest() {
-        const btn = document.getElementById('data-access-confirm-btn');
-        if (!currentDataAccessClientId || !btn) return;
-
-        btn.disabled = true;
-        const originalText = btn.innerText;
-        btn.innerText = 'Sending OTP...';
-
-        try {
-            const response = await fetch("{{ route('data-access.request') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ client_id: currentDataAccessClientId })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                closeDataAccessRequestModal();
-                document.getElementById('data-access-otp-input').value = '';
-                document.getElementById('data-access-otp-message').innerText = data.success || 'Enter the 6-digit code';
-                document.getElementById('data-access-otp-modal').classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-            } else {
-                alert(data.error || 'Failed to send OTP.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An unexpected error occurred.');
-        } finally {
-            btn.disabled = false;
-            btn.innerText = originalText;
-        }
-    }
-
-    async function executeDataAccessVerify() {
-        const otpInput = document.getElementById('data-access-otp-input');
-        const btn = document.getElementById('data-access-verify-btn');
-        if (!currentDataAccessClientId || !otpInput || !btn) return;
-
-        const otp = otpInput.value.trim();
-        if (otp.length !== 6) {
-            alert('Please enter a valid 6-digit OTP.');
-            return;
-        }
-
-        btn.disabled = true;
-        const originalText = btn.innerText;
-        btn.innerText = 'Verifying...';
-
-        try {
-            const response = await fetch("{{ route('data-access.verify') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ client_id: currentDataAccessClientId, otp: otp })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                if (window.showZayaToast) showZayaToast('Access Granted!', 'Success');
-                closeDataAccessOTPModal();
-                setTimeout(() => {
-                    window.location.href = "{{ route('client.profile.view', ['id' => ':id']) }}".replace(':id', currentDataAccessClientId);
-                }, 1000);
-            } else {
-                alert(data.error || 'Invalid OTP.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An unexpected error occurred.');
-        } finally {
-            btn.disabled = false;
-            btn.innerText = originalText;
-        }
-    }
-
     // Referral Modal Logic
     let fetchTimeout = null;
     let selectedProfessionals = {}; // { 'practitioner': {id, name, fee, pic}, ... }
@@ -473,24 +343,38 @@
                 return;
             }
 
-            // Sort so recommended appear on top, others chronological
+            // Sort: Recommended first, then by service handling capability
             professionals.sort((a, b) => {
-                if(b.is_recommended && !a.is_recommended) return 1;
-                if(!b.is_recommended && a.is_recommended) return -1;
+                if (b.is_recommended && !a.is_recommended) return 1;
+                if (!b.is_recommended && a.is_recommended) return -1;
+                
+                // If both recommended or both not, sort by handles_service
+                if (b.handles_service && !a.handles_service) return 1;
+                if (!b.handles_service && a.handles_service) return -1;
+                
                 return 0;
             });
 
             list.innerHTML = '';
             professionals.forEach(p => {
                 const isSelected = selectedProfessionals[role] && selectedProfessionals[role].id === p.id;
+                const isAlreadyReferred = p.is_already_referred;
+                
                 const item = document.createElement('div');
-                item.className = `p-4 rounded-2xl border ${isSelected ? 'border-secondary bg-secondary/5' : 'border-gray-100'} flex items-center justify-between group hover:border-secondary/20 hover:bg-gray-50/50 transition-all cursor-pointer professional-item`;
-                item.onclick = () => selectProfessional(p.id, p.name, p.service_fee, p.profile_pic, role);
+                item.className = `p-4 rounded-2xl border ${isSelected ? 'border-secondary bg-secondary/5' : 'border-gray-100'} flex items-center justify-between group transition-all ${isAlreadyReferred ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:border-secondary/20 hover:bg-gray-50/50 cursor-pointer professional-item'}`;
+                
+                if (!isAlreadyReferred) {
+                    item.onclick = () => selectProfessional(p.id, p.name, p.service_fee, p.profile_pic, role);
+                }
 
                 const canViewProfile = (p.role === 'practitioner');
 
                 const recommendedBadge = p.is_recommended
                     ? `<span class="text-[9px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-black uppercase tracking-widest border border-blue-100">⭐ Recommended</span>`
+                    : '';
+                
+                const alreadyReferredBadge = isAlreadyReferred
+                    ? `<span class="text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-black uppercase tracking-widest border border-gray-200">Already Referred</span>`
                     : '';
 
                 const matchingChips = (p.matched_expertises || []).map(exp => 
@@ -498,7 +382,7 @@
                 ).join(' ');
 
                 const missingServicesLabel = (!p.handles_service && p.missing_services && p.missing_services.length > 0)
-                    ? `<div class="mt-2"><span class="text-[10px] bg-red-50 text-red-600 px-2 font-bold py-1 rounded-md border border-red-200 uppercase tracking-wider inline-block leading-snug">Missing: ${p.missing_services.join(', ')}</span></div>`
+                    ? `<div class="mt-2"><span class="text-[12px] bg-red-50 text-red-600 px-3 font-black py-2 rounded-xl border border-red-200 uppercase tracking-widest inline-block leading-none shadow-sm">Missing Services: ${p.missing_services.join(', ')}</span></div>`
                     : '';
                 
                 item.innerHTML = `
@@ -508,6 +392,7 @@
                             <div class="flex items-center gap-2">
                                 <p class="text-sm font-bold text-secondary leading-tight mb-0">${p.name}</p>
                                 ${recommendedBadge}
+                                ${alreadyReferredBadge}
                             </div>
                             <div class="flex flex-wrap items-center gap-2 mt-1">
                                 <span class="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${p.handles_service ? 'bg-emerald-50 text-emerald-600' : (p.service_fee > 0 ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-400')}">
@@ -515,7 +400,7 @@
                                 </span>
                                 ${p.service_fee > 0 ? `
                                     <span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/5 text-secondary font-black uppercase tracking-widest border border-secondary/10">
-                                        Fee: €${parseFloat(p.service_fee).toFixed(2)}
+                                        Fee: ${p.currency} ${parseFloat(p.service_fee).toFixed(2)}
                                     </span>
                                 ` : ''}
                             </div>
@@ -664,14 +549,14 @@
             const roleLabel = roleKey.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
             const canViewProfile = (p.role === 'practitioner');
             const card = document.createElement('div');
-            card.className = 'p-4 bg-white border border-[#2E4B3D]/12 rounded-2xl shadow-sm space-y-4 mb-3';
+            card.className = 'p-6 bg-white border border-gray-100 rounded-[2rem] shadow-sm space-y-6 mb-4 transition-all hover:shadow-md';
             card.innerHTML = `
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <img src="${p.pic}" class="w-10 h-10 rounded-xl object-cover border border-gray-100">
                         <div>
-                            <p class="text-xs font-black text-secondary uppercase tracking-tight">${p.name}</p>
-                            <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">${roleLabel}</p>
+                            <p class="text-sm font-black text-secondary tracking-tight">${p.name}</p>
+                            <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-0.5">${roleLabel}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
@@ -689,19 +574,27 @@
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 gap-6 p-6 bg-gray-50/50 rounded-[2rem] border border-gray-100 shadow-inner">
                     <div>
-                        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Consultation Date</label>
-                        <input type="date" 
-                            onchange="fetchSlotsForReferral('${roleKey}', this.value)"
-                            min="{{ now()->format('Y-m-d') }}"
-                            class="w-full px-3 py-2 text-xs rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 transition-all bg-gray-50/50"
-                            id="date-${roleKey}">
+                        <label class="block text-[10px] font-black text-secondary uppercase tracking-[0.15em] mb-3 opacity-60">Consultation Date</label>
+                        <div class="relative group">
+                            <i class="ri-calendar-event-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-secondary transition-all text-lg"></i>
+                            <input type="date" 
+                                onchange="fetchSlotsForReferral('${roleKey}', this.value)"
+                                min="{{ now()->format('Y-m-d') }}"
+                                class="w-full pl-12 pr-4 py-4 text-sm rounded-2xl border border-gray-200 focus:border-secondary focus:bg-white focus:ring-0 transition-all bg-white font-bold text-secondary shadow-sm"
+                                id="date-${roleKey}">
+                        </div>
                     </div>
-                    <div class="col-span-2">
-                        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Select Slot</label>
-                        <div id="slots-container-${roleKey}" class="time-slots-grid">
-                            <p class="text-[10px] text-gray-400 font-bold uppercase col-span-3 py-2">Select date first</p>
+                    <div>
+                        <label class="block text-[10px] font-black text-secondary uppercase tracking-[0.15em] mb-3 opacity-60">Select Time Slot</label>
+                        <div id="slots-container-${roleKey}" class="time-slots-grid min-h-[80px]">
+                            <div class="col-span-3 py-10 text-center bg-white/60 rounded-3xl border border-dashed border-gray-200 flex flex-col items-center justify-center gap-3">
+                                <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center">
+                                    <i class="ri-time-line text-gray-300 text-2xl"></i>
+                                </div>
+                                <p class="text-[9px] text-gray-400 font-black uppercase tracking-[0.2em]">Select date first</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -716,12 +609,24 @@
         
         if (!date || !container) {
             if (container) {
-                container.innerHTML = '<p class="text-[10px] text-gray-400 font-bold uppercase col-span-3 py-2">Select date first</p>';
+                container.innerHTML = `
+                    <div class="col-span-3 py-10 text-center bg-white/60 rounded-3xl border border-dashed border-gray-200 flex flex-col items-center justify-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center">
+                            <i class="ri-time-line text-gray-300 text-2xl"></i>
+                        </div>
+                        <p class="text-[9px] text-gray-400 font-black uppercase tracking-[0.2em]">Select date first</p>
+                    </div>
+                `;
             }
             return;
         }
 
-        container.innerHTML = '<div class="col-span-3 py-2 flex items-center gap-2"><div class="animate-spin h-3 w-3 border-b-2 border-secondary rounded-full"></div><span class="text-[10px] text-gray-400 uppercase font-black">Loading...</span></div>';
+        container.innerHTML = `
+            <div class="col-span-3 py-8 text-center bg-gray-50/30 rounded-2xl border border-gray-100 flex flex-col items-center justify-center gap-3">
+                <div class="animate-spin h-6 w-6 border-2 border-secondary border-t-transparent rounded-full"></div>
+                <span class="text-[9px] text-gray-400 uppercase font-black tracking-widest">Fetching available slots...</span>
+            </div>
+        `;
 
         try {
             // Fetch both available and booked slots
@@ -786,7 +691,12 @@
             }
         } catch (error) {
             console.error('Fetch slots error:', error);
-            container.innerHTML = '<p class="text-[10px] text-red-400 font-bold uppercase col-span-3 py-2">Error loading slots</p>';
+            container.innerHTML = `
+                <div class="col-span-3 py-6 text-center bg-red-50 rounded-2xl border border-red-100 flex flex-col items-center justify-center gap-2">
+                    <i class="ri-error-warning-line text-red-400 text-xl"></i>
+                    <p class="text-[9px] text-red-400 font-black uppercase tracking-widest">Error loading slots</p>
+                </div>
+            `;
         }
     }
 
@@ -886,10 +796,18 @@
         list.classList.add('hidden');
 
         try {
+            const ignoreLangs = document.getElementById('translator-ignore-langs')?.checked || false;
+
+            const fromLangInput = document.getElementById('translator-from-lang');
+            const toLangInput = document.getElementById('translator-to-lang');
+            const fromLang = fromLangInput ? fromLangInput.value : currentFromLang;
+            const toLang = toLangInput ? toLangInput.value : currentToLang;
+
             const url = new URL("{{ route('available-translators-api') }}", window.location.origin);
             if (query) url.searchParams.append('query', query);
-            url.searchParams.append('from_lang', currentFromLang);
-            url.searchParams.append('to_lang', currentToLang);
+            url.searchParams.append('from_lang', fromLang);
+            url.searchParams.append('to_lang', toLang);
+            if (ignoreLangs) url.searchParams.append('ignore_languages', 'true');
 
             const response = await fetch(url);
             const translators = await response.json();
@@ -945,27 +863,70 @@
         fetchTranslators();
     }
 
-    function openTranslatorModal(bookingId, fromLang, toLang) {
+    function updateTranslatorLanguages() {
+        const fromLangInput = document.getElementById('translator-from-lang');
+        const toLangInput = document.getElementById('translator-to-lang');
+        if (fromLangInput) currentFromLang = fromLangInput.value;
+        if (toLangInput) currentToLang = toLangInput.value;
+        
+        const langPairText = document.getElementById('translator-lang-pair');
+        if (langPairText) langPairText.innerText = `Language Pair: ${currentFromLang || 'None'} → ${currentToLang || 'Any'}`;
+        
+        fetchTranslators();
+    }
+
+    async function openTranslatorModal(bookingId, fromLang = null, toLang = null) {
         const modal = document.getElementById('translator-modal');
         const bookingIdInput = document.getElementById('translator-booking-id');
         const langPairText = document.getElementById('translator-lang-pair');
         if (!modal || !bookingIdInput) return;
 
         bookingIdInput.value = bookingId;
-        currentFromLang = fromLang;
-        currentToLang = toLang;
-        if (langPairText) langPairText.innerText = `Language Pair: ${fromLang} → ${toLang}`;
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
         
+        // Show loading state for lang pair
+        if (langPairText) langPairText.innerText = 'Fetching requested languages...';
+
         // Reset
         const searchInput = document.getElementById('translator-search');
         if (searchInput) searchInput.value = '';
+        
+        const ignoreLangsCheckbox = document.getElementById('translator-ignore-langs');
+        if (ignoreLangsCheckbox) ignoreLangsCheckbox.checked = false;
+
         selectedTranslatorId = null;
         const submitBtn = document.getElementById('translator-submit-btn');
         if (submitBtn) submitBtn.disabled = true;
-        
-        fetchTranslators();
+
+        try {
+            // Fetch the client's requested languages if not provided
+            if (!fromLang || !toLang || fromLang === 'English' || toLang === 'Any') {
+                const response = await fetch(`/api/bookings/${bookingId}`);
+                const booking = await response.json();
+                currentFromLang = booking.from_language;
+                currentToLang = booking.to_language;
+            } else {
+                currentFromLang = fromLang;
+                currentToLang = toLang;
+            }
+
+            if (langPairText) langPairText.innerText = `Language Pair: ${currentFromLang} → ${currentToLang}`;
+            
+            // Update select values
+            const fromLangInput = document.getElementById('translator-from-lang');
+            const toLangInput = document.getElementById('translator-to-lang');
+            if (fromLangInput) fromLangInput.value = currentFromLang;
+            if (toLangInput) toLangInput.value = currentToLang;
+
+            fetchTranslators();
+        } catch (error) {
+            console.error('Error fetching booking languages:', error);
+            if (langPairText) langPairText.innerText = 'Error fetching languages.';
+            currentFromLang = fromLang || 'English';
+            currentToLang = toLang || 'Any';
+            fetchTranslators();
+        }
     }
 
     function closeTranslatorModal() {
@@ -993,7 +954,9 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({
-                    translator_id: selectedTranslatorId
+                    translator_id: selectedTranslatorId,
+                    from_language: currentFromLang,
+                    to_language: currentToLang
                 })
             });
             const data = await response.json();
@@ -1060,6 +1023,69 @@
             }
         } catch (error) {
             console.error('Referral Error:', error);
+            alert('An error occurred.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
+    }
+
+    function openRequestReferralModal(bookingId) {
+        const modal = document.getElementById('request-referral-modal');
+        const bookingIdInput = document.getElementById('request-referral-booking-id');
+        const noteInput = document.getElementById('request-referral-note');
+        if (!modal || !bookingIdInput) return;
+
+        bookingIdInput.value = bookingId;
+        if (noteInput) noteInput.value = '';
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeRequestReferralModal() {
+        const modal = document.getElementById('request-referral-modal');
+        if (modal) modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    async function submitReferralRequest() {
+        const bookingIdInput = document.getElementById('request-referral-booking-id');
+        const noteInput = document.getElementById('request-referral-note');
+        const submitBtn = document.getElementById('request-referral-submit-btn');
+        if (!bookingIdInput || !submitBtn) return;
+
+        const bookingId = bookingIdInput.value;
+        const note = noteInput ? noteInput.value : '';
+
+        if (!note.trim()) {
+            alert('Please add a note for your referral request.');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = 'Submitting...';
+
+        try {
+            const response = await fetch(`/bookings/${bookingId}/refer-request`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ note: note })
+            });
+            const data = await response.json();
+            if (data.success) {
+                if (window.showZayaToast) showZayaToast(data.success, 'Referral Request');
+                closeRequestReferralModal();
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                alert(data.error || 'Request failed.');
+            }
+        } catch (error) {
+            console.error('Request Error:', error);
             alert('An error occurred.');
         } finally {
             submitBtn.disabled = false;

@@ -32,8 +32,8 @@ class ReferralController extends Controller
     {
         $user = Auth::user();
         
-        if (!in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'], true)) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        if ($user->role !== 'practitioner') {
+            return response()->json(['error' => 'Only practitioners can perform direct referrals.'], 403);
         }
 
         $booking = Booking::with('user')->findOrFail($id);
@@ -53,8 +53,8 @@ class ReferralController extends Controller
             'note' => 'nullable|string',
         ]);
 
-        // Check if current practitioner already has approved access
-        $hasExistingAccess = DataAccessController::hasAccess($user->id, $booking->user_id);
+        // Check if current practitioner already has approved access for THIS booking
+        $hasExistingAccess = DataAccessController::hasAccess($user->id, $booking->user_id, $booking->id);
 
         $availabilityService = new PractitionerAvailabilityService();
         $clientCountryId = null;
@@ -71,7 +71,7 @@ class ReferralController extends Controller
         $batchNo = 'BATCH-' . strtoupper(Str::random(10));
         $referralResults = [];
         $proNames = [];
-        $initialStatus = $hasExistingAccess ? 'pending' : 'awaiting_consent';
+        $initialStatus = 'awaiting_consent';
 
         foreach ($request->referrals as $refData) {
             $referredToUser = User::find($refData['id']);
@@ -91,7 +91,7 @@ class ReferralController extends Controller
             $referralNo = 'ZAYA-REF-' . date('Ymd') . '-' . strtoupper(Str::random(4));
             
             // If has access and amount is 0, we can skip pending and go straight to paid
-            $status = ($hasExistingAccess && $refData['amount'] == 0) ? 'paid' : $initialStatus;
+            $status = $initialStatus;
 
             // Only refer services that the professional actually handles
             $requiredServiceIds = (array) ($booking->service_ids ?? []);
@@ -140,13 +140,10 @@ class ReferralController extends Controller
             $referralResults[] = $referralNo;
         }
 
-        if (!$hasExistingAccess) {
-            // Trigger OTP only if no existing access
-            $this->triggerReferralOTP($user, $booking->user, $proNames);
-            $msg = 'Referral request sent! The client has been notified to provide consent via OTP.';
-        } else {
-            $msg = 'Referral processed! The client has been notified for payment/confirmation.';
-        }
+        // Always trigger OTP for every new referral
+        $this->triggerReferralOTP($user, $booking->user, $proNames, $booking->id);
+        $msg = 'Referral request sent! The client has been notified to provide consent via OTP.';
+
 
         // Send ONE Referral Invitation Mail to Client
         try {
@@ -165,7 +162,7 @@ class ReferralController extends Controller
         ]);
     }
 
-    private function triggerReferralOTP($practitioner, $client, $proNames)
+    private function triggerReferralOTP($practitioner, $client, $proNames, $bookingId)
     {
         $otp = rand(100000, 999999);
         
@@ -173,6 +170,7 @@ class ReferralController extends Controller
             [
                 'requester_id' => $practitioner->id,
                 'client_id' => $client->id,
+                'booking_id' => $bookingId,
                 'type' => 'referral',
             ],
             [
@@ -197,6 +195,7 @@ class ReferralController extends Controller
         
         $accessRequest = \App\Models\DataAccessRequest::where('requester_id', $referral->referred_by_id)
             ->where('client_id', $referral->user_id)
+            ->where('booking_id', $referral->booking_id)
             ->where('type', 'referral')
             ->first();
 
@@ -211,7 +210,7 @@ class ReferralController extends Controller
             ->pluck('referredTo.name')
             ->toArray();
 
-        $this->triggerReferralOTP($referral->referredBy, $referral->user, $proNames);
+        $this->triggerReferralOTP($referral->referredBy, $referral->user, $proNames, $referral->booking_id);
 
         return response()->json(['success' => 'A new OTP has been sent to your email.']);
     }
@@ -238,19 +237,25 @@ class ReferralController extends Controller
             'translator_id' => $oldBooking->translator_id,
             'booking_date' => $referral->booking_date,
             'booking_time' => $referral->booking_time,
-            'total_price' => $referral->amount,
+            'subtotal' => $referral->amount,
+            'total_price' => max(0, $referral->amount - $referral->discount_amount - $referral->coin_discount),
+            'promo_code' => $referral->promo_code,
+            'discount_amount' => $referral->discount_amount,
+            'coins_used' => $referral->coins_used,
+            'coin_discount' => $referral->coin_discount,
             'currency' => $currency,
             'status' => 'confirmed',
             'razorpay_payment_id' => $paymentId,
         ]);
 
-        // Auto-grant data access to the new professional
-        DataAccessController::grantAccess($referral->referred_to_id, $referral->user_id);
+        // Data access will now require manual OTP verification by the referred expert
+
 
         // Record Financial Transaction
         $this->recordTransaction([
             'type' => 'referral',
-            'amount' => $referral->amount,
+            'amount' => $newBooking->total_price,
+            'subtotal' => $newBooking->subtotal,
             'user_id' => $referral->user_id,
             'practitioner_id' => $referredToUser->id, // Receiver
             'referrer_id' => $referral->referred_by_id, // Referrer
@@ -260,6 +265,8 @@ class ReferralController extends Controller
             'currency' => $currency,
             'referrer_role' => $referral->referredBy->role ?? null,
             'referred_role' => $referredToUser->role ?? null,
+            'coins_used' => $referral->coins_used,
+            'coin_discount' => $referral->coin_discount,
         ]);
 
         $newBooking->load('referral.referredBy');
@@ -309,14 +316,22 @@ class ReferralController extends Controller
         }
 
         if ($referral->status === 'pending' && $referral->amount > 0) {
-            return view('referrals.pay', compact('referral', 'serviceTitles', 'expertCurrency', 'clientCurrency', 'converted'));
+            $userPromoCodes = collect();
+            if (Auth::check() && \Illuminate\Support\Facades\Schema::hasTable('user_promo_codes')) {
+                $userPromoCodes = Auth::user()->userPromoCodes()->latest()->get();
+            }
+
+            $coinSetting = \App\Models\CoinSetting::where('currency_code', $clientCurrency)->where('status', true)->first();
+
+            return view('referrals.pay', compact('referral', 'serviceTitles', 'expertCurrency', 'clientCurrency', 'converted', 'userPromoCodes', 'coinSetting'));
         }
 
         return redirect()->route('dashboard');
     }
 
-    public function initiatePayment($referral_no)
+    public function initiatePayment(Request $request, $referral_no)
     {
+        Log::info('initiatePayment hit', ['referral_no' => $referral_no, 'request' => $request->all()]);
         $referral = Referral::with(['user', 'referredTo'])->where('referral_no', $referral_no)->firstOrFail();
 
         if ($referral->status === 'awaiting_consent') {
@@ -328,7 +343,84 @@ class ReferralController extends Controller
         }
 
         if ($referral->status === 'pending' && $referral->amount > 0) {
-            return $this->initiateRazorpay($referral);
+            $clientCurrency = derive_currency_from_user(Auth::user());
+            $expertCurrency = strtoupper((string) ($referral->currency ?? $this->resolveProfessionalCurrency($referral->referredTo) ?? config('currencies.default', 'INR')));
+            
+            $converted = $this->calculateTotal([
+                'subtotal' => $referral->amount,
+                'currency' => $expertCurrency
+            ], $clientCurrency);
+
+            // Validate and apply discounts on the server side
+            $subtotal = (float) $converted['converted'];
+            $currency = $clientCurrency;
+            
+            // 1. Validate Promo Code
+            $promoDiscount = 0;
+            $promoCode = null;
+            if ($request->promo_code) {
+                $code = trim((string) $request->promo_code);
+                $promo = \App\Models\PromoCode::whereRaw('LOWER(code) = ?', [mb_strtolower($code)])
+                    ->where('status', true)
+                    ->where(function($q) {
+                        $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', now()->toDateTimeString());
+                    })->first();
+                
+                if ($promo && ($promo->usage_limit === null || $promo->used_count < $promo->usage_limit)) {
+                    if ($promo->usage_type === 'both' || $promo->usage_type === 'booking') {
+                        if ($promo->type === 'fixed' && $promo->currency && $promo->currency !== $currency) {
+                            Log::warning("Promo code currency mismatch: code uses {$promo->currency}, transaction uses {$currency}");
+                        } else {
+                            $promoCode = $promo->code;
+                            $reward = (float) $promo->reward;
+                            if ($promo->type === 'percentage') {
+                                $promoDiscount = $subtotal * ($reward / 100.0);
+                            } else {
+                                $promoDiscount = min($reward, $subtotal);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 2. Calculate Coin Discount
+            $coinsUsed = 0;
+            $coinDiscount = 0;
+            if ($request->coins_applied && Auth::user()->coins > 0) {
+                $clientCurrency = derive_currency_from_user(Auth::user());
+                $coinSetting = \App\Models\CoinSetting::where('currency_code', $clientCurrency)->where('status', true)->first();
+                if ($coinSetting && $coinSetting->coin_value > 0) {
+                    $afterPromo = max(0, $subtotal - $promoDiscount);
+                    
+                    $potentialDiscount = Auth::user()->coins * $coinSetting->coin_value;
+                    if ($potentialDiscount > $afterPromo) {
+                        $coinDiscount = $afterPromo;
+                        $coinsUsed = ceil($afterPromo / $coinSetting->coin_value);
+                    } else {
+                        $coinDiscount = $potentialDiscount;
+                        $coinsUsed = Auth::user()->coins;
+                    }
+                }
+            }
+
+            $finalPayable = max(0, $subtotal - $promoDiscount - $coinDiscount);
+
+            // Update referral record with discount details
+            $referral->update([
+                'promo_code' => $promoCode,
+                'discount_amount' => $promoDiscount,
+                'coins_used' => $coinsUsed,
+                'coin_discount' => $coinDiscount,
+                'currency' => $currency, // Payment currency (client currency)
+                'amount' => $subtotal,    // Subtotal in payment currency
+            ]);
+
+            // If final payable is 0, we can skip Razorpay
+            if ($finalPayable <= 0) {
+                return $this->processZeroPaymentReferral($referral);
+            }
+
+            return $this->initiateRazorpay($referral, $finalPayable);
         }
 
         return redirect()->route('dashboard');
@@ -343,6 +435,7 @@ class ReferralController extends Controller
 
         $accessRequest = \App\Models\DataAccessRequest::where('requester_id', $referral->referred_by_id)
             ->where('client_id', $referral->user_id)
+            ->where('booking_id', $referral->booking_id)
             ->where('type', 'referral')
             ->where('status', 'pending')
             ->where('otp', $request->otp)
@@ -376,7 +469,39 @@ class ReferralController extends Controller
         return redirect()->route('dashboard')->with('success', 'Consent granted and referral confirmed!');
     }
 
-    private function initiateRazorpay($referral)
+    private function processZeroPaymentReferral($referral)
+    {
+        $referral->status = 'paid';
+        $referral->razorpay_payment_id = 'ZERO_PAYMENT';
+        $referral->save();
+
+        // Deduct coins if used
+        if ($referral->coins_used > 0) {
+            $user = Auth::user();
+            $user->coins = max(0, $user->coins - $referral->coins_used);
+            $user->save();
+
+            \App\Models\CoinTransaction::create([
+                'user_id' => $user->id,
+                'amount' => -$referral->coins_used,
+                'type' => 'debit',
+                'description' => 'Used for referral payment ' . $referral->referral_no,
+                'metadata' => ['referral_id' => $referral->id, 'referral_no' => $referral->referral_no]
+            ]);
+        }
+
+        // Increment promo usage
+        if ($referral->promo_code) {
+            $promo = \App\Models\PromoCode::where('code', $referral->promo_code)->first();
+            if ($promo) $promo->incrementUsageIfAvailable();
+        }
+
+        $newBooking = $this->createReferredBooking($referral, 'ZERO_PAYMENT');
+
+        return redirect()->route('invoice.show', $newBooking->invoice_no)->with('success', 'Referral confirmed successfully (Discount applied)!');
+    }
+
+    private function initiateRazorpay($referral, $payableAmount)
     {
         $razorpayKey = config('services.razorpay.key');
         $razorpaySecret = config('services.razorpay.secret');
@@ -388,13 +513,10 @@ class ReferralController extends Controller
 
         $currency = strtoupper((string) ($referral->currency ?? $this->resolveProfessionalCurrency($referral->referredTo) ?? config('currencies.default', 'INR')));
 
-        $customerPhone = preg_replace('/[^0-9]/', '', (string) ($referral->user->phone ?? '9999999999'));
-        if (strlen($customerPhone) < 10) {
-            $customerPhone = '9999999999';
-        }
+        $customerPhone = (string) ($referral->user->phone ?? $referral->user->mobile ?? '');
 
         $payload = [
-            'amount' => (int) round(((float) $referral->amount) * 100),
+            'amount' => (int) round(((float) $payableAmount) * 100),
             'currency' => $currency,
             'accept_partial' => false,
             'description' => "Referral Session: " . $referral->referredTo->name,
@@ -403,8 +525,8 @@ class ReferralController extends Controller
                 'email' => $referral->user->email,
                 'contact' => $customerPhone,
             ],
-            'notify' => ['sms' => true, 'email' => true],
-            'callback_url' => route('referrals.payment.callback'),
+            'notify' => ['sms' => false, 'email' => true],
+            'callback_url' => url('/referrals/payment/callback'),
             'callback_method' => 'get',
             'notes' => [
                 'referral_no' => $referral->referral_no,
@@ -417,23 +539,30 @@ class ReferralController extends Controller
             'payload' => $payload
         ]);
 
-        $response = Http::withOptions(['verify' => (bool) $verifySsl])
-            ->withBasicAuth($razorpayKey, $razorpaySecret)
-            ->post('https://api.razorpay.com/v1/payment_links', $payload);
+        try {
+            $response = Http::withOptions(['verify' => (bool) $verifySsl])
+                ->withBasicAuth($razorpayKey, $razorpaySecret)
+                ->post('https://api.razorpay.com/v1/payment_links', $payload);
 
-        if ($response->successful()) {
-            $paymentData = $response->json();
-            $referral->razorpay_order_id = $paymentData['id'];
-            $referral->save();
-            return redirect($paymentData['short_url']);
+            if ($response->successful()) {
+                $paymentData = $response->json();
+                $referral->razorpay_order_id = $paymentData['id'];
+                $referral->save();
+                return redirect($paymentData['short_url']);
+            }
+
+            Log::error('Razorpay Referral Payment Link API Error:', [
+                'referral_no' => $referral->referral_no,
+                'status' => $response->status(),
+                'response' => $response->json(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Razorpay Referral Connection Error:', [
+                'referral_no' => $referral->referral_no,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
-
-        Log::error('Razorpay Referral Payment Link Error:', [
-            'referral_no' => $referral->referral_no,
-            'payload' => $payload,
-            'response' => $response->body(),
-            'status' => $response->status(),
-        ]);
 
         return redirect()->route('dashboard')->with('error', 'Unable to initiate payment.');
     }
@@ -451,12 +580,93 @@ class ReferralController extends Controller
             $referral->razorpay_payment_id = $paymentId;
             $referral->save();
 
+            // Deduct coins if used
+            if ($referral->coins_used > 0) {
+                $user = User::find($referral->user_id);
+                if ($user) {
+                    $user->coins = max(0, $user->coins - $referral->coins_used);
+                    $user->save();
+
+                    \App\Models\CoinTransaction::create([
+                        'user_id' => $user->id,
+                        'amount' => -$referral->coins_used,
+                        'type' => 'debit',
+                        'description' => 'Used for referral payment ' . $referral->referral_no,
+                        'metadata' => ['referral_id' => $referral->id, 'referral_no' => $referral->referral_no]
+                    ]);
+                }
+            }
+
+            // Increment promo usage
+            if ($referral->promo_code) {
+                $promo = \App\Models\PromoCode::where('code', $referral->promo_code)->first();
+                if ($promo) $promo->incrementUsageIfAvailable();
+            }
+
             $newBooking = $this->createReferredBooking($referral, $paymentId);
 
             return redirect()->route('invoice.show', $newBooking->invoice_no)->with('success', 'Referral payment successful!');
         }
 
         return redirect()->route('dashboard')->with('error', 'Payment failed.');
+    }
+
+    public function requestReReferral(Request $request, $id)
+    {
+        $user = Auth::user();
+        $booking = Booking::with(['referral', 'practitioner'])->findOrFail($id);
+
+        if (!in_array($user->role, ['doctor', 'mindfulness_practitioner', 'yoga_therapist'], true)) {
+            return response()->json(['error' => 'Unauthorized role for referral requests.'], 403);
+        }
+
+        $request->validate([
+            'note' => 'required|string|max:1000',
+        ]);
+
+        $recipientId = null;
+
+        // 1. If it was a referral, send request to the original referrer
+        if ($booking->referral) {
+            $recipientId = $booking->referral->referred_by_id;
+        } 
+        
+        // 2. Fallback: If no specific practitioner found, send to the first active practitioner in the system
+        if (!$recipientId) {
+            $recipientId = User::where('role', 'practitioner')->where('status', 'active')->orderBy('id')->value('id');
+        }
+
+        if (!$recipientId) {
+            return response()->json(['error' => 'No practitioner available to receive this request.'], 422);
+        }
+
+        \App\Models\ReferralRequest::create([
+            'booking_id' => $booking->id,
+            'requester_id' => $user->id,
+            'recipient_id' => $recipientId,
+            'note' => $request->note,
+            'status' => 'pending',
+        ]);
+
+        return response()->json(['success' => 'Referral request has been sent to the practitioner.']);
+    }
+
+    public function updateRequestStatus(Request $request, $id)
+    {
+        $user = Auth::user();
+        $referralRequest = \App\Models\ReferralRequest::findOrFail($id);
+
+        if ($referralRequest->recipient_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'status' => 'required|in:processed,dismissed',
+        ]);
+
+        $referralRequest->update(['status' => $request->status]);
+
+        return response()->json(['success' => 'Request status updated.']);
     }
 
     private function resolveProfessionalCurrency(?User $user): string

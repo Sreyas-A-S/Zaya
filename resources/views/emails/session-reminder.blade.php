@@ -39,12 +39,25 @@
             <div class="session-info">
                 <table class="session-table">
                     <tr>
-                        <td class="label">Session ID:</td>
-                        <td class="value">{{ $booking->invoice_no }}</td>
+                        <td class="label">Date:</td>
+                        <td class="value">
+                            @if(isset($session) && !empty($session['day']))
+                                {{ $session['day'] }}
+                            @else
+                                {{ $booking->booking_date->format('d M Y') }}
+                            @endif
+                        </td>
                     </tr>
                     <tr>
                         <td class="label">Time:</td>
-                        <td class="value">{{ $booking->booking_time }} ({{ $timezone ?? 'UTC' }}) - Today</td>
+                        <td class="value">
+                            @if(isset($session) && !empty($session['time']))
+                                {{ $session['time'] }}
+                            @else
+                                {{ $booking->booking_time }}
+                            @endif
+                            ({{ $timezone ?? 'UTC' }})
+                        </td>
                     </tr>
                     <tr>
                         <td class="label">Participants:</td>
@@ -59,6 +72,7 @@
                 </table>
             </div>
 
+            @if(!$isMissed)
             <div style="margin: 40px 0;">
                 <a href="{{ $videoLink }}" class="join-button">Join Meeting Now</a>
             </div>
@@ -67,6 +81,11 @@
                 If the button above doesn't work, copy and paste this link into your browser:<br>
                 <span style="word-break: break-all; color: #2E4B3C; font-weight: 500;">{{ $videoLink }}</span>
             </p>
+            @else
+            <div style="margin: 40px 0; padding: 20px; background-color: #fff5f5; border-radius: 12px; border: 1px solid #feb2b2;">
+                <p style="color: #c53030; font-weight: 600; margin: 0;">This session time has passed. Please contact support if you need assistance with rescheduling.</p>
+            </div>
+            @endif
         </div>
 
         <div class="footer">

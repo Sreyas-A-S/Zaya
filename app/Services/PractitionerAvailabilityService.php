@@ -111,23 +111,7 @@ class PractitionerAvailabilityService
             return true;
         });
 
-        // 6. Filter out existing bookings
-        $bookingQuery = Booking::where('booking_date', $date)
-            ->whereIn('status', ['pending', 'confirmed', 'paid']);
-            
-        if ($provider instanceof Translator) {
-            $bookingQuery->where(function($q) use ($providerId) {
-                $q->where(function($sq) use ($providerId) {
-                    $sq->where('profile_id', $providerId)
-                       ->where('practitioner_type', 'translator');
-                })->orWhere('translator_id', $providerId);
-            });
-        } else {
-            $bookingQuery->where('profile_id', $providerId)
-                         ->where('practitioner_type', $providerType);
-        }
-        
-        $existingBookings = $bookingQuery->pluck('booking_time')->toArray();
+        $existingBookings = $this->getBusySlots($provider, $date);
 
         $availableSlots = array_filter($availableSlots, function($slot) use ($existingBookings) {
             return !in_array($slot['time'], $existingBookings);
@@ -144,6 +128,58 @@ class PractitionerAvailabilityService
         }
 
         return array_values($availableSlots);
+    }
+
+    /**
+     * Get all times where the professional is busy (any role, any session).
+     */
+    public function getBusySlots($provider, $date)
+    {
+        $userId = $provider->user_id;
+        $profiles = [];
+        $models = [Practitioner::class, Doctor::class, MindfulnessPractitioner::class, YogaTherapist::class, Translator::class];
+        foreach ($models as $model) {
+            $p = $model::where('user_id', $userId)->first();
+            if ($p) {
+                $profiles[] = ['id' => $p->id, 'type' => $p->getMorphClass()];
+            }
+        }
+
+        $allBookings = Booking::whereIn('status', ['pending', 'confirmed', 'paid', 'completed'])
+            ->where(function($q) use ($profiles, $userId) {
+                foreach ($profiles as $prof) {
+                    $q->orWhere(function($sq) use ($prof) {
+                        $sq->where('profile_id', $prof['id'])
+                           ->where('practitioner_type', $prof['type']);
+                    });
+                }
+                $translator = Translator::where('user_id', $userId)->first();
+                if ($translator) {
+                    $q->orWhere('translator_id', $translator->id);
+                }
+            })
+            ->get();
+
+        $busySlots = [];
+        foreach ($allBookings as $booking) {
+            if ($booking->booking_date->toDateString() === $date) {
+                $busySlots[] = $booking->booking_time;
+            }
+            
+            $sessions = $booking->additional_info['sessions'] ?? [];
+            foreach ($sessions as $session) {
+                $sDate = $session['date'] ?? ($session['day'] ?? null);
+                if ($sDate) {
+                    try {
+                        if (Carbon::parse($sDate)->toDateString() === $date) {
+                            $busySlots[] = $session['time'] ?? null;
+                        }
+                    } catch (\Exception $e) { }
+                }
+            }
+        }
+        
+        return array_values(array_filter(array_unique($busySlots)));
     }
 
     private function findProvider($identifier)

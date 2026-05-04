@@ -414,19 +414,19 @@
                         <div>
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Source Languages') }}</label>
                             <select id="source-languages-select" name="source_languages[]" multiple>
-                                @foreach($allLanguages as $lang)
-                                    <option value="{{ $lang->code }}" {{ in_array($lang->code, (array)($profile->source_languages ?? [])) || in_array($lang->name, (array)($profile->source_languages ?? [])) ? 'selected' : '' }}>
-                                        {{ $lang->flag }} {{ $lang->display_name }}
+                                @foreach($languages as $lang)
+                                    <option value="{{ $lang->display_name }}" {{ in_array($lang->display_name, (array)($profile->source_languages ?? [])) || in_array($lang->name, (array)($profile->source_languages ?? [])) || in_array($lang->code, (array)($profile->source_languages ?? [])) ? 'selected' : '' }}>
+                                        {{ $lang->display_name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Target Languages') }}</label>
-                            <select id="target-languages-select" name="target_languages[]" multiple>
-                                @foreach($allLanguages as $lang)
-                                    <option value="{{ $lang->code }}" {{ in_array($lang->code, (array)($profile->target_languages ?? [])) || in_array($lang->name, (array)($profile->target_languages ?? [])) ? 'selected' : '' }}>
-                                        {{ $lang->flag }} {{ $lang->display_name }}
+                            <select id="source-languages-select" name="source_languages[]" multiple>
+                                @foreach($languages as $lang)
+                                    <option value="{{ $lang->display_name }}" {{ in_array($lang->display_name, (array)($profile->source_languages ?? [])) || in_array($lang->name, (array)($profile->source_languages ?? [])) || in_array($lang->code, (array)($profile->source_languages ?? [])) ? 'selected' : '' }}>
+                                        {{ $lang->display_name }}
                                     </option>
                                 @endforeach
                             </select>
