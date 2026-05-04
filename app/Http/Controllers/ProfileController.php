@@ -431,6 +431,15 @@ class ProfileController extends Controller
             $params['minimal'] = '1';
         }
 
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'form_id' => $form->id,
+                'params' => $params
+            ]);
+        }
+
         return redirect()
             ->route('bookings.consultation-form.show', $params)
             ->with('status', $msg);

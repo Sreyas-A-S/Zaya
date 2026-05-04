@@ -613,6 +613,52 @@ function applyTitle() {
             showZayaToast('Connection error.', 'error', 'Error');
         });
     }
+
+    // AJAX Form Submission for Consultation Forms
+    document.querySelectorAll('.consultation-form-root').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (!submitBtn) return;
+            
+            const originalBtnHtml = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i> Saving...';
+
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showZayaToast(data.message, 'success', 'Consultation Form');
+                    // Update form_id if it was a new form
+                    const formIdInput = form.querySelector('input[name="form_id"]');
+                    if (formIdInput && data.form_id) {
+                        formIdInput.value = data.form_id;
+                    }
+                } else {
+                    showZayaToast(data.message || data.error || 'Something went wrong.', 'error', 'Error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showZayaToast('Connection error.', 'error', 'Error');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnHtml;
+            });
+        });
+    });
 </script>
 @endpush
 
