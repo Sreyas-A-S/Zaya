@@ -32,8 +32,8 @@ class ReferralController extends Controller
     {
         $user = Auth::user();
         
-        if (!in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'], true)) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        if ($user->role !== 'practitioner') {
+            return response()->json(['error' => 'Only practitioners can perform direct referrals.'], 403);
         }
 
         $booking = Booking::with('user')->findOrFail($id);
@@ -202,7 +202,7 @@ class ReferralController extends Controller
 
         if ($accessRequest && $accessRequest->updated_at->addMinute()->isFuture()) {
             $seconds = $accessRequest->updated_at->addMinute()->diffInSeconds(now());
-            return response()->json(['error' => "Please wait {$seconds} seconds before requesting a new OTP."], 422);
+            return response()->json(['error' => \"Please wait {$seconds} seconds before requesting a new OTP.\"], 422);
         }
 
         $proNames = Referral::where('batch_no', $referral->batch_no)
@@ -370,7 +370,7 @@ class ReferralController extends Controller
                 if ($promo && ($promo->usage_limit === null || $promo->used_count < $promo->usage_limit)) {
                     if ($promo->usage_type === 'both' || $promo->usage_type === 'booking') {
                         if ($promo->type === 'fixed' && $promo->currency && $promo->currency !== $currency) {
-                            Log::warning("Promo code currency mismatch: code uses {$promo->currency}, transaction uses {$currency}");
+                            Log::warning(\"Promo code currency mismatch: code uses {$promo->currency}, transaction uses {$currency}\");
                         } else {
                             $promoCode = $promo->code;
                             $reward = (float) $promo->reward;
@@ -519,7 +519,7 @@ class ReferralController extends Controller
             'amount' => (int) round(((float) $payableAmount) * 100),
             'currency' => $currency,
             'accept_partial' => false,
-            'description' => "Referral Session: " . $referral->referredTo->name,
+            'description' => \"Referral Session: \" . $referral->referredTo->name,
             'customer' => [
                 'name' => $referral->user->name,
                 'email' => $referral->user->email,
@@ -614,25 +614,41 @@ class ReferralController extends Controller
     public function requestReReferral(Request $request, $id)
     {
         $user = Auth::user();
-        $booking = Booking::with('referral')->findOrFail($id);
+        $booking = Booking::with(['referral', 'practitioner'])->findOrFail($id);
 
-        if (!$booking->referral || $booking->referral->referred_to_id !== $user->id) {
-            return response()->json(['error' => 'Only the referred expert can request a re-referral.'], 403);
+        if (!in_array($user->role, ['doctor', 'mindfulness_practitioner', 'yoga_therapist'], true)) {
+            return response()->json(['error' => 'Unauthorized role for referral requests.'], 403);
         }
 
         $request->validate([
             'note' => 'required|string|max:1000',
         ]);
 
+        $recipientId = null;
+
+        // 1. If it was a referral, send request to the original referrer
+        if ($booking->referral) {
+            $recipientId = $booking->referral->referred_by_id;
+        } 
+        
+        // 2. Fallback: If no specific practitioner found, send to the first active practitioner in the system
+        if (!$recipientId) {
+            $recipientId = User::where('role', 'practitioner')->where('status', 'active')->orderBy('id')->value('id');
+        }
+
+        if (!$recipientId) {
+            return response()->json(['error' => 'No practitioner available to receive this request.'], 422);
+        }
+
         \App\Models\ReferralRequest::create([
             'booking_id' => $booking->id,
             'requester_id' => $user->id,
-            'recipient_id' => $booking->referral->referred_by_id,
+            'recipient_id' => $recipientId,
             'note' => $request->note,
             'status' => 'pending',
         ]);
 
-        return response()->json(['success' => 'Re-referral request sent to the original practitioner.']);
+        return response()->json(['success' => 'Referral request has been sent to the practitioner.']);
     }
 
     public function updateRequestStatus(Request $request, $id)

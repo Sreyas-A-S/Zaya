@@ -322,6 +322,44 @@
 </div>
 @endif
 
+@if($referralRequests->isNotEmpty())
+<div class="mb-8">
+    <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4 ml-1">Referral Requests</h3>
+    <div class="space-y-4">
+        @foreach($referralRequests as $request)
+            <div class="p-6 bg-white border {{ $request->status === 'pending' ? 'border-amber-200 bg-amber-50/30' : 'border-[#2E4B3D]/12' }} rounded-[2rem] shadow-sm flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-secondary shadow-sm flex-shrink-0">
+                        <i class="ri-user-shared-2-line text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-sm font-black text-secondary">{{ $request->requester->name }}</span>
+                            <span class="px-2 py-0.5 bg-white border border-gray-100 rounded-full text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{{ str_replace('_', ' ', $request->requester->role) }}</span>
+                        </div>
+                        <p class="text-xs text-gray-600 leading-relaxed italic">"{{ $request->note }}"</p>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-2">{{ $request->created_at->format('M d, Y \a\t H:i') }}</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    @if($request->status === 'pending')
+                        @if($user->id === $request->recipient_id)
+                            <button type="button" onclick="openReferModal('{{ $booking->id }}')" class="flex-1 md:flex-none px-6 py-2.5 bg-secondary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-all">Process Referral</button>
+                            <button type="button" onclick="updateReferralRequestStatus('{{ $request->id }}', 'dismissed')" class="flex-1 md:flex-none px-6 py-2.5 border border-gray-200 text-gray-500 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all">Dismiss</button>
+                        @else
+                            <span class="px-4 py-2 bg-amber-100 text-amber-700 rounded-xl text-[10px] font-black uppercase tracking-widest">Pending Practitioner Review</span>
+                        @endif
+                    @else
+                        <span class="px-4 py-2 bg-gray-100 text-gray-500 rounded-xl text-[10px] font-black uppercase tracking-widest">{{ ucfirst($request->status) }}</span>
+                    @endif
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
 <div id="consultation-form-container" class="relative">
     <div id="consultation-loading-overlay" class="hidden absolute inset-0 bg-white/60 backdrop-blur-[2px] z-50 flex items-center justify-center rounded-[2.5rem]">
         <div class="flex flex-col items-center gap-3">
@@ -734,4 +772,5 @@
 
 </div> <!-- End global container -->
 
+@include('partials.refer-modal-scripts')
 @endsection

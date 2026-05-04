@@ -141,9 +141,15 @@ class ProfileController extends Controller
                 ->latest()
                 ->take(5)
                 ->get();
+
+            $pendingReferralRequests = \App\Models\ReferralRequest::with(['requester', 'booking.user'])
+                ->where('recipient_id', $user->id)
+                ->where('status', 'pending')
+                ->latest()
+                ->get();
         }
 
-        return view('dashboard', compact('user', 'upcomingBookings', 'completedBookings', 'reviews', 'invoices', 'allServices', 'clinicalDocuments', 'referrals', 'dataAccessRequests'));
+        return view('dashboard', compact('user', 'upcomingBookings', 'completedBookings', 'reviews', 'invoices', 'allServices', 'clinicalDocuments', 'referrals', 'dataAccessRequests', 'pendingReferralRequests'));
     }
 
     public function uploadDocument(Request $request)

@@ -204,6 +204,42 @@
     </div>
 </div>
 
+<!-- Request Referral Modal -->
+<div id="request-referral-modal" class="fixed inset-0 z-[1000] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/50 transition-opacity" onclick="closeRequestReferralModal()"></div>
+
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-[2rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-[#2E4B3D]/12">
+                <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <div>
+                        <h3 class="text-xl font-black text-secondary tracking-tight">Request Referral</h3>
+                        <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1">Submit request to practitioner</p>
+                    </div>
+                    <button onclick="closeRequestReferralModal()" class="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-all shadow-sm">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                <div class="px-8 py-8">
+                    <form id="request-referral-form">
+                        <input type="hidden" id="request-referral-booking-id">
+                        
+                        <div class="mb-8">
+                            <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">Referral Notes</label>
+                            <textarea id="request-referral-note" rows="5" placeholder="Explain why you are requesting a referral for this client..." 
+                                class="w-full px-4 py-4 rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-sm transition-all shadow-sm bg-gray-50/30"></textarea>
+                        </div>
+
+                        <button type="button" id="request-referral-submit-btn" onclick="submitReferralRequest()" class="w-full py-5 bg-secondary text-white rounded-[1.5rem] font-black text-sm hover:bg-primary transition-all shadow-2xl shadow-secondary/30 uppercase tracking-[0.2em]">
+                            Submit Request
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @include('partials.data-access-modals')
 
 @push('scripts')
@@ -987,6 +1023,69 @@
             }
         } catch (error) {
             console.error('Referral Error:', error);
+            alert('An error occurred.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
+    }
+
+    function openRequestReferralModal(bookingId) {
+        const modal = document.getElementById('request-referral-modal');
+        const bookingIdInput = document.getElementById('request-referral-booking-id');
+        const noteInput = document.getElementById('request-referral-note');
+        if (!modal || !bookingIdInput) return;
+
+        bookingIdInput.value = bookingId;
+        if (noteInput) noteInput.value = '';
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeRequestReferralModal() {
+        const modal = document.getElementById('request-referral-modal');
+        if (modal) modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    async function submitReferralRequest() {
+        const bookingIdInput = document.getElementById('request-referral-booking-id');
+        const noteInput = document.getElementById('request-referral-note');
+        const submitBtn = document.getElementById('request-referral-submit-btn');
+        if (!bookingIdInput || !submitBtn) return;
+
+        const bookingId = bookingIdInput.value;
+        const note = noteInput ? noteInput.value : '';
+
+        if (!note.trim()) {
+            alert('Please add a note for your referral request.');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = 'Submitting...';
+
+        try {
+            const response = await fetch(`/bookings/${bookingId}/refer-request`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ note: note })
+            });
+            const data = await response.json();
+            if (data.success) {
+                if (window.showZayaToast) showZayaToast(data.success, 'Referral Request');
+                closeRequestReferralModal();
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                alert(data.error || 'Request failed.');
+            }
+        } catch (error) {
+            console.error('Request Error:', error);
             alert('An error occurred.');
         } finally {
             submitBtn.disabled = false;

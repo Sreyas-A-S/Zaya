@@ -223,10 +223,17 @@
                                             Reschedule
                                         </button>
 
+                                        @if($user->role === 'practitioner')
                                         <button onclick="openReferModal({{ $booking->id }}, {{ $booking->user_id }})" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors text-left">
                                             <i class="ri-user-shared-line mr-3 text-lg text-orange-500"></i>
                                             Refer
                                         </button>
+                                        @else
+                                        <button onclick="openRequestReferralModal({{ $booking->id }})" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors text-left">
+                                            <i class="ri-user-received-2-line mr-3 text-lg text-orange-500"></i>
+                                            Request Referral
+                                        </button>
+                                        @endif
 
                                         @if(!$booking->translator_id)
                                         <button onclick="openTranslatorModal({{ $booking->id }}, '{{ $booking->from_language ?: 'English' }}', '{{ $booking->to_language ?: 'Any' }}')" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors text-left">
