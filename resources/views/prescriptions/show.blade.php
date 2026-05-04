@@ -3,7 +3,7 @@
 @section('title', 'Prescription Details | Zaya Wellness')
 
 @section('content')
-<div class="max-w-4xl mx-auto space-y-8">
+<div class="w-full space-y-8">
     <!-- Action Bar -->
     <div class="flex items-center justify-between">
         <a href="{{ route('prescriptions.index') }}" class="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-secondary transition-colors flex items-center gap-2">

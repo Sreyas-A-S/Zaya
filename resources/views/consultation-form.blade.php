@@ -362,7 +362,7 @@
                 <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $f->id]) }}" 
                    class="px-5 py-2.5 rounded-full text-xs font-bold transition-all border {{ ($existingForm && $existingForm->id === $f->id) ? 'bg-secondary text-white border-secondary shadow-lg' : 'bg-white text-gray-500 border-gray-200 hover:border-secondary/30 hover:text-secondary' }}">
                     <i class="ri-file-list-3-line mr-1.5"></i>
-                    {{ $f->title ?: 'Prescription #'.$loop->iteration }}
+                    {{ $f->title ?: 'Consultation Record #'.$loop->iteration }}
                     <span class="opacity-50 ml-1 font-normal text-[10px]">{{ $f->created_at->format('M d') }}</span>
                 </a>
             @endforeach
@@ -370,7 +370,7 @@
             @if($existingForm)
             <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'new' => 1]) }}" 
                class="px-5 py-2.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all">
-                <i class="ri-add-line mr-1.5"></i> New Prescription
+                <i class="ri-add-line mr-1.5"></i> New Consultation Form
             </a>
             @endif
         </div>
@@ -398,8 +398,8 @@
                 <i class="ri-add-circle-fill text-xl"></i>
             </div>
             <div>
-                <h4 class="text-sm font-black text-emerald-700">Starting New Prescription</h4>
-                <p class="text-[10px] text-emerald-600/60 font-bold uppercase tracking-widest">Digital Prescription</p>
+                <h4 class="text-sm font-black text-emerald-700">Starting New Consultation Form</h4>
+                <p class="text-[10px] text-emerald-600/60 font-bold uppercase tracking-widest">Digital Consultation Record</p>
             </div>
         </div>
     </div>
@@ -408,7 +408,7 @@
 <div id="title-edit-box" class="hidden mb-6 p-6 bg-white border border-[#2E4B3D]/12 rounded-[2rem] shadow-sm">
     <label class="block text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3">Form Title / Reference</label>
     <div class="flex gap-3">
-        <input type="text" id="new-form-title" value="{{ $existingForm->title ?? 'Digital Prescription' }}" 
+        <input type="text" id="new-form-title" value="{{ $existingForm->title ?? 'Consultation Form' }}" 
                placeholder="Enter a title for this record (e.g., Weekly Follow-up, Post-Surgery Notes)" class="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-secondary outline-none">
         <button type="button" onclick="applyTitle()" class="px-6 py-3 bg-secondary text-white rounded-xl font-bold text-sm">Apply</button>
     </div>

@@ -3,16 +3,8 @@
 @section('title', 'Issue Prescription | Zaya Wellness')
 
 @section('content')
-<div class="max-w-4xl mx-auto space-y-8">
-    <!-- Hero Section -->
-    <section class="bg-white rounded-[2.5rem] p-8 md:p-12 border border-[#2E4B3D]/12 shadow-sm relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-64 h-64 -mr-20 -mt-20 bg-secondary/5 blur-3xl rounded-full"></div>
-        <div class="relative z-10">
-            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-3">Professional Prescription</p>
-            <h1 class="text-3xl md:text-4xl font-black text-secondary leading-tight">Issue New Prescription</h1>
-            <p class="text-gray-500 mt-2 max-w-xl">Create a digital prescription for {{ $booking->user->name }}. You can include medications, lifestyle advice, and additional notes.</p>
-        </div>
-    </section>
+<div class="w-full space-y-8">
+
 
     <!-- Client Info Card -->
     <div class="bg-[#F8FBF9] rounded-[2rem] p-6 border border-[#2E4B3D]/8 flex items-center gap-6">
