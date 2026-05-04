@@ -127,7 +127,16 @@ class PromoCodeController extends Controller
             'code' => 'required|string|unique:promo_codes,code|max:255',
             'type' => 'required|in:fixed,percentage',
             'usage_type' => 'required|in:registration,booking,both',
-            'reward' => 'required|numeric|min:0',
+            'reward' => [
+                'required',
+                'numeric',
+                'min:0',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->type === 'percentage' && $value > 100) {
+                        $fail('The percentage discount cannot exceed 100%.');
+                    }
+                },
+            ],
             'currency' => 'required_if:type,fixed|nullable|string|max:10',
             'description' => 'nullable|string',
             'benefits' => 'nullable|array',
@@ -161,7 +170,16 @@ class PromoCodeController extends Controller
             'code' => 'required|string|max:255|unique:promo_codes,code,'.$id,
             'type' => 'required|in:fixed,percentage',
             'usage_type' => 'required|in:registration,booking,both',
-            'reward' => 'required|numeric|min:0',
+            'reward' => [
+                'required',
+                'numeric',
+                'min:0',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->type === 'percentage' && $value > 100) {
+                        $fail('The percentage discount cannot exceed 100%.');
+                    }
+                },
+            ],
             'currency' => 'required_if:type,fixed|nullable|string|max:10',
             'description' => 'nullable|string',
             'benefits' => 'nullable|array',
