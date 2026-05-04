@@ -755,6 +755,20 @@
             btn.classList.add('opacity-70', 'cursor-not-allowed');
             document.getElementById('logout-form').submit();
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('status'))
+                if (window.showZayaToast) {
+                    showZayaToast("{{ session('status') }}", 'success', 'Zaya Wellness');
+                }
+            @endif
+
+            @if(session('error'))
+                if (window.showZayaToast) {
+                    showZayaToast("{{ session('error') }}", 'error', 'Zaya Wellness');
+                }
+            @endif
+        });
     </script>
 
     <!-- Logout Confirmation Modal -->

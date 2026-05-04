@@ -245,6 +245,7 @@ class BookingController extends Controller
                 \Log::error('Zero-Pay Booking Confirmation Email Error: ' . $e->getMessage());
             }
 
+            session()->flash('status', 'Booking confirmed successfully!');
             return response()->json([
                 'success' => true,
                 'message' => 'Booking confirmed! (Discount applied)',
