@@ -371,7 +371,10 @@
                             <input type="text" name="zip_code" value="{{ old('zip_code') }}"
                                 pattern="^[A-Za-z0-9\s\-]{4,10}$" title="Enter a valid zip code (4-10 characters)"
                                 class="w-full py-3.5 px-6 bg-[#F5F5F5] rounded-full border border-transparent outline-none text-[0.95rem] text-gray-700 transition-all duration-300 placeholder:text-gray-400 focus:border-[#97563D] focus:bg-white focus:shadow-[0_0_0_3px_rgba(151,86,61,0.1)]"
-                                placeholder="{{ __('Enter Zip Code') }}" required autocomplete="off" data-autofill-guarded="false">
+                                placeholder="{{ __('Enter Zip Code') }}" required autocomplete="off"
+                                readonly
+                                onfocus="this.removeAttribute('readonly');"
+                                onclick="this.removeAttribute('readonly');">
                         </div>
                     </div>
                 </div>
@@ -1198,8 +1201,10 @@
                     if (stateInput && !stateInput.value && region) stateInput.value = region;
                     */
 
+                    /*
                     const zipInput = document.querySelector("input[name='zip_code']");
                     if (zipInput && !zipInput.value && postal) zipInput.value = postal;
+                    */
 
                     // Update Country Select (TomSelect)
                     const countrySelect = document.querySelector('#country-select');
