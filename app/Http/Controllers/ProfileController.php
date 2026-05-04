@@ -128,6 +128,7 @@ class ProfileController extends Controller
 
         $referrals = [];
         $dataAccessRequests = [];
+        $pendingReferralRequests = [];
         if (in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist'])) {
             $referrals = \App\Models\Referral::with(['user', 'referredTo'])
                 ->where('referred_by_id', $user->id)
