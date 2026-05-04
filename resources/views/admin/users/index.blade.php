@@ -306,7 +306,7 @@
         // Handle Delete
         $('body').on('click', '.deleteUser', function() {
             var user_id = $(this).data("id");
-            if (confirm("Are you sure you want to delete this user?")) {
+            if (confirm("Are you sure you want to delete this user? This action is permanent and will permanently remove all associated data including bookings, transactions, and records.")) {
                 $.ajax({
                     type: "DELETE",
                     url: "{{ url('admin/' . $urlSegment) }}" + '/' + user_id,

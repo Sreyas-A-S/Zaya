@@ -694,7 +694,8 @@
             <div class="modal-body text-center p-4">
                 <i class="iconly-Delete icli text-danger mb-3" style="font-size: 50px;"></i>
                 <h5>Are you sure?</h5>
-                <p>This action cannot be undone. All data related to this client will be permanently removed.</p>
+                <p class="text-danger fw-bold">This action cannot be undone and is permanent.</p>
+                <p>Deleting this client will permanently remove all their associated data, including <strong>bookings, transactions, invoices, and health records</strong>. Their account access will be immediately revoked.</p>
                 <input type="hidden" id="delete-client-id">
             </div>
             <div class="modal-footer justify-content-center">

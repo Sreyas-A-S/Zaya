@@ -564,8 +564,11 @@
                 <h5 class="modal-title">Delete Translator</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this translator? This action cannot be undone.</p>
+            <div class="modal-body text-center p-4">
+                <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
+                <h5>Are you sure?</h5>
+                <p class="text-danger fw-bold">This action cannot be undone and is permanent.</p>
+                <p>Deleting this translator will permanently remove their <strong>profile, language specializations, earned commissions, and translation history</strong>. Their account access will be immediately revoked.</p>
                 <input type="hidden" id="delete-translator-id">
             </div>
             <div class="modal-footer">

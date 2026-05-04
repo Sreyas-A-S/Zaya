@@ -738,8 +738,11 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 <h5 class="modal-title">Delete Therapist</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this therapist? This action cannot be undone.</p>
+            <div class="modal-body text-center p-4">
+                <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
+                <h5>Are you sure?</h5>
+                <p class="text-danger fw-bold">This action cannot be undone and is permanent.</p>
+                <p>Deleting this therapist will permanently remove their <strong>profile, services, availability, earned commissions, and past session records</strong>. Their account access will be immediately revoked.</p>
                 <input type="hidden" id="delete-therapist-id">
             </div>
             <div class="modal-footer">

@@ -239,7 +239,7 @@
         btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i>';
 
         try {
-            const response = await fetch('{{ route('validate-promo-code') }}', {
+            const response = await fetch('{{ route('promo.validate') }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
