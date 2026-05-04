@@ -11,9 +11,9 @@
 
 @if($isMinimal)
 <style>
-    body { background: #fff !important; }
-    .main-content { padding: 0 !important; margin: 0 !important; }
-    .consultation-hero { border-radius: 0; border-top: 0; border-left: 0; border-right: 0; margin-bottom: 1.5rem; padding: 1.5rem; }
+    body { background: #f9fafb !important; }
+    .main-content { min-height: 100vh; display: flex; flex-direction: column; }
+    .consultation-hero { border-radius: 0; border-top: 0; border-left: 0; border-right: 0; margin-bottom: 1.5rem; padding: 1.5rem 1rem; }
     .consultation-hero h1 { font-size: 1.5rem; }
 </style>
 @endif
@@ -27,7 +27,7 @@
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(251, 248, 240, 0.96));
         box-shadow: 0 24px 60px rgba(17, 24, 39, 0.08);
         backdrop-filter: blur(14px);
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         text-align: left;
     }
 
@@ -209,10 +209,44 @@
         from { opacity: 0; transform: translateY(8px); }
         to { opacity: 1; transform: translateY(0); }
     }
+
+    #consultation-history-list {
+        display: flex;
+        overflow-x: auto;
+        padding: 0.5rem 0.25rem 1rem;
+        gap: 0.75rem;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(46, 75, 61, 0.1) transparent;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+
+    #consultation-history-list::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    #consultation-history-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    #consultation-history-list::-webkit-scrollbar-thumb {
+        background: rgba(46, 75, 61, 0.1);
+        border-radius: 10px;
+    }
+
+    #consultation-history-list::-webkit-scrollbar-thumb:hover {
+        background: rgba(46, 75, 61, 0.2);
+    }
+
+    #consultation-history-list > a {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
 </style>
 @endpush
 
-<section class="consultation-hero">
+<div class="py-2 lg:py-4">
+    <section class="consultation-hero">
     <div class="flex flex-col gap-8">
         <!-- Compact Client Info (Top Left) -->
         <div class="flex items-center gap-4">
@@ -263,12 +297,12 @@
 
 @if(!$isMinimal)
 <!-- Form History and Actions -->
-<div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-    <div class="flex-1">
-        <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Consultation History</h3>
-        <div class="flex flex-wrap gap-2">
+<div class="mb-6">
+    <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1">Consultation History</h3>
+    <div id="consultation-history-list">
             @foreach($allForms as $f)
                 <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $f->id]) }}" 
+                   data-consultation-switch
                    class="px-5 py-2.5 rounded-full text-xs font-bold transition-all border {{ ($existingForm && $existingForm->id === $f->id) ? 'bg-secondary text-white border-secondary shadow-lg' : 'bg-white text-gray-500 border-gray-200 hover:border-secondary/30 hover:text-secondary' }}">
                     <i class="ri-file-list-3-line mr-1.5"></i>
                     {{ $f->title ?: 'Consultation Record #'.$loop->iteration }}
@@ -276,9 +310,10 @@
                 </a>
             @endforeach
             
-            @if($existingForm)
+            @if($allForms->isNotEmpty())
             <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'new' => 1]) }}" 
-               class="px-5 py-2.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all">
+               data-consultation-switch
+               class="px-5 py-2.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all {{ $isNew ? 'ring-2 ring-emerald-400 ring-offset-2' : '' }}">
                 <i class="ri-add-line mr-1.5"></i> New Consultation Form
             </a>
             @endif
@@ -287,7 +322,15 @@
 </div>
 @endif
 
-@if($existingForm)
+<div id="consultation-form-container" class="relative">
+    <div id="consultation-loading-overlay" class="hidden absolute inset-0 bg-white/60 backdrop-blur-[2px] z-50 flex items-center justify-center rounded-[2.5rem]">
+        <div class="flex flex-col items-center gap-3">
+            <div class="w-12 h-12 border-4 border-secondary/20 border-t-secondary rounded-full animate-spin"></div>
+            <p class="text-xs font-bold text-secondary uppercase tracking-widest">Loading Form...</p>
+        </div>
+    </div>
+
+    @if($existingForm && !$isNew)
     <div class="mb-6 p-6 bg-secondary/5 border border-secondary/10 rounded-[2rem] flex items-center justify-between">
         <div class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-secondary shadow-sm">
@@ -299,18 +342,6 @@
             </div>
         </div>
         <button type="button" onclick="toggleTitleEdit()" class="text-xs font-bold text-secondary hover:underline">Rename Form</button>
-    </div>
-@else
-    <div class="mb-6 p-6 bg-emerald-50 border border-emerald-100 rounded-[2rem]">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
-                <i class="ri-add-circle-fill text-xl"></i>
-            </div>
-            <div>
-                <h4 class="text-sm font-black text-emerald-700">Starting New Consultation Form</h4>
-                <p class="text-[10px] text-emerald-600/60 font-bold uppercase tracking-widest">Digital Consultation Record</p>
-            </div>
-        </div>
     </div>
 @endif
 
@@ -345,19 +376,18 @@
     'consultationSchema' => $consultationSchema,
 ])
 @endif
+</div> <!-- End #consultation-form-container -->
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const tabButtons = Array.from(document.querySelectorAll('.consultation-tab-button'));
-    const tabPanels = document.querySelectorAll('.consultation-tab-panel');
-
-    if (tabButtons.length === 0) return;
+    // --- SHARED UTILITIES ---
+    let tabButtons = [];
+    let tabPanels = [];
 
     const updateNavButtons = (targetTab) => {
+        if (!tabButtons.length) return;
         const currentIndex = tabButtons.findIndex(btn => btn.getAttribute('data-tab') === targetTab);
         
-        // Find buttons within the current active form
         const prevBtns = document.querySelectorAll('#consultation-prev-tab');
         const nextBtns = document.querySelectorAll('#consultation-next-tab');
         
@@ -371,6 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const switchTab = (targetTab) => {
+        if (!tabButtons.length) return;
         tabButtons.forEach(btn => {
             const isActive = btn.getAttribute('data-tab') === targetTab;
             btn.classList.toggle('is-active', isActive);
@@ -384,64 +415,135 @@ document.addEventListener('DOMContentLoaded', () => {
         updateNavButtons(targetTab);
         sessionStorage.setItem('activeConsultationTab', targetTab);
         
-        // Scroll to top of form section for better UX
         const hero = document.querySelector('.consultation-hero');
         if (hero) {
             window.scrollTo({ top: hero.offsetTop - 20, behavior: 'smooth' });
         }
     };
 
-    tabButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchTab(button.getAttribute('data-tab'));
+    const initTabLogic = () => {
+        tabButtons = Array.from(document.querySelectorAll('.consultation-tab-button'));
+        tabPanels = document.querySelectorAll('.consultation-tab-panel');
+        if (tabButtons.length === 0) return;
+
+        tabButtons.forEach(button => {
+            button.onclick = (e) => {
+                e.preventDefault();
+                switchTab(button.getAttribute('data-tab'));
+            };
         });
-    });
 
-    // Delegate navigation clicks
-    document.addEventListener('click', (e) => {
-        const prevBtn = e.target.closest('#consultation-prev-tab');
-        const nextBtn = e.target.closest('#consultation-next-tab');
+        const savedTab = sessionStorage.getItem('activeConsultationTab');
+        const initialTab = (savedTab && document.querySelector(`[data-tab="${savedTab}"]`)) 
+            ? savedTab 
+            : tabButtons[0].getAttribute('data-tab');
+        switchTab(initialTab);
+    };
 
-        if (prevBtn) {
-            e.preventDefault();
-            const activeBtn = document.querySelector('.consultation-tab-button.is-active');
-            const currentIndex = tabButtons.indexOf(activeBtn);
-            if (currentIndex > 0) {
-                switchTab(tabButtons[currentIndex - 1].getAttribute('data-tab'));
-            }
-        }
+    const initFormSubmission = () => {
+        document.querySelectorAll('.consultation-form-root').forEach(form => {
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (!submitBtn) return;
+                
+                const originalBtnHtml = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i> Saving...';
 
-        if (nextBtn) {
-            e.preventDefault();
-            const activeBtn = document.querySelector('.consultation-tab-button.is-active');
-            const currentIndex = tabButtons.indexOf(activeBtn);
-            if (currentIndex < tabButtons.length - 1) {
-                switchTab(tabButtons[currentIndex + 1].getAttribute('data-tab'));
-            }
-        }
-    });
+                const formData = new FormData(form);
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showZayaToast(data.message, 'success', 'Consultation Form');
+                        const formIdInput = form.querySelector('input[name="form_id"]');
+                        if (formIdInput && data.form_id) {
+                            formIdInput.value = data.form_id;
+                        }
+                    } else {
+                        showZayaToast(data.message || data.error || 'Something went wrong.', 'error', 'Error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showZayaToast('Connection error.', 'error', 'Error');
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                });
+            };
+        });
+    };
 
-    // Restore last active tab or default to first
-    const savedTab = sessionStorage.getItem('activeConsultationTab');
-    const initialTab = (savedTab && document.querySelector(`[data-tab="${savedTab}"]`)) 
-        ? savedTab 
-        : tabButtons[0].getAttribute('data-tab');
-    
-    switchTab(initialTab);
+    const initSwitcher = () => {
+        document.querySelectorAll('[data-consultation-switch]').forEach(link => {
+            link.onclick = function(e) {
+                e.preventDefault();
+                const url = this.href;
+                const container = document.getElementById('consultation-form-container');
+                const historyList = document.getElementById('consultation-history-list');
+                const overlay = document.getElementById('consultation-loading-overlay');
+
+                if (overlay) overlay.classList.remove('hidden');
+
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    const newContainer = doc.getElementById('consultation-form-container');
+                    if (newContainer && container) container.innerHTML = newContainer.innerHTML;
+
+                    const newHistoryList = doc.getElementById('consultation-history-list');
+                    if (newHistoryList && historyList) historyList.innerHTML = newHistoryList.innerHTML;
+
+                    window.history.pushState({}, '', url);
+
+                    initTabLogic();
+                    initFormSubmission();
+                    initSwitcher();
+                    initAutoSave();
+                    
+                    // Re-run subform scripts
+                    doc.querySelectorAll('script').forEach(oldScript => {
+                        if (oldScript.innerHTML.includes('doctor-consultation-form') || 
+                            oldScript.innerHTML.includes('consultation-form-root')) {
+                            const newScript = document.createElement('script');
+                            newScript.innerHTML = oldScript.innerHTML;
+                            document.body.appendChild(newScript);
+                        }
+                    });
+
+                    if (overlay) overlay.classList.add('hidden');
+                    const hero = document.querySelector('.consultation-hero');
+                    if (hero) window.scrollTo({ top: hero.offsetTop - 20, behavior: 'smooth' });
+                })
+                .catch(error => {
+                    console.error('Switch Error:', error);
+                    window.location.href = url;
+                });
+            };
+        });
+    };
 
     // --- AUTO-SAVE LOGIC ---
-    const form = document.querySelector('.consultation-form-root');
-    if (form) {
-        const bookingId = "{{ $booking->id }}";
-        const formId = "{{ $existingForm->id ?? 'new' }}";
-        const storageKey = `consultation_draft_${bookingId}_${formId}`;
+    const initAutoSave = () => {
+        const form = document.querySelector('.consultation-form-root');
+        if (!form) return;
 
-        // Clear if successful submission just happened
-        @if(session('status'))
-            localStorage.removeItem(storageKey);
-            localStorage.removeItem(`consultation_draft_${bookingId}_new`);
-        @endif
+        const bookingId = "{{ $booking->id }}";
+        const formId = form.querySelector('input[name="form_id"]')?.value || 'new';
+        const storageKey = `consultation_draft_${bookingId}_${formId}`;
 
         const saveDraft = () => {
             const formData = new FormData(form);
@@ -463,16 +565,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!saved) return;
             const data = JSON.parse(saved);
 
-            // Reconstruct dynamic rows first
             const sectionCounts = {};
             Object.keys(data).forEach(key => {
                 const match = key.match(/^(.+)\[(\d+)\]\[(.+)\]$/);
                 if (match) {
                     const section = match[1];
                     const index = parseInt(match[2]);
-                    if (!sectionCounts[section] || index > sectionCounts[section]) {
-                        sectionCounts[section] = index;
-                    }
+                    if (!sectionCounts[section] || index > sectionCounts[section]) sectionCounts[section] = index;
                 }
             });
 
@@ -487,7 +586,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Set values
             Object.entries(data).forEach(([name, value]) => {
                 const inputs = form.querySelectorAll(`[name="${name}"]`);
                 inputs.forEach(input => {
@@ -501,20 +599,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
-            if (window.showZayaToast) {
-                showZayaToast('Restored unsaved draft.', 'Consultation Form');
-            }
+            if (window.showZayaToast) showZayaToast('Restored unsaved draft.', 'Consultation Form');
         };
 
         form.addEventListener('input', debounce(saveDraft, 1000));
         form.addEventListener('change', saveDraft);
         
-        // Restore only if we are NOT viewing an existing record with database data, 
-        // OR if the draft exists and might be newer. 
-        // For simplicity: restore if it exists.
-        @if(!session('status'))
-        setTimeout(restoreDraft, 500); 
-        @endif    }
+        // Restore only if fresh load
+        setTimeout(restoreDraft, 500);
+    };
 
     function debounce(func, wait) {
         let timeout;
@@ -524,8 +617,35 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // --- NAVIGATION DELEGATION (Global) ---
+    document.addEventListener('click', (e) => {
+        const prevBtn = e.target.closest('#consultation-prev-tab');
+        const nextBtn = e.target.closest('#consultation-next-tab');
+
+        if (prevBtn) {
+            e.preventDefault();
+            const activeBtn = document.querySelector('.consultation-tab-button.is-active');
+            if (!activeBtn) return;
+            const currentIndex = tabButtons.indexOf(activeBtn);
+            if (currentIndex > 0) switchTab(tabButtons[currentIndex - 1].getAttribute('data-tab'));
+        }
+
+        if (nextBtn) {
+            e.preventDefault();
+            const activeBtn = document.querySelector('.consultation-tab-button.is-active');
+            if (!activeBtn) return;
+            const currentIndex = tabButtons.indexOf(activeBtn);
+            if (currentIndex < tabButtons.length - 1) switchTab(tabButtons[currentIndex + 1].getAttribute('data-tab'));
+        }
+    });
+
+    // --- INITIALIZE EVERYTHING ---
+    initTabLogic();
+    initFormSubmission();
+    initSwitcher();
+    initAutoSave();
+
     @if($isMinimal)
-    // Inject minimal mode flag into all forms
     document.querySelectorAll('form.consultation-form-root').forEach(form => {
         if (!form.querySelector('input[name="minimal"]')) {
             const input = document.createElement('input');
@@ -536,34 +656,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     @endif
-});
 
-function toggleTitleEdit() {
-    const box = document.getElementById('title-edit-box');
-    box.classList.toggle('hidden');
-}
+    window.toggleTitleEdit = function() {
+        const box = document.getElementById('title-edit-box');
+        if (box) box.classList.toggle('hidden');
+    }
 
-function applyTitle() {
-    const newTitle = document.getElementById('new-form-title').value;
-    if (!newTitle) return;
-    
-    // Update all hidden form title inputs
-    const inputs = document.querySelectorAll('input[name="form_title"]');
-    inputs.forEach(i => i.value = newTitle);
-    
-    // Update display
-    const editHeading = document.querySelector('h4.text-secondary');
-    if (editHeading) editHeading.innerText = 'Editing: ' + newTitle;
-    
-    toggleTitleEdit();
-}
-    function submitReferralRequest() {
+    window.applyTitle = function() {
+        const newTitle = document.getElementById('new-form-title').value;
+        if (!newTitle) return;
+        const inputs = document.querySelectorAll('input[name="form_title"]');
+        inputs.forEach(i => i.value = newTitle);
+        const editHeading = document.querySelector('h4.text-secondary');
+        if (editHeading) editHeading.innerText = 'Editing: ' + newTitle;
+        toggleTitleEdit();
+    }
+
+    window.submitReferralRequest = function() {
         const note = document.getElementById('refer-request-note').value;
         if (!note) {
             showZayaToast('Please add a note explaining why re-referral is needed.', 'error', 'Error');
             return;
         }
-
         fetch("{{ route('bookings.refer-request', $booking->id) }}", {
             method: 'POST',
             headers: {
@@ -589,7 +703,7 @@ function applyTitle() {
         });
     }
 
-    function updateReferralRequestStatus(requestId, status) {
+    window.updateReferralRequestStatus = function(requestId, status) {
         fetch(`/refer-requests/${requestId}/status`, {
             method: 'POST',
             headers: {
@@ -614,52 +728,10 @@ function applyTitle() {
         });
     }
 
-    // AJAX Form Submission for Consultation Forms
-    document.querySelectorAll('.consultation-form-root').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const submitBtn = form.querySelector('button[type="submit"]');
-            if (!submitBtn) return;
-            
-            const originalBtnHtml = submitBtn.innerHTML;
-            
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i> Saving...';
 
-            const formData = new FormData(form);
-            
-            fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showZayaToast(data.message, 'success', 'Consultation Form');
-                    // Update form_id if it was a new form
-                    const formIdInput = form.querySelector('input[name="form_id"]');
-                    if (formIdInput && data.form_id) {
-                        formIdInput.value = data.form_id;
-                    }
-                } else {
-                    showZayaToast(data.message || data.error || 'Something went wrong.', 'error', 'Error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showZayaToast('Connection error.', 'error', 'Error');
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnHtml;
-            });
-        });
-    });
 </script>
 @endpush
+
+</div> <!-- End global container -->
 
 @endsection
