@@ -39,8 +39,11 @@ if (! function_exists('get_currency_symbol')) {
     /**
      * Get currency symbol from code.
      */
-    function get_currency_symbol(string $code): string
+    function get_currency_symbol(?string $code): string
     {
+        if (!$code) {
+            return config('currencies.default', 'INR') === 'INR' ? '₹' : '$';
+        }
         $symbols = config('currencies.symbols', []);
         return $symbols[strtoupper($code)] ?? $code;
     }
