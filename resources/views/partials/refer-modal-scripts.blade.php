@@ -121,7 +121,7 @@
                                 <select id="translator-from-lang" onchange="updateTranslatorLanguages()" class="w-full px-4 py-3 rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-xs font-bold transition-all shadow-sm">
                                     <option value="">Select Source</option>
                                     @foreach($languages as $lang)
-                                        <option value="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->name }} ({{ $lang->native_name }})</option>
+                                        <option value="{{ $lang->display_name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -130,7 +130,7 @@
                                 <select id="translator-to-lang" onchange="updateTranslatorLanguages()" class="w-full px-4 py-3 rounded-xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-xs font-bold transition-all shadow-sm">
                                     <option value="Any">Any</option>
                                     @foreach($languages as $lang)
-                                        <option value="{{ $lang->name }}">{{ $lang->flag }} {{ $lang->name }} ({{ $lang->native_name }})</option>
+                                        <option value="{{ $lang->display_name }}">{{ $lang->flag }} {{ $lang->display_name }}</option>
                                     @endforeach
                                 </select>
                             </div>

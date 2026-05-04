@@ -470,7 +470,7 @@
                             <div class="py-2">
                                 @forelse($languages as $language)
                                     <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="{{ $language->name }}">{{ $language->display_name }}</div>
+                                        data-value="{{ $language->display_name }}">{{ $language->display_name }}</div>
                                 @empty
                                     <div class="px-6 py-3 text-sm text-gray-400" data-i18n="No languages available.">{{ __('No languages available.') }}</div>
                                 @endforelse
@@ -493,7 +493,7 @@
                             <div class="py-2">
                                 @forelse($languages as $language)
                                     <div class="dropdown-item px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-[#F9F9F9] transition-colors"
-                                        data-value="{{ $language->name }}">{{ $language->display_name }}</div>
+                                        data-value="{{ $language->display_name }}">{{ $language->display_name }}</div>
                                 @empty
                                     <div class="px-6 py-3 text-sm text-gray-400" data-i18n="No languages available.">{{ __('No languages available.') }}</div>
                                 @endforelse

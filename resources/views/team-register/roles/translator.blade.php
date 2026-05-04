@@ -7,7 +7,7 @@
             class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
             <option value="">{{ __('Select') }}</option>
             @foreach(($languages ?? []) as $lang)
-                <option value="{{ $lang->name }}" @selected(old('native_language') === $lang->name)>{{ $lang->display_name }}</option>
+                <option value="{{ $lang->display_name }}" @selected(old('native_language') === $lang->display_name)>{{ $lang->display_name }}</option>
             @endforeach
         </select>
     </div>
@@ -29,7 +29,7 @@
         <select name="source_languages[]" multiple data-tomselect required
             class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
             @foreach(($languages ?? []) as $lang)
-                <option value="{{ $lang->name }}" @selected(in_array($lang->name, (array) old('source_languages', []), true))>{{ $lang->display_name }}</option>
+                <option value="{{ $lang->display_name }}" @selected(in_array($lang->display_name, (array) old('source_languages', []), true))>{{ $lang->display_name }}</option>
             @endforeach
         </select>
     </div>
@@ -38,7 +38,7 @@
         <select name="target_languages[]" multiple data-tomselect required
             class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
             @foreach(($languages ?? []) as $lang)
-                <option value="{{ $lang->name }}" @selected(in_array($lang->name, (array) old('target_languages', []), true))>{{ $lang->display_name }}</option>
+                <option value="{{ $lang->display_name }}" @selected(in_array($lang->display_name, (array) old('target_languages', []), true))>{{ $lang->display_name }}</option>
             @endforeach
         </select>
     </div>
@@ -47,7 +47,7 @@
         <select name="additional_languages[]" multiple data-tomselect
             class="w-full py-3.5 px-6 bg-white rounded-full border border-[#D1D5DB] outline-none text-[0.95rem] text-gray-700">
             @foreach(($languages ?? []) as $lang)
-                <option value="{{ $lang->name }}" @selected(in_array($lang->name, (array) old('additional_languages', []), true))>{{ $lang->display_name }}</option>
+                <option value="{{ $lang->display_name }}" @selected(in_array($lang->display_name, (array) old('additional_languages', []), true))>{{ $lang->display_name }}</option>
             @endforeach
         </select>
     </div>
