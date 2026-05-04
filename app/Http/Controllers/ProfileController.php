@@ -965,18 +965,19 @@ class ProfileController extends Controller
         $fromLang = $booking->from_language;
         $toLang = $booking->to_language;
 
-        // Fallback for Source Language
-        if (!$fromLang) {
+        // Better Fallback for Source Language (Client's primary language)
+        if (!$fromLang || $fromLang === 'null' || $fromLang === 'undefined') {
             $patient = $booking->user->patient ?? null;
             if ($patient && !empty($patient->languages_spoken) && is_array($patient->languages_spoken)) {
                 $fromLang = $patient->languages_spoken[0];
             } else {
-                $fromLang = $booking->language ? $booking->language->display_name : 'English';
+                // Try to use the client's language preference if available, else default
+                $fromLang = 'English';
             }
         }
 
-        // Fallback for Target Language
-        if (!$toLang || strtolower($toLang) === 'any') {
+        // Better Fallback for Target Language (Practitioner's primary language)
+        if (!$toLang || strtolower($toLang) === 'any' || $toLang === 'null' || $toLang === 'undefined') {
             if ($booking->language) {
                 $toLang = $booking->language->display_name;
             } else {
@@ -1003,6 +1004,10 @@ class ProfileController extends Controller
         $fromLang = $request->query('from_lang');
         $toLang = $request->query('to_lang');
 
+        // Handle JS null/undefined strings
+        if ($fromLang === 'null' || $fromLang === 'undefined') $fromLang = null;
+        if ($toLang === 'null' || $toLang === 'undefined') $toLang = null;
+
         $ignoreLanguages = $request->query('ignore_languages') === 'true';
 
         $translatorsQuery = \App\Models\Translator::with('user')
@@ -1028,7 +1033,6 @@ class ProfileController extends Controller
                             ->orWhereJsonContains('target_languages', $baseFrom)
                             ->orWhereJsonContains('additional_languages', $baseFrom)
                             ->orWhere('native_language', 'LIKE', $baseFrom)
-                            // Also match any variant of the base language
                             ->orWhere('source_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
                             ->orWhere('target_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
                             ->orWhere('additional_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
@@ -1042,7 +1046,6 @@ class ProfileController extends Controller
                             ->orWhereJsonContains('target_languages', $baseTo)
                             ->orWhereJsonContains('additional_languages', $baseTo)
                             ->orWhere('native_language', 'LIKE', $baseTo)
-                            // Also match any variant of the base language
                             ->orWhere('source_languages', 'LIKE', '%"' . $baseTo . ' (%"')
                             ->orWhere('target_languages', 'LIKE', '%"' . $baseTo . ' (%"')
                             ->orWhere('additional_languages', 'LIKE', '%"' . $baseTo . ' (%"')
@@ -1061,11 +1064,27 @@ class ProfileController extends Controller
                       ->orWhereJsonContains('target_languages', $baseFrom)
                       ->orWhereJsonContains('additional_languages', $baseFrom)
                       ->orWhere('native_language', 'LIKE', $baseFrom)
-                      // Also match any variant of the base language
                       ->orWhere('source_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
                       ->orWhere('target_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
                       ->orWhere('additional_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
                       ->orWhere('native_language', 'LIKE', $baseFrom . ' (%');
+                });
+            } elseif ($toLang && strtolower($toLang) !== 'any') {
+                // Only match toLang
+                $translatorsQuery->where(function ($q) use ($toLang) {
+                    $baseTo = explode(' (', $toLang)[0];
+                    $q->whereJsonContains('source_languages', $toLang)
+                      ->orWhereJsonContains('target_languages', $toLang)
+                      ->orWhereJsonContains('additional_languages', $toLang)
+                      ->orWhere('native_language', 'LIKE', $toLang)
+                      ->orWhereJsonContains('source_languages', $baseTo)
+                      ->orWhereJsonContains('target_languages', $baseTo)
+                      ->orWhereJsonContains('additional_languages', $baseTo)
+                      ->orWhere('native_language', 'LIKE', $baseTo)
+                      ->orWhere('source_languages', 'LIKE', '%"' . $baseTo . ' (%"')
+                      ->orWhere('target_languages', 'LIKE', '%"' . $baseTo . ' (%"')
+                      ->orWhere('additional_languages', 'LIKE', '%"' . $baseTo . ' (%"')
+                      ->orWhere('native_language', 'LIKE', $baseTo . ' (%');
                 });
             }
         }

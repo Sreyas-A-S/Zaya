@@ -77,7 +77,6 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     Route::delete('/my-services/group/{service_id}', [ProfileController::class, 'deleteServiceGroup'])->name('my-services.delete-group');
 
     Route::get('/api/referrable-practitioners', [BookingController::class, 'fetchReferrablePractitioners'])->name('referrable-practitioners-api');
-    Route::get('/api/available-translators', [ProfileController::class, 'fetchAvailableTranslators'])->name('available-translators-api');
     Route::get('/api/professional-profile/{user}', [BookingController::class, 'getProfessionalProfile'])->name('professional-profile-api');
     Route::get('/api/available-translators', [ProfileController::class, 'fetchAvailableTranslators'])->name('available-translators-api');
     Route::get('/api/bookings/{id}', [ProfileController::class, 'getBookingDetails'])->name('bookings.api.details');

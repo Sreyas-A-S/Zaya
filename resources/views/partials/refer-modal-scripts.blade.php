@@ -904,8 +904,8 @@
             if (!fromLang || !toLang || fromLang === 'English' || toLang === 'Any') {
                 const response = await fetch(`/api/bookings/${bookingId}`);
                 const booking = await response.json();
-                currentFromLang = booking.from_language;
-                currentToLang = booking.to_language;
+                currentFromLang = booking.from_language || 'English';
+                currentToLang = booking.to_language || 'Any';
             } else {
                 currentFromLang = fromLang;
                 currentToLang = toLang;
