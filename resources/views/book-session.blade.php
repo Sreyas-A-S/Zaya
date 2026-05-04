@@ -911,6 +911,7 @@
                 need_translator: needTranslator,
                 from_language: fromLanguage,
                 to_language: toLanguage,
+                language_id: document.getElementById('session-language')?.value,
                 booking_date: bookingDate,
                 booking_time: bookingTime,
                 total_price: totalPrice,

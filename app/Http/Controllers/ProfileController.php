@@ -948,22 +948,23 @@ class ProfileController extends Controller
         $booking = Booking::with(['language', 'practitioner', 'user.patient'])->findOrFail($id);
         
         $fromLang = $booking->from_language;
+        $toLang = $booking->to_language;
+
+        // Fallback for Source Language
         if (!$fromLang) {
-            // Try patient's first spoken language as a fallback for source
             $patient = $booking->user->patient ?? null;
             if ($patient && !empty($patient->languages_spoken) && is_array($patient->languages_spoken)) {
                 $fromLang = $patient->languages_spoken[0];
             } else {
-                $fromLang = $booking->language->display_name ?? 'English';
+                $fromLang = $booking->language ? $booking->language->display_name : 'English';
             }
         }
 
-        $toLang = $booking->to_language;
+        // Fallback for Target Language
         if (!$toLang || strtolower($toLang) === 'any') {
-            // Target is usually the session language or practitioner's language
-            $toLang = $booking->language->display_name ?? null;
-            
-            if (!$toLang) {
+            if ($booking->language) {
+                $toLang = $booking->language->display_name;
+            } else {
                 $practitioner = $booking->practitioner;
                 if ($practitioner && !empty($practitioner->languages_spoken) && is_array($practitioner->languages_spoken)) {
                     $toLang = $practitioner->languages_spoken[0];

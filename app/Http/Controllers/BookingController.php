@@ -192,6 +192,7 @@ class BookingController extends Controller
                 'need_translator' => $request->need_translator ?? false,
                 'from_language' => $request->from_language,
                 'to_language' => $request->to_language,
+                'language_id' => $request->language_id,
                 'additional_info' => $request->additional_info,
             ]);
 
@@ -280,6 +281,7 @@ class BookingController extends Controller
                 'need_translator' => $request->need_translator ?? false,
                 'from_language' => $request->from_language,
                 'to_language' => $request->to_language,
+                'language_id' => $request->language_id,
                 'additional_info' => $request->additional_info,
             ]
         ]);
@@ -417,6 +419,7 @@ class BookingController extends Controller
             'need_translator' => $bookingData['need_translator'] ?? false,
             'from_language' => $bookingData['from_language'] ?? null,
             'to_language' => $bookingData['to_language'] ?? null,
+            'language_id' => $bookingData['language_id'] ?? null,
             'razorpay_order_id' => $paymentLinkId,
             'razorpay_payment_id' => $paymentId,
             'additional_info' => $bookingData['additional_info'] ?? null,
