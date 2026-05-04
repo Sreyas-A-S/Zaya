@@ -945,20 +945,33 @@ class ProfileController extends Controller
 
     public function getBookingDetails($id)
     {
-        $booking = Booking::with(['language', 'practitioner'])->findOrFail($id);
+        $booking = Booking::with(['language', 'practitioner', 'user.patient'])->findOrFail($id);
         
-        $fromLang = $booking->from_language ?: ($booking->language->native_name ?? 'English');
-        $toLang = $booking->to_language;
-        
-        if (!$toLang || strtolower($toLang) === 'any') {
-            // Fallback to practitioner's first spoken language if available
-            $practitioner = $booking->practitioner;
-            if ($practitioner && !empty($practitioner->languages_spoken) && is_array($practitioner->languages_spoken)) {
-                $toLang = $practitioner->languages_spoken[0];
+        $fromLang = $booking->from_language;
+        if (!$fromLang) {
+            // Try patient's first spoken language as a fallback for source
+            $patient = $booking->user->patient ?? null;
+            if ($patient && !empty($patient->languages_spoken) && is_array($patient->languages_spoken)) {
+                $fromLang = $patient->languages_spoken[0];
             } else {
-                $toLang = 'Any';
+                $fromLang = $booking->language->name ?? 'English';
             }
         }
+
+        $toLang = $booking->to_language;
+        if (!$toLang || strtolower($toLang) === 'any') {
+            // Target is usually the session language or practitioner's language
+            $toLang = $booking->language->name ?? null;
+            
+            if (!$toLang) {
+                $practitioner = $booking->practitioner;
+                if ($practitioner && !empty($practitioner->languages_spoken) && is_array($practitioner->languages_spoken)) {
+                    $toLang = $practitioner->languages_spoken[0];
+                }
+            }
+        }
+
+        if (!$toLang) $toLang = 'Any';
 
         return response()->json([
             'id' => $booking->id,
