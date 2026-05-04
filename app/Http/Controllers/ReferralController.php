@@ -390,9 +390,6 @@ class ReferralController extends Controller
         $currency = strtoupper((string) ($referral->currency ?? $this->resolveProfessionalCurrency($referral->referredTo) ?? config('currencies.default', 'INR')));
 
         $customerPhone = (string) ($referral->user->phone ?? $referral->user->mobile ?? '');
-        if (empty($customerPhone)) {
-            $customerPhone = '9999999999'; // Fallback if absolutely necessary, but preferably empty
-        }
 
         $payload = [
             'amount' => (int) round(((float) $referral->amount) * 100),
