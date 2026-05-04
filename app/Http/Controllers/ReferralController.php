@@ -317,6 +317,7 @@ class ReferralController extends Controller
 
     public function initiatePayment($referral_no)
     {
+        Log::info('initiatePayment hit', ['referral_no' => $referral_no]);
         $referral = Referral::with(['user', 'referredTo'])->where('referral_no', $referral_no)->firstOrFail();
 
         if ($referral->status === 'awaiting_consent') {
@@ -388,9 +389,9 @@ class ReferralController extends Controller
 
         $currency = strtoupper((string) ($referral->currency ?? $this->resolveProfessionalCurrency($referral->referredTo) ?? config('currencies.default', 'INR')));
 
-        $customerPhone = preg_replace('/[^0-9]/', '', (string) ($referral->user->phone ?? '9999999999'));
-        if (strlen($customerPhone) < 10) {
-            $customerPhone = '9999999999';
+        $customerPhone = (string) ($referral->user->phone ?? $referral->user->mobile ?? '');
+        if (empty($customerPhone)) {
+            $customerPhone = '9999999999'; // Fallback if absolutely necessary, but preferably empty
         }
 
         $payload = [
@@ -403,8 +404,8 @@ class ReferralController extends Controller
                 'email' => $referral->user->email,
                 'contact' => $customerPhone,
             ],
-            'notify' => ['sms' => true, 'email' => true],
-            'callback_url' => route('referrals.payment.callback'),
+            'notify' => ['sms' => false, 'email' => true],
+            'callback_url' => url('/referrals/payment/callback'),
             'callback_method' => 'get',
             'notes' => [
                 'referral_no' => $referral->referral_no,
@@ -417,23 +418,30 @@ class ReferralController extends Controller
             'payload' => $payload
         ]);
 
-        $response = Http::withOptions(['verify' => (bool) $verifySsl])
-            ->withBasicAuth($razorpayKey, $razorpaySecret)
-            ->post('https://api.razorpay.com/v1/payment_links', $payload);
+        try {
+            $response = Http::withOptions(['verify' => (bool) $verifySsl])
+                ->withBasicAuth($razorpayKey, $razorpaySecret)
+                ->post('https://api.razorpay.com/v1/payment_links', $payload);
 
-        if ($response->successful()) {
-            $paymentData = $response->json();
-            $referral->razorpay_order_id = $paymentData['id'];
-            $referral->save();
-            return redirect($paymentData['short_url']);
+            if ($response->successful()) {
+                $paymentData = $response->json();
+                $referral->razorpay_order_id = $paymentData['id'];
+                $referral->save();
+                return redirect($paymentData['short_url']);
+            }
+
+            Log::error('Razorpay Referral Payment Link API Error:', [
+                'referral_no' => $referral->referral_no,
+                'status' => $response->status(),
+                'response' => $response->json(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Razorpay Referral Connection Error:', [
+                'referral_no' => $referral->referral_no,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
-
-        Log::error('Razorpay Referral Payment Link Error:', [
-            'referral_no' => $referral->referral_no,
-            'payload' => $payload,
-            'response' => $response->body(),
-            'status' => $response->status(),
-        ]);
 
         return redirect()->route('dashboard')->with('error', 'Unable to initiate payment.');
     }
