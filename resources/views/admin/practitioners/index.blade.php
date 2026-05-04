@@ -962,6 +962,7 @@
     let table;
     let toastInstance;
     let languageChoices;
+    let langSelect;
     let qualCount = 1;
     let cropper;
     let croppedFile;
@@ -1158,7 +1159,7 @@
 
 
         // Initialize Choices.js
-        const langSelect = document.getElementById('languages_select');
+        langSelect = document.getElementById('languages_select');
         if (langSelect) {
             languageChoices = new Choices(langSelect, {
                 removeItemButton: true,

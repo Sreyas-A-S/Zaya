@@ -182,6 +182,26 @@ class PractitionerAvailabilityService
         return array_values(array_filter(array_unique($busySlots)));
     }
 
+    /**
+     * Check if a specific slot is available for a professional.
+     */
+    public function isSlotAvailable($profileId, $type, $date, $time)
+    {
+        $provider = $this->findProvider($profileId);
+        if (!$provider || $provider->getMorphClass() !== $type) {
+            return false;
+        }
+
+        $slots = $this->getAvailableSlotsForProvider($provider, $date);
+        foreach ($slots as $slot) {
+            if ($slot['time'] === $time) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function findProvider($identifier)
     {
         $models = [Practitioner::class, Doctor::class, MindfulnessPractitioner::class, YogaTherapist::class, Translator::class];

@@ -469,6 +469,22 @@ class ProfileController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized. Only assigned professionals can reschedule.'], 403);
         }
 
+        // CRITICAL: Check if the NEW slot is available
+        $availabilityService = new \App\Services\PractitionerAvailabilityService();
+        $isAvailable = $availabilityService->isSlotAvailable(
+            $booking->profile_id,
+            $booking->practitioner_type,
+            $request->booking_date,
+            $request->booking_time
+        );
+
+        if (!$isAvailable) {
+            return response()->json(['success' => false, 'message' => 'The selected slot is no longer available. Please choose another time.'], 422);
+        }
+
+        $oldDate = $booking->booking_date->toDateString();
+        $oldTime = $booking->booking_time;
+
         // Save original datetime if it's the first reschedule
         if (!$booking->original_booking_date) {
             $booking->original_booking_date = $booking->booking_date;
@@ -480,6 +496,32 @@ class ProfileController extends Controller
         $booking->booking_time = $request->booking_time;
         $booking->rescheduled_at = now();
         $booking->rescheduled_by = $user->role;
+
+        // Update sessions array in additional_info to ensure previous slot is freed up in availability calculations
+        if ($booking->additional_info && isset($booking->additional_info['sessions'])) {
+            $sessions = $booking->additional_info['sessions'];
+            $newDateObj = \Carbon\Carbon::parse($request->booking_date);
+            
+            foreach ($sessions as &$session) {
+                $sDate = $session['date'] ?? ($session['day'] ?? null);
+                $sTime = $session['time'] ?? null;
+
+                if ($sDate && $sTime) {
+                    try {
+                        if (\Carbon\Carbon::parse($sDate)->toDateString() === $oldDate && $sTime === $oldTime) {
+                            if (isset($session['date'])) $session['date'] = $newDateObj->toDateString();
+                            if (isset($session['day'])) $session['day'] = $newDateObj->format('D, M d, Y');
+                            $session['time'] = $request->booking_time;
+                            if (isset($session['day_label'])) $session['day_label'] = $newDateObj->format('M d, Y');
+                        }
+                    } catch (\Exception $e) { }
+                }
+            }
+            $additionalInfo = $booking->additional_info;
+            $additionalInfo['sessions'] = $sessions;
+            $booking->additional_info = $additionalInfo;
+        }
+
         $booking->save();
 
         return response()->json([

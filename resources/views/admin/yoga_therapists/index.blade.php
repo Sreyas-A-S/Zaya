@@ -802,6 +802,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
     <script>
         const storageBase = "{{ asset('storage') }}/";
         let table;
+        let languageChoices, langSelect;
         let therapistIti;
         let currentStep = 1;
         const totalSteps = 6;
@@ -1104,9 +1105,9 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             });
 
             // Initialize Choices.js
-            let languageChoices = null;
-            if (document.getElementById('languages_select')) {
-                languageChoices = new Choices('#languages_select', {
+            langSelect = document.getElementById('languages_select');
+            if (langSelect) {
+                languageChoices = new Choices(langSelect, {
                     removeItemButton: true,
                     searchEnabled: true,
                     shouldSort: false,
@@ -1114,16 +1115,14 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     itemSelectText: '',
                 });
 
-                document.getElementById('languages_select').addEventListener('addItem', function(event) {
+                langSelect.addEventListener('addItem', function(event) {
                     addLanguageCapabilityRow(event.detail.value, event.detail.label);
                 });
 
-                document.getElementById('languages_select').addEventListener('removeItem', function(event) {
+                langSelect.addEventListener('removeItem', function(event) {
                     $(`#lang-row-${event.detail.value.replace(/\s+/g, '_')}`).remove();
                 });
             }
-
-            window.languageChoices = languageChoices;
 
             /*
             // Promocode Logic for Admin Modal (Yoga)
