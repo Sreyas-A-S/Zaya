@@ -151,9 +151,13 @@
 @media print {
     body { background: white !important; }
     .main-content { padding: 0 !important; margin: 0 !important; }
-    header, footer, nav, .action-bar, button, a[href*="back"] { display: none !important; }
-    .max-w-4xl { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
-    .bg-white { border: 0 !important; shadow: none !important; }
+    header, footer, nav, aside, #sidebar, .sidebar-wrapper, .action-bar, button, a[href*="back"], .flex.items-center.justify-between.mb-8, .breadcrumb-wrapper { 
+        display: none !important; 
+    }
+    .w-full { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    .bg-white { border: 0 !important; box-shadow: none !important; }
+    .rounded-\[2\.5rem\] { border-radius: 0 !important; }
+    .p-8, .md\:p-12 { padding: 2rem !important; }
 }
 </style>
 @endsection
