@@ -1021,7 +1021,12 @@ class ProfileController extends Controller
                             ->orWhereJsonContains('source_languages', $baseFrom)
                             ->orWhereJsonContains('target_languages', $baseFrom)
                             ->orWhereJsonContains('additional_languages', $baseFrom)
-                            ->orWhere('native_language', 'LIKE', $baseFrom);
+                            ->orWhere('native_language', 'LIKE', $baseFrom)
+                            // Also match any variant of the base language
+                            ->orWhere('source_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
+                            ->orWhere('target_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
+                            ->orWhere('additional_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
+                            ->orWhere('native_language', 'LIKE', $baseFrom . ' (%');
                     })->where(function ($sub) use ($toLang, $baseTo) {
                         $sub->whereJsonContains('source_languages', $toLang)
                             ->orWhereJsonContains('target_languages', $toLang)
@@ -1030,7 +1035,12 @@ class ProfileController extends Controller
                             ->orWhereJsonContains('source_languages', $baseTo)
                             ->orWhereJsonContains('target_languages', $baseTo)
                             ->orWhereJsonContains('additional_languages', $baseTo)
-                            ->orWhere('native_language', 'LIKE', $baseTo);
+                            ->orWhere('native_language', 'LIKE', $baseTo)
+                            // Also match any variant of the base language
+                            ->orWhere('source_languages', 'LIKE', '%"' . $baseTo . ' (%"')
+                            ->orWhere('target_languages', 'LIKE', '%"' . $baseTo . ' (%"')
+                            ->orWhere('additional_languages', 'LIKE', '%"' . $baseTo . ' (%"')
+                            ->orWhere('native_language', 'LIKE', $baseTo . ' (%');
                     });
                 });
             } elseif ($fromLang) {
@@ -1044,7 +1054,12 @@ class ProfileController extends Controller
                       ->orWhereJsonContains('source_languages', $baseFrom)
                       ->orWhereJsonContains('target_languages', $baseFrom)
                       ->orWhereJsonContains('additional_languages', $baseFrom)
-                      ->orWhere('native_language', 'LIKE', $baseFrom);
+                      ->orWhere('native_language', 'LIKE', $baseFrom)
+                      // Also match any variant of the base language
+                      ->orWhere('source_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
+                      ->orWhere('target_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
+                      ->orWhere('additional_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
+                      ->orWhere('native_language', 'LIKE', $baseFrom . ' (%');
                 });
             }
         }
