@@ -19,7 +19,7 @@
         <!-- Header -->
         <div class="p-8 md:p-12 border-b border-gray-50 bg-[#F8FBF9]/50 relative">
             <div class="absolute top-0 right-0 p-8 opacity-10 print:opacity-20">
-                <img src="{{ asset('frontend/assets/logo.png') }}" class="w-32">
+                <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" class="w-32">
             </div>
             <div class="relative z-10">
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -130,7 +130,7 @@
         <div class="p-8 md:p-12 bg-gray-50/30 border-t border-gray-50 flex flex-col md:flex-row items-center justify-between gap-8">
             <div class="text-center md:text-left">
                 <p class="text-[10px] font-black uppercase tracking-widest text-gray-300 mb-2">Prescription issued via</p>
-                <img src="{{ asset('frontend/assets/logo.png') }}" class="h-6 opacity-40 grayscale">
+                <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" class="h-6 opacity-40 grayscale">
             </div>
             <div class="text-center md:text-right border-t md:border-t-0 pt-6 md:pt-0 border-gray-100 w-full md:w-auto">
                 @if($prescription->practitioner->signature_path)
@@ -149,15 +149,78 @@
 
 <style>
 @media print {
-    body { background: white !important; }
-    .main-content { padding: 0 !important; margin: 0 !important; }
-    header, footer, nav, aside, #sidebar, .sidebar-wrapper, .action-bar, button, a[href*="back"], .flex.items-center.justify-between.mb-8, .breadcrumb-wrapper { 
-        display: none !important; 
+    /* Hide ALL UI elements */
+    aside, 
+    header, 
+    nav, 
+    footer, 
+    .lg\:hidden, 
+    #global-preloader,
+    .action-bar,
+    button,
+    a,
+    .ri-arrow-left-line,
+    [class*="sidebar"],
+    [class*="nav"] {
+        display: none !important;
     }
-    .w-full { width: 100% !important; margin: 0 !important; padding: 0 !important; }
-    .bg-white { border: 0 !important; box-shadow: none !important; }
-    .rounded-\[2\.5rem\] { border-radius: 0 !important; }
-    .p-8, .md\:p-12 { padding: 2rem !important; }
+
+    /* Reset layout for print */
+    body, html {
+        height: auto !important;
+        overflow: visible !important;
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    main {
+        overflow: visible !important;
+        height: auto !important;
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    main > div {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .w-full {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .bg-white {
+        border: 0 !important;
+        box-shadow: none !important;
+    }
+
+    /* Ensure card looks like a document */
+    .bg-white.rounded-\[2\.5rem\] {
+        border-radius: 0 !important;
+        border: 1px solid #eee !important;
+    }
+
+    .p-8, .md\:p-12 {
+        padding: 2rem !important;
+    }
+
+    /* Fix image visibility */
+    img {
+        max-width: 100% !important;
+    }
+
+    /* Force background colors to print if possible */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
 }
 </style>
 @endsection
