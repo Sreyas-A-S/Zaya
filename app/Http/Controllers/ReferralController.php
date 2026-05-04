@@ -238,7 +238,12 @@ class ReferralController extends Controller
             'translator_id' => $oldBooking->translator_id,
             'booking_date' => $referral->booking_date,
             'booking_time' => $referral->booking_time,
-            'total_price' => $referral->amount,
+            'subtotal' => $referral->amount,
+            'total_price' => max(0, $referral->amount - $referral->discount_amount - $referral->coin_discount),
+            'promo_code' => $referral->promo_code,
+            'discount_amount' => $referral->discount_amount,
+            'coins_used' => $referral->coins_used,
+            'coin_discount' => $referral->coin_discount,
             'currency' => $currency,
             'status' => 'confirmed',
             'razorpay_payment_id' => $paymentId,
@@ -250,7 +255,8 @@ class ReferralController extends Controller
         // Record Financial Transaction
         $this->recordTransaction([
             'type' => 'referral',
-            'amount' => $referral->amount,
+            'amount' => $newBooking->total_price,
+            'subtotal' => $newBooking->subtotal,
             'user_id' => $referral->user_id,
             'practitioner_id' => $referredToUser->id, // Receiver
             'referrer_id' => $referral->referred_by_id, // Referrer
@@ -260,6 +266,8 @@ class ReferralController extends Controller
             'currency' => $currency,
             'referrer_role' => $referral->referredBy->role ?? null,
             'referred_role' => $referredToUser->role ?? null,
+            'coins_used' => $referral->coins_used,
+            'coin_discount' => $referral->coin_discount,
         ]);
 
         $newBooking->load('referral.referredBy');
@@ -309,15 +317,22 @@ class ReferralController extends Controller
         }
 
         if ($referral->status === 'pending' && $referral->amount > 0) {
-            return view('referrals.pay', compact('referral', 'serviceTitles', 'expertCurrency', 'clientCurrency', 'converted'));
+            $userPromoCodes = collect();
+            if (Auth::check() && \Illuminate\Support\Facades\Schema::hasTable('user_promo_codes')) {
+                $userPromoCodes = Auth::user()->userPromoCodes()->latest()->get();
+            }
+
+            $coinSetting = \App\Models\CoinSetting::where('currency_code', $clientCurrency)->where('status', true)->first();
+
+            return view('referrals.pay', compact('referral', 'serviceTitles', 'expertCurrency', 'clientCurrency', 'converted', 'userPromoCodes', 'coinSetting'));
         }
 
         return redirect()->route('dashboard');
     }
 
-    public function initiatePayment($referral_no)
+    public function initiatePayment(Request $request, $referral_no)
     {
-        Log::info('initiatePayment hit', ['referral_no' => $referral_no]);
+        Log::info('initiatePayment hit', ['referral_no' => $referral_no, 'request' => $request->all()]);
         $referral = Referral::with(['user', 'referredTo'])->where('referral_no', $referral_no)->firstOrFail();
 
         if ($referral->status === 'awaiting_consent') {
@@ -329,7 +344,84 @@ class ReferralController extends Controller
         }
 
         if ($referral->status === 'pending' && $referral->amount > 0) {
-            return $this->initiateRazorpay($referral);
+            $clientCurrency = derive_currency_from_user(Auth::user());
+            $expertCurrency = strtoupper((string) ($referral->currency ?? $this->resolveProfessionalCurrency($referral->referredTo) ?? config('currencies.default', 'INR')));
+            
+            $converted = $this->calculateTotal([
+                'subtotal' => $referral->amount,
+                'currency' => $expertCurrency
+            ], $clientCurrency);
+
+            // Validate and apply discounts on the server side
+            $subtotal = (float) $converted['converted'];
+            $currency = $clientCurrency;
+            
+            // 1. Validate Promo Code
+            $promoDiscount = 0;
+            $promoCode = null;
+            if ($request->promo_code) {
+                $code = trim((string) $request->promo_code);
+                $promo = \App\Models\PromoCode::whereRaw('LOWER(code) = ?', [mb_strtolower($code)])
+                    ->where('status', true)
+                    ->where(function($q) {
+                        $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', now()->toDateTimeString());
+                    })->first();
+                
+                if ($promo && ($promo->usage_limit === null || $promo->used_count < $promo->usage_limit)) {
+                    if ($promo->usage_type === 'both' || $promo->usage_type === 'booking') {
+                        if ($promo->type === 'fixed' && $promo->currency && $promo->currency !== $currency) {
+                            Log::warning("Promo code currency mismatch: code uses {$promo->currency}, transaction uses {$currency}");
+                        } else {
+                            $promoCode = $promo->code;
+                            $reward = (float) $promo->reward;
+                            if ($promo->type === 'percentage') {
+                                $promoDiscount = $subtotal * ($reward / 100.0);
+                            } else {
+                                $promoDiscount = min($reward, $subtotal);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 2. Calculate Coin Discount
+            $coinsUsed = 0;
+            $coinDiscount = 0;
+            if ($request->coins_applied && Auth::user()->coins > 0) {
+                $clientCurrency = derive_currency_from_user(Auth::user());
+                $coinSetting = \App\Models\CoinSetting::where('currency_code', $clientCurrency)->where('status', true)->first();
+                if ($coinSetting && $coinSetting->coin_value > 0) {
+                    $afterPromo = max(0, $subtotal - $promoDiscount);
+                    
+                    $potentialDiscount = Auth::user()->coins * $coinSetting->coin_value;
+                    if ($potentialDiscount > $afterPromo) {
+                        $coinDiscount = $afterPromo;
+                        $coinsUsed = ceil($afterPromo / $coinSetting->coin_value);
+                    } else {
+                        $coinDiscount = $potentialDiscount;
+                        $coinsUsed = Auth::user()->coins;
+                    }
+                }
+            }
+
+            $finalPayable = max(0, $subtotal - $promoDiscount - $coinDiscount);
+
+            // Update referral record with discount details
+            $referral->update([
+                'promo_code' => $promoCode,
+                'discount_amount' => $promoDiscount,
+                'coins_used' => $coinsUsed,
+                'coin_discount' => $coinDiscount,
+                'currency' => $currency, // Payment currency (client currency)
+                'amount' => $subtotal,    // Subtotal in payment currency
+            ]);
+
+            // If final payable is 0, we can skip Razorpay
+            if ($finalPayable <= 0) {
+                return $this->processZeroPaymentReferral($referral);
+            }
+
+            return $this->initiateRazorpay($referral, $finalPayable);
         }
 
         return redirect()->route('dashboard');
@@ -377,7 +469,39 @@ class ReferralController extends Controller
         return redirect()->route('dashboard')->with('success', 'Consent granted and referral confirmed!');
     }
 
-    private function initiateRazorpay($referral)
+    private function processZeroPaymentReferral($referral)
+    {
+        $referral->status = 'paid';
+        $referral->razorpay_payment_id = 'ZERO_PAYMENT';
+        $referral->save();
+
+        // Deduct coins if used
+        if ($referral->coins_used > 0) {
+            $user = Auth::user();
+            $user->coins = max(0, $user->coins - $referral->coins_used);
+            $user->save();
+
+            \App\Models\CoinTransaction::create([
+                'user_id' => $user->id,
+                'amount' => -$referral->coins_used,
+                'type' => 'debit',
+                'description' => 'Used for referral payment ' . $referral->referral_no,
+                'metadata' => ['referral_id' => $referral->id, 'referral_no' => $referral->referral_no]
+            ]);
+        }
+
+        // Increment promo usage
+        if ($referral->promo_code) {
+            $promo = \App\Models\PromoCode::where('code', $referral->promo_code)->first();
+            if ($promo) $promo->incrementUsageIfAvailable();
+        }
+
+        $newBooking = $this->createReferredBooking($referral, 'ZERO_PAYMENT');
+
+        return redirect()->route('invoice.show', $newBooking->invoice_no)->with('success', 'Referral confirmed successfully (Discount applied)!');
+    }
+
+    private function initiateRazorpay($referral, $payableAmount)
     {
         $razorpayKey = config('services.razorpay.key');
         $razorpaySecret = config('services.razorpay.secret');
@@ -392,7 +516,7 @@ class ReferralController extends Controller
         $customerPhone = (string) ($referral->user->phone ?? $referral->user->mobile ?? '');
 
         $payload = [
-            'amount' => (int) round(((float) $referral->amount) * 100),
+            'amount' => (int) round(((float) $payableAmount) * 100),
             'currency' => $currency,
             'accept_partial' => false,
             'description' => "Referral Session: " . $referral->referredTo->name,
@@ -455,6 +579,29 @@ class ReferralController extends Controller
             $referral->status = 'paid';
             $referral->razorpay_payment_id = $paymentId;
             $referral->save();
+
+            // Deduct coins if used
+            if ($referral->coins_used > 0) {
+                $user = User::find($referral->user_id);
+                if ($user) {
+                    $user->coins = max(0, $user->coins - $referral->coins_used);
+                    $user->save();
+
+                    \App\Models\CoinTransaction::create([
+                        'user_id' => $user->id,
+                        'amount' => -$referral->coins_used,
+                        'type' => 'debit',
+                        'description' => 'Used for referral payment ' . $referral->referral_no,
+                        'metadata' => ['referral_id' => $referral->id, 'referral_no' => $referral->referral_no]
+                    ]);
+                }
+            }
+
+            // Increment promo usage
+            if ($referral->promo_code) {
+                $promo = \App\Models\PromoCode::where('code', $referral->promo_code)->first();
+                if ($promo) $promo->incrementUsageIfAvailable();
+            }
 
             $newBooking = $this->createReferredBooking($referral, $paymentId);
 
