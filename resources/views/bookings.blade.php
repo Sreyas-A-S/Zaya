@@ -24,10 +24,12 @@
     }
     /* Loading state for the time‑picker dropdown */
     .time-picker-dropdown.loading {
-        opacity: 0;
         pointer-events: none;
     }
-    .time-picker-dropdown:not(.loading) {
+    .time-picker-dropdown.loading .time-picker-content {
+        opacity: 0.6;
+    }
+    .time-picker-dropdown {
         opacity: 1;
         transition: opacity 0.2s ease-in-out;
     }
@@ -505,10 +507,12 @@
             return;
         }
 
-        // Show loading state while fetching slots
-        dropdown.classList.add('loading');
-
+        // Show dropdown immediately
         if (dropdown.classList.contains('hidden')) {
+            dropdown.classList.remove('hidden');
+            dropdown.classList.add('loading');
+            smartPosition(trigger, dropdown);
+
             const parts = dateInput.value.split('-');
             if (parts.length < 3) return;
             const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
@@ -525,10 +529,16 @@
             const timeInput = document.getElementById('reschedule-time');
             const selectedTime = timeInput.value;
 
+            // Initial preloader content
+            content.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-10 px-4">
+                    <div class="w-8 h-8 border-4 border-[#F5A623] border-t-transparent rounded-full animate-spin mb-3"></div>
+                    <p class="text-sm text-gray-500 font-medium text-center">Fetching available slots...</p>
+                </div>
+            `;
+
             await renderRescheduleTimePicker(content, dateInput.value, selectedTime, isToday, dateLabel);
             dropdown.classList.remove('loading');
-            dropdown.classList.remove('hidden');
-            smartPosition(trigger, dropdown);
         } else {
             dropdown.classList.add('hidden');
             dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
