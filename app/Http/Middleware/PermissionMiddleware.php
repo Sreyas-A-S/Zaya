@@ -17,7 +17,7 @@ class PermissionMiddleware
     public function handle(Request $request, Closure $next, string $permission): Response
     {
         if (!\Illuminate\Support\Facades\Auth::check()) {
-            return redirect()->route('login');
+            return redirect()->route('login', ['redirect' => $request->fullUrl()]);
         }
 
         if (!\Illuminate\Support\Facades\Auth::user()->hasPermission($permission)) {

@@ -45,7 +45,7 @@ class ZegoController extends Controller
                 }
             } else {
                 if (!$isPublicMeeting) {
-                    return redirect()->route('login')->with('error', 'Please login to join your scheduled session.');
+                    return redirect()->route('login', ['redirect' => request()->fullUrl()])->with('error', 'Please login to join your scheduled session.');
                 }
             }
         }
