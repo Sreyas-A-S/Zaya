@@ -50,24 +50,24 @@
                                 ->first();
                         @endphp
                         <td class="px-6 py-4 text-sm font-medium text-secondary">
-                            {{ $loop->iteration + ($bookings->currentPage() - 1) * $bookings->perPage() }}
+                            <div class="flex items-center gap-3">
+                                <span>{{ $loop->iteration + ($bookings->currentPage() - 1) * $bookings->perPage() }}</span>
+                                @if($pendingRefRequest)
+                                    <div class="relative flex" title="Referral Requested: {{ \Illuminate\Support\Str::headline($pendingRefRequest->expert_type) }}. Note: {{ $pendingRefRequest->note }}">
+                                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
+                                        <i class="ri-alert-fill text-amber-500 text-lg relative"></i>
+                                    </div>
+                                @endif
+                            </div>
                         </td>
                         <td class="px-6 py-4 text-sm font-medium text-secondary">
                             <div class="flex items-center gap-2">
-                                <div class="flex flex-col">
-                                    <span class="flex items-center gap-2">
-                                        {{ $booking->invoice_no }}
-                                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id !== $user->profile_id)
-                                            <span class="px-1.5 py-0.5 bg-orange-50 text-orange-600 text-[9px] font-black uppercase tracking-tighter rounded border border-orange-100">Referred</span>
-                                        @endif
-                                    </span>
-                                    @if($pendingRefRequest)
-                                        <span class="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-black uppercase tracking-widest rounded-md border border-amber-200 animate-pulse cursor-help" title="Note from {{ $pendingRefRequest->requester->name ?? 'Expert' }}: {{ $pendingRefRequest->note }}">
-                                            <i class="ri-error-warning-fill"></i>
-                                            Referral Requested: {{ \Illuminate\Support\Str::headline($pendingRefRequest->expert_type) }}
-                                        </span>
+                                <span class="flex items-center gap-2">
+                                    {{ $booking->invoice_no }}
+                                    @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id !== $user->profile_id)
+                                        <span class="px-1.5 py-0.5 bg-orange-50 text-orange-600 text-[9px] font-black uppercase tracking-tighter rounded border border-orange-100">Referred</span>
                                     @endif
-                                </div>
+                                </span>
                             </div>
                         </td>
                         <td class="px-6 py-4">
