@@ -26,7 +26,7 @@ class InvoiceController extends Controller
     public function show($invoice_no)
     {
         if (!auth()->check()) {
-            return redirect()->route('login')->with('error', 'Please login to view your invoice.');
+            return redirect()->route('login', ['redirect' => request()->fullUrl()])->with('error', 'Please login to view your invoice.');
         }
 
         $isRegistration = str_starts_with($invoice_no, 'ZAYA-REG');
@@ -41,8 +41,9 @@ class InvoiceController extends Controller
         
         // Ensure user can only see their own invoice unless admin
         if (auth()->user()->role !== 'admin' && $booking->user_id !== auth()->id()) {
+            $invoice_url = route('invoice.show', $invoice_no);
             auth()->logout();
-            return redirect()->route('login')->with('error', 'For security purposes, please log in with the account associated with this invoice.');
+            return redirect()->route('login', ['redirect' => $invoice_url])->with('error', 'For security purposes, please log in with the account associated with this invoice.');
         }
         
         return view('invoice.index', compact('booking'));

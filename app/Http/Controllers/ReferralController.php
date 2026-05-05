@@ -346,10 +346,15 @@ class ReferralController extends Controller
             $clientCurrency = derive_currency_from_user(Auth::user());
             $expertCurrency = strtoupper((string) ($referral->currency ?? $this->resolveProfessionalCurrency($referral->referredTo) ?? config('currencies.default', 'INR')));
             
-            $converted = $this->calculateTotal([
-                'subtotal' => $referral->amount,
-                'currency' => $expertCurrency
-            ], $clientCurrency);
+            $converted = app(CurrencyConversionService::class)->convert(
+                (float) $referral->amount, 
+                $expertCurrency, 
+                $clientCurrency
+            );
+
+            if (!$converted) {
+                return back()->with('error', 'Currency conversion failed. Please try again later.');
+            }
 
             // Validate and apply discounts on the server side
             $subtotal = (float) $converted['converted'];

@@ -1572,14 +1572,15 @@
     });
 
     function addLanguageCapabilityRow(value, label, caps = null) {
-        if ($(`#lang-row-${value.replace(/\s+/g, '_')}`).length > 0) return;
+        const safeValue = value.replace(/[^a-z0-9]/gi, '_');
+        if ($(`[id="lang-row-${safeValue}"]`).length > 0) return;
 
         const isRead = caps && caps.read ? 'checked' : '';
         const isWrite = caps && caps.write ? 'checked' : '';
         const isSpeak = caps && caps.speak ? 'checked' : '';
 
         const html = `
-            <div class="language-capability-row" id="lang-row-${value.replace(/\s+/g, '_')}">
+            <div class="language-capability-row" id="lang-row-${safeValue}">
                 <div class="row align-items-center">
                     <div class="col-md-4">
                         <span class="language-capability-title">${label}</span>
@@ -1588,16 +1589,16 @@
                     <div class="col-md-8">
                         <div class="d-flex gap-3 capability-checkboxes">
                             <div class="form-check checkbox-primary mb-0">
-                                <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][read]" value="1" id="read_${value}" ${isRead}>
-                                <label class="form-check-label small" for="read_${value}">Read</label>
+                                <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][read]" value="1" id="read_${safeValue}" ${isRead}>
+                                <label class="form-check-label small" for="read_${safeValue}">Read</label>
                             </div>
                             <div class="form-check checkbox-primary mb-0">
-                                <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][write]" value="1" id="write_${value}" ${isWrite}>
-                                <label class="form-check-label small" for="write_${value}">Write</label>
+                                <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][write]" value="1" id="write_${safeValue}" ${isWrite}>
+                                <label class="form-check-label small" for="write_${safeValue}">Write</label>
                             </div>
                             <div class="form-check checkbox-primary mb-0">
-                                <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][speak]" value="1" id="speak_${value}" ${isSpeak}>
-                                <label class="form-check-label small" for="speak_${value}">Speak</label>
+                                <input class="form-check-input" type="checkbox" name="languages_spoken[${value}][speak]" value="1" id="speak_${safeValue}" ${isSpeak}>
+                                <label class="form-check-label small" for="speak_${safeValue}">Speak</label>
                             </div>
                         </div>
                     </div>
