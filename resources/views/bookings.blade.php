@@ -6,6 +6,7 @@
 <style>
     /* Time Picker Dropdown Styles */
     .time-picker-dropdown {
+        display: none;
         position: fixed;
         z-index: 1100;
         background: #fff;
@@ -14,10 +15,12 @@
         padding: 0;
         width: 320px;
         max-height: 400px;
-        display: flex;
         flex-direction: column;
         overflow: hidden;
         border: 1px solid rgba(0,0,0,0.05);
+    }
+    .time-picker-dropdown:not(.hidden) {
+        display: flex;
     }
     /* Loading state for the time‑picker dropdown */
     .time-picker-dropdown.loading {
@@ -482,6 +485,12 @@
         
         document.getElementById('reschedule-modal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+
+        const dropdown = document.querySelector('.time-picker-dropdown');
+        if (dropdown) {
+            dropdown.classList.add('hidden');
+            dropdown.classList.remove('loading');
+        }
     }
 
     async function toggleRescheduleTimePicker(trigger) {
@@ -717,6 +726,11 @@
     function closeRescheduleModal() {
         document.getElementById('reschedule-modal').classList.add('hidden');
         document.body.style.overflow = 'auto';
+        const dropdown = document.querySelector('.time-picker-dropdown');
+        if (dropdown) {
+            dropdown.classList.add('hidden');
+            dropdown.classList.remove('loading', 'cal-open-top', 'cal-open-bottom');
+        }
     }
 
     document.getElementById('reschedule-form').addEventListener('submit', async function(e) {
