@@ -25,7 +25,7 @@
                         <h1 class="text-3xl font-black text-secondary">{{ $prescription->title }}</h1>
                         <p class="text-sm text-gray-500 mt-1">Issued on {{ $prescription->prescription_date->format('F d, Y') }}</p>
                     </div>
-                    <div class="flex items-center gap-4 md:justify-end">
+                    <div class="flex items-center gap-4 justify-end">
                         <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" class="h-12 w-auto opacity-100">
                         <div class="text-left">
                             <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Reference</p>
@@ -128,10 +128,7 @@
 
         <!-- Footer / Signature Area -->
         <div class="p-8 md:p-12 bg-gray-50/30 border-t border-gray-50 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div class="text-center md:text-left">
-                <p class="text-[10px] font-black uppercase tracking-widest text-gray-300 mb-2">Prescription issued via</p>
-                <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" class="h-6 opacity-40 grayscale">
-            </div>
+            
             <div class="text-center md:text-right border-t md:border-t-0 pt-6 md:pt-0 border-gray-100 w-full md:w-auto">
                 @if($prescription->practitioner->signature_path)
                     <img src="{{ asset('storage/' . $prescription->practitioner->signature_path) }}" class="h-12 mx-auto md:ml-auto mb-2 print:block">
