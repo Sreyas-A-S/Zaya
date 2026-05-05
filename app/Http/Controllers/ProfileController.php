@@ -36,7 +36,7 @@ class ProfileController extends Controller
     {
         $role = $user->role;
         $profileId = $user->profile_id;
-        $query = Booking::with(['practitioner.user', 'user', 'transactions']);
+        $query = Booking::with(['practitioner.user', 'user', 'transactions', 'referralRequests.requester']);
 
         if ($forceClientView || $role === 'client' || $role === 'patient') {
             $query->where('user_id', $user->id);

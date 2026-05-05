@@ -44,15 +44,30 @@
                 <tbody class="divide-y divide-[#2E4B3D]/12">
                     @forelse($bookings as $booking)
                     <tr class="hover:bg-[#FDFDFD] transition-colors">
+                        @php
+                            $pendingRefRequest = $booking->referralRequests->where('status', 'pending')
+                                ->where('recipient_id', $user->id)
+                                ->first();
+                        @endphp
                         <td class="px-6 py-4 text-sm font-medium text-secondary">
                             {{ $loop->iteration + ($bookings->currentPage() - 1) * $bookings->perPage() }}
                         </td>
                         <td class="px-6 py-4 text-sm font-medium text-secondary">
                             <div class="flex items-center gap-2">
-                                {{ $booking->invoice_no }}
-                                @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id !== $user->profile_id)
-                                    <span class="px-1.5 py-0.5 bg-orange-50 text-orange-600 text-[9px] font-black uppercase tracking-tighter rounded border border-orange-100">Referred</span>
-                                @endif
+                                <div class="flex flex-col">
+                                    <span class="flex items-center gap-2">
+                                        {{ $booking->invoice_no }}
+                                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id !== $user->profile_id)
+                                            <span class="px-1.5 py-0.5 bg-orange-50 text-orange-600 text-[9px] font-black uppercase tracking-tighter rounded border border-orange-100">Referred</span>
+                                        @endif
+                                    </span>
+                                    @if($pendingRefRequest)
+                                        <span class="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-black uppercase tracking-widest rounded-md border border-amber-200 animate-pulse">
+                                            <i class="ri-error-warning-fill"></i>
+                                            Referral Requested: {{ \Illuminate\Support\Str::headline($pendingRefRequest->expert_type) }}
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                         </td>
                         <td class="px-6 py-4">
@@ -224,9 +239,9 @@
                                         </button>
 
                                         @if($user->role === 'practitioner')
-                                        <button onclick="openReferModal({{ $booking->id }}, {{ $booking->user_id }})" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors text-left">
+                                        <button onclick="openReferModal({{ $booking->id }}, {{ $booking->user_id }}, '{{ $pendingRefRequest ? $pendingRefRequest->expert_type : '' }}')" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors text-left">
                                             <i class="ri-user-shared-line mr-3 text-lg text-orange-500"></i>
-                                            Refer
+                                            Refer{{ $pendingRefRequest ? ' Expert' : '' }}
                                         </button>
                                         @else
                                         <button onclick="openRequestReferralModal({{ $booking->id }})" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors text-left">

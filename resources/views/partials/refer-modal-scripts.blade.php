@@ -752,7 +752,7 @@
         fetchProfessionals();
     }
 
-    async function openReferModal(bookingId, clientId) {
+    async function openReferModal(bookingId, clientId, expertType = null) {
         const modal = document.getElementById('refer-modal');
         const bookingIdInput = document.getElementById('refer-booking-id');
         const clientIdInput = document.getElementById('refer-client-id');
@@ -772,8 +772,12 @@
         selectedProfessionals = {};
         renderSelectedSummary();
         
-        // Default to practitioner tab
-        switchReferTab('practitioner');
+        // Use expertType if provided, otherwise default to practitioner tab
+        if (expertType) {
+            switchReferTab(expertType);
+        } else {
+            switchReferTab('practitioner');
+        }
     }
 
     function closeReferModal() {
