@@ -162,6 +162,11 @@
         display: none !important;
     }
 
+    @page {
+        size: auto;
+        margin: 10mm 5mm;
+    }
+
     /* Reset layout for print */
     body, html {
         height: auto !important;
@@ -205,8 +210,15 @@
     }
 
     .p-8, .md\:p-12 {
-        padding: 2rem !important;
+        padding: 1.5rem !important;
     }
+
+    /* Reduce vertical spacing specifically for print */
+    .space-y-8 > * + * { margin-top: 1rem !important; }
+    .space-y-6 > * + * { margin-top: 0.75rem !important; }
+    .space-y-4 > * + * { margin-top: 0.5rem !important; }
+    .gap-12 { gap: 1.5rem !important; }
+    .py-5 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
 
     /* Fix image visibility */
     img {
