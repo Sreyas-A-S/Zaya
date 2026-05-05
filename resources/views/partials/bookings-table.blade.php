@@ -62,7 +62,7 @@
                                         @endif
                                     </span>
                                     @if($pendingRefRequest)
-                                        <span class="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-black uppercase tracking-widest rounded-md border border-amber-200 animate-pulse">
+                                        <span class="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-black uppercase tracking-widest rounded-md border border-amber-200 animate-pulse cursor-help" title="Note from {{ $pendingRefRequest->requester->name ?? 'Expert' }}: {{ $pendingRefRequest->note }}">
                                             <i class="ri-error-warning-fill"></i>
                                             Referral Requested: {{ \Illuminate\Support\Str::headline($pendingRefRequest->expert_type) }}
                                         </span>

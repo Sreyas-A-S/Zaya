@@ -140,6 +140,12 @@ class ReferralController extends Controller
             $referralResults[] = $referralNo;
         }
 
+        // Mark any pending referral requests for this booking/recipient as processed
+        \App\Models\ReferralRequest::where('booking_id', $booking->id)
+            ->where('recipient_id', $user->id)
+            ->where('status', 'pending')
+            ->update(['status' => 'processed']);
+
         // Always trigger OTP for every new referral
         $this->triggerReferralOTP($user, $booking->user, $proNames, $booking->id);
         $msg = 'Referral request sent! The client has been notified to provide consent via OTP.';
