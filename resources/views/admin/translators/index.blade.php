@@ -127,27 +127,27 @@
                             <div class="stepper-horizontal mb-5" id="translator-stepper">
                                 <div class="stepper-item active" data-step="1">
                                     <div class="step-counter">1</div>
-                                    <div class="step-name text-nowrap">Personal Details</div>
+                                    <div class="step-name">Personal Details</div>
                                 </div>
                                 <div class="stepper-item" data-step="2">
                                     <div class="step-counter">2</div>
-                                    <div class="step-name text-nowrap">Language Details</div>
+                                    <div class="step-name">Language Details</div>
                                 </div>
                                 <div class="stepper-item" data-step="3">
                                     <div class="step-counter">3</div>
-                                    <div class="step-name text-nowrap">Professional Details</div>
+                                    <div class="step-name">Professional Details</div>
                                 </div>
                                 <div class="stepper-item" data-step="4">
                                     <div class="step-counter">4</div>
-                                    <div class="step-name text-nowrap">Qualifications</div>
+                                    <div class="step-name">Qualifications</div>
                                 </div>
                                 <div class="stepper-item" data-step="5">
                                     <div class="step-counter">5</div>
-                                    <div class="step-name text-nowrap">Services</div>
+                                    <div class="step-name">Services</div>
                                 </div>
                                 <div class="stepper-item" data-step="6">
                                     <div class="step-counter">6</div>
-                                    <div class="step-name text-nowrap">Identity</div>
+                                    <div class="step-name">Identity</div>
                                 </div>
                             </div>
 
@@ -1981,6 +1981,49 @@ function openCreateModal() {
 
         .stepper-horizontal .stepper-item.completed .step-name {
             color: #51bb25;
+        }
+
+        @media (max-width: 767px) {
+            .stepper-horizontal .step-name {
+                display: none;
+            }
+            .stepper-horizontal .stepper-item.active .step-name {
+                display: block;
+                position: absolute;
+                top: 45px;
+                width: 100px;
+                font-size: 10px;
+                line-height: 1.2;
+            }
+            .stepper-horizontal {
+                margin-bottom: 50px !important;
+            }
+            .stepper-horizontal .step-counter {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+            .stepper-horizontal::before {
+                top: 15px;
+            }
+            .modal-body.p-4 {
+                padding: 1rem !important;
+            }
+            .form-check.d-flex {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                width: 100%;
+                gap: 10px;
+            }
+            .form-check.d-flex .form-check-label {
+                flex: 1;
+                margin-right: 10px;
+                word-break: break-word;
+            }
+            .form-check.d-flex .delete-master-data-btn {
+                flex-shrink: 0;
+            }
         }
 
         .translator-avatar-preview {
