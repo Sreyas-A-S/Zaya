@@ -835,7 +835,8 @@
                         });
 
                         element.addEventListener('removeItem', function(event) {
-                            $(`#lang-row-${fieldName}-${event.detail.value.replace(/\s+/g, '_')}`).remove();
+                            const safeValue = event.detail.value.replace(/[^a-z0-9]/gi, '_');
+                            $(`[id="lang-row-${fieldName}-${safeValue}"]`).remove();
                         });
 
                         return choices;

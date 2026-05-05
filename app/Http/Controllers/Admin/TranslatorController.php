@@ -203,8 +203,11 @@ class TranslatorController extends Controller
 
             'native_language' => 'nullable|string|max:100',
             'source_languages' => 'nullable|array',
+            'source_languages.*' => 'nullable|array',
             'target_languages' => 'nullable|array',
+            'target_languages.*' => 'nullable|array',
             'additional_languages' => 'nullable|array',
+            'additional_languages.*' => 'nullable|array',
 
             'translator_type' => 'nullable|string|max:255',
             'years_of_experience' => 'nullable|integer',
@@ -350,8 +353,11 @@ class TranslatorController extends Controller
 
             'native_language' => 'nullable|string|max:100',
             'source_languages' => 'nullable|array',
+            'source_languages.*' => 'nullable|array',
             'target_languages' => 'nullable|array',
+            'target_languages.*' => 'nullable|array',
             'additional_languages' => 'nullable|array',
+            'additional_languages.*' => 'nullable|array',
 
             'translator_type' => 'nullable|string|max:255',
             'years_of_experience' => 'nullable|integer',
