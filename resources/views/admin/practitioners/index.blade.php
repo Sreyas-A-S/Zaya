@@ -1437,8 +1437,8 @@
     }
 
     function addLanguageCapabilityRow(value, label, capabilities = {}) {
-        const safeValue = value.replace(/\s+/g, '_'); // Replace spaces for ID
-        const existingRow = $(`#lang-row-${safeValue}`);
+        const safeValue = value.replace(/[^a-z0-9]/gi, '_'); // Replace special characters for ID
+        const existingRow = $(`[id="lang-row-${safeValue}"]`);
         if (existingRow.length) {
             // If row already exists, update its checkboxes
             existingRow.find(`input[name="languages_spoken[${value}][read]"]`).prop('checked', capabilities.read || false);

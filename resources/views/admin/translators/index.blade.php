@@ -1011,8 +1011,9 @@
                     }
 
                     function addLanguageCapabilityRow(value, label, fieldName, caps = null) {
-                        const rowId = `lang-row-${fieldName}-${value.replace(/\s+/g, '_')}`;
-                        if ($(`#${rowId}`).length > 0) return;
+                        const safeValue = value.replace(/[^a-z0-9]/gi, '_');
+                        const rowId = `lang-row-${fieldName}-${safeValue}`;
+                        if ($(`[id="${rowId}"]`).length > 0) return;
 
                         const isRead = caps && caps.read ? 'checked' : '';
                         const isWrite = caps && caps.write ? 'checked' : '';
@@ -1028,16 +1029,16 @@
                             <div class="col-md-8">
                                 <div class="d-flex gap-3 capability-checkboxes">
                                     <div class="form-check checkbox-primary mb-0">
-                                        <input class="form-check-input" type="checkbox" name="${fieldName}[${value}][read]" value="1" id="read_${fieldName}_${value.replace(/\s+/g, '_')}" ${isRead}>
-                                        <label class="form-check-label small" for="read_${fieldName}_${value.replace(/\s+/g, '_')}">Read</label>
+                                        <input class="form-check-input" type="checkbox" name="${fieldName}[${value}][read]" value="1" id="read_${fieldName}_${safeValue}" ${isRead}>
+                                        <label class="form-check-label small" for="read_${fieldName}_${safeValue}">Read</label>
                                     </div>
                                     <div class="form-check checkbox-primary mb-0">
-                                        <input class="form-check-input" type="checkbox" name="${fieldName}[${value}][write]" value="1" id="write_${fieldName}_${value.replace(/\s+/g, '_')}" ${isWrite}>
-                                        <label class="form-check-label small" for="write_${fieldName}_${value.replace(/\s+/g, '_')}">Write</label>
+                                        <input class="form-check-input" type="checkbox" name="${fieldName}[${value}][write]" value="1" id="write_${fieldName}_${safeValue}" ${isWrite}>
+                                        <label class="form-check-label small" for="write_${fieldName}_${safeValue}">Write</label>
                                     </div>
                                     <div class="form-check checkbox-primary mb-0">
-                                        <input class="form-check-input" type="checkbox" name="${fieldName}[${value}][speak]" value="1" id="speak_${fieldName}_${value.replace(/\s+/g, '_')}" ${isSpeak}>
-                                        <label class="form-check-label small" for="speak_${fieldName}_${value.replace(/\s+/g, '_')}">Speak</label>
+                                        <input class="form-check-input" type="checkbox" name="${fieldName}[${value}][speak]" value="1" id="speak_${fieldName}_${safeValue}" ${isSpeak}>
+                                        <label class="form-check-label small" for="speak_${fieldName}_${safeValue}">Speak</label>
                                     </div>
                                 </div>
                             </div>
