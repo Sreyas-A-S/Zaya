@@ -361,11 +361,9 @@
                 const isAlreadyReferred = p.is_already_referred;
                 
                 const item = document.createElement('div');
-                item.className = `p-4 rounded-2xl border ${isSelected ? 'border-secondary bg-secondary/5' : 'border-gray-100'} flex items-center justify-between group transition-all ${isAlreadyReferred ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:border-secondary/20 hover:bg-gray-50/50 cursor-pointer professional-item'}`;
+                item.className = `p-4 rounded-2xl border ${isSelected ? 'border-secondary bg-secondary/5' : 'border-gray-100'} flex items-center justify-between group transition-all hover:border-secondary/20 hover:bg-gray-50/50 cursor-pointer professional-item`;
                 
-                if (!isAlreadyReferred) {
-                    item.onclick = () => selectProfessional(p.id, p.name, p.service_fee, p.profile_pic, role);
-                }
+                item.onclick = () => selectProfessional(p.id, p.name, p.service_fee, p.profile_pic, role);
 
                 const canViewProfile = (p.role === 'practitioner');
 
