@@ -1044,14 +1044,37 @@ class ProfileController extends Controller
     public function fetchAvailableTranslators(Request $request)
     {
         $query = $request->query('query');
-        $fromLang = $request->query('from_lang');
-        $toLang = $request->query('to_lang');
+        $fromLangRaw = $request->query('from_lang');
+        $toLangRaw = $request->query('to_lang');
 
         // Handle JS null/undefined strings
-        if ($fromLang === 'null' || $fromLang === 'undefined') $fromLang = null;
-        if ($toLang === 'null' || $toLang === 'undefined') $toLang = null;
+        if ($fromLangRaw === 'null' || $fromLangRaw === 'undefined') $fromLangRaw = null;
+        if ($toLangRaw === 'null' || $toLangRaw === 'undefined') $toLangRaw = null;
 
         $ignoreLanguages = $request->query('ignore_languages') === 'true';
+
+        // Resolve language names to a list of possible aliases (English name, Native name)
+        $resolveLang = function($langStr) {
+            if (!$langStr || strtolower($langStr) === 'any') return [];
+            
+            $base = explode(' (', $langStr)[0];
+            $variants = [$langStr, $base];
+
+            $langRecord = \App\Models\Language::where('name', $base)
+                ->orWhere('native_name', $base)
+                ->orWhere('name', $langStr)
+                ->orWhere('native_name', $langStr)
+                ->first();
+
+            if ($langRecord) {
+                $variants[] = $langRecord->name;
+                $variants[] = $langRecord->native_name;
+            }
+            return array_unique(array_filter($variants));
+        };
+
+        $fromLangs = $resolveLang($fromLangRaw);
+        $toLangs = $resolveLang($toLangRaw);
 
         $translatorsQuery = \App\Models\Translator::with('user')
             ->where('status', 'active');
@@ -1061,73 +1084,39 @@ class ProfileController extends Controller
         }
 
         if (!$ignoreLanguages) {
-            if ($fromLang && $toLang && strtolower($toLang) !== 'any') {
-                $translatorsQuery->where(function ($q) use ($fromLang, $toLang) {
-                    $baseFrom = explode(' (', $fromLang)[0];
-                    $baseTo = explode(' (', $toLang)[0];
-
-                    // Match translators who support both languages in any capacity
-                    $q->where(function ($sub) use ($fromLang, $baseFrom) {
-                        $sub->whereJsonContains('source_languages', $fromLang)
-                            ->orWhereJsonContains('target_languages', $fromLang)
-                            ->orWhereJsonContains('additional_languages', $fromLang)
-                            ->orWhere('native_language', 'LIKE', $fromLang)
-                            ->orWhereJsonContains('source_languages', $baseFrom)
-                            ->orWhereJsonContains('target_languages', $baseFrom)
-                            ->orWhereJsonContains('additional_languages', $baseFrom)
-                            ->orWhere('native_language', 'LIKE', $baseFrom)
-                            ->orWhere('source_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
-                            ->orWhere('target_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
-                            ->orWhere('additional_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
-                            ->orWhere('native_language', 'LIKE', $baseFrom . ' (%');
-                    })->where(function ($sub) use ($toLang, $baseTo) {
-                        $sub->whereJsonContains('source_languages', $toLang)
-                            ->orWhereJsonContains('target_languages', $toLang)
-                            ->orWhereJsonContains('additional_languages', $toLang)
-                            ->orWhere('native_language', 'LIKE', $toLang)
-                            ->orWhereJsonContains('source_languages', $baseTo)
-                            ->orWhereJsonContains('target_languages', $baseTo)
-                            ->orWhereJsonContains('additional_languages', $baseTo)
-                            ->orWhere('native_language', 'LIKE', $baseTo)
-                            ->orWhere('source_languages', 'LIKE', '%"' . $baseTo . ' (%"')
-                            ->orWhere('target_languages', 'LIKE', '%"' . $baseTo . ' (%"')
-                            ->orWhere('additional_languages', 'LIKE', '%"' . $baseTo . ' (%"')
-                            ->orWhere('native_language', 'LIKE', $baseTo . ' (%');
-                    });
+            if (!empty($fromLangs) && !empty($toLangs)) {
+                $translatorsQuery->where(function ($q) use ($fromLangs) {
+                    foreach ($fromLangs as $variant) {
+                        $q->orWhere('source_languages', 'LIKE', '%"' . $variant . '"%')
+                          ->orWhere('target_languages', 'LIKE', '%"' . $variant . '"%')
+                          ->orWhere('additional_languages', 'LIKE', '%"' . $variant . '"%')
+                          ->orWhere('native_language', 'LIKE', $variant);
+                    }
+                })->where(function ($q) use ($toLangs) {
+                    foreach ($toLangs as $variant) {
+                        $q->orWhere('source_languages', 'LIKE', '%"' . $variant . '"%')
+                          ->orWhere('target_languages', 'LIKE', '%"' . $variant . '"%')
+                          ->orWhere('additional_languages', 'LIKE', '%"' . $variant . '"%')
+                          ->orWhere('native_language', 'LIKE', $variant);
+                    }
                 });
-            } elseif ($fromLang) {
-                // Only match fromLang
-                $translatorsQuery->where(function ($q) use ($fromLang) {
-                    $baseFrom = explode(' (', $fromLang)[0];
-                    $q->whereJsonContains('source_languages', $fromLang)
-                      ->orWhereJsonContains('target_languages', $fromLang)
-                      ->orWhereJsonContains('additional_languages', $fromLang)
-                      ->orWhere('native_language', 'LIKE', $fromLang)
-                      ->orWhereJsonContains('source_languages', $baseFrom)
-                      ->orWhereJsonContains('target_languages', $baseFrom)
-                      ->orWhereJsonContains('additional_languages', $baseFrom)
-                      ->orWhere('native_language', 'LIKE', $baseFrom)
-                      ->orWhere('source_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
-                      ->orWhere('target_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
-                      ->orWhere('additional_languages', 'LIKE', '%"' . $baseFrom . ' (%"')
-                      ->orWhere('native_language', 'LIKE', $baseFrom . ' (%');
+            } elseif (!empty($fromLangs)) {
+                $translatorsQuery->where(function ($q) use ($fromLangs) {
+                    foreach ($fromLangs as $variant) {
+                        $q->orWhere('source_languages', 'LIKE', '%"' . $variant . '"%')
+                          ->orWhere('target_languages', 'LIKE', '%"' . $variant . '"%')
+                          ->orWhere('additional_languages', 'LIKE', '%"' . $variant . '"%')
+                          ->orWhere('native_language', 'LIKE', $variant);
+                    }
                 });
-            } elseif ($toLang && strtolower($toLang) !== 'any') {
-                // Only match toLang
-                $translatorsQuery->where(function ($q) use ($toLang) {
-                    $baseTo = explode(' (', $toLang)[0];
-                    $q->whereJsonContains('source_languages', $toLang)
-                      ->orWhereJsonContains('target_languages', $toLang)
-                      ->orWhereJsonContains('additional_languages', $toLang)
-                      ->orWhere('native_language', 'LIKE', $toLang)
-                      ->orWhereJsonContains('source_languages', $baseTo)
-                      ->orWhereJsonContains('target_languages', $baseTo)
-                      ->orWhereJsonContains('additional_languages', $baseTo)
-                      ->orWhere('native_language', 'LIKE', $baseTo)
-                      ->orWhere('source_languages', 'LIKE', '%"' . $baseTo . ' (%"')
-                      ->orWhere('target_languages', 'LIKE', '%"' . $baseTo . ' (%"')
-                      ->orWhere('additional_languages', 'LIKE', '%"' . $baseTo . ' (%"')
-                      ->orWhere('native_language', 'LIKE', $baseTo . ' (%');
+            } elseif (!empty($toLangs)) {
+                $translatorsQuery->where(function ($q) use ($toLangs) {
+                    foreach ($toLangs as $variant) {
+                        $q->orWhere('source_languages', 'LIKE', '%"' . $variant . '"%')
+                          ->orWhere('target_languages', 'LIKE', '%"' . $variant . '"%')
+                          ->orWhere('additional_languages', 'LIKE', '%"' . $variant . '"%')
+                          ->orWhere('native_language', 'LIKE', $variant);
+                    }
                 });
             }
         }

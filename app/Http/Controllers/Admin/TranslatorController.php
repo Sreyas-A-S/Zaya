@@ -75,13 +75,41 @@ class TranslatorController extends Controller
                 $query->where('translators.country', $request->country_filter);
             }
 
+            $resolveLang = function($langStr) {
+                if (!$langStr || strtolower($langStr) === 'any') return [];
+                
+                $base = explode(' (', $langStr)[0];
+                $variants = [$langStr, $base];
+
+                $langRecord = \App\Models\Language::where('name', $base)
+                    ->orWhere('native_name', $base)
+                    ->orWhere('name', $langStr)
+                    ->orWhere('native_name', $langStr)
+                    ->first();
+
+                if ($langRecord) {
+                    $variants[] = $langRecord->name;
+                    $variants[] = $langRecord->native_name;
+                }
+                return array_unique(array_filter($variants));
+            };
+
             if ($request->filled('source_lang')) {
-                $lang = $request->source_lang;
-                $query->where('translators.source_languages', 'like', '%"' . $lang . '"%');
+                $variants = $resolveLang($request->source_lang);
+                $query->where(function($q) use ($variants) {
+                    foreach ($variants as $v) {
+                        $q->orWhere('translators.source_languages', 'like', '%"' . $v . '"%')
+                          ->orWhere('translators.native_language', 'like', $v);
+                    }
+                });
             }
             if ($request->filled('target_lang')) {
-                $lang = $request->target_lang;
-                $query->where('translators.target_languages', 'like', '%"' . $lang . '"%');
+                $variants = $resolveLang($request->target_lang);
+                $query->where(function($q) use ($variants) {
+                    foreach ($variants as $v) {
+                        $q->orWhere('translators.target_languages', 'like', '%"' . $v . '"%');
+                    }
+                });
             }
 
             return DataTables::of($query)
