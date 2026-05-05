@@ -210,7 +210,7 @@
         </div>
 
         <!-- Global Rules -->
-        <div class="w-full bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-sm">
+        <div class="w-full bg-white rounded-[32px] border border-[#2E4B3D]/12 overflow-hidden shadow-sm d-none">
             <div class="p-8 border-b border-gray-50">
                 <h2 class="text-2xl font-bold text-secondary font-sans!">Booking Horizon</h2>
                 <p class="text-sm text-gray-500 mt-2">Control how far into the future clients can see your availability and book appointments (e.g., allow bookings up to 2 months in advance).</p>
