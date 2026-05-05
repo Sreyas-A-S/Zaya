@@ -19,6 +19,15 @@
         overflow: hidden;
         border: 1px solid rgba(0,0,0,0.05);
     }
+    /* Loading state for the time‑picker dropdown */
+    .time-picker-dropdown.loading {
+        opacity: 0;
+        pointer-events: none;
+    }
+    .time-picker-dropdown:not(.loading) {
+        opacity: 1;
+        transition: opacity 0.2s ease-in-out;
+    }
     .time-picker-content {
         padding: 24px;
         overflow-y: auto;
@@ -475,7 +484,7 @@
         document.body.style.overflow = 'hidden';
     }
 
-    function toggleRescheduleTimePicker(trigger) {
+    async function toggleRescheduleTimePicker(trigger) {
         const container = trigger.closest('.relative');
         const dropdown = container.querySelector('.time-picker-dropdown');
         const content = container.querySelector('.time-picker-content');
@@ -487,8 +496,10 @@
             return;
         }
 
+        // Show loading state while fetching slots
+        dropdown.classList.add('loading');
+
         if (dropdown.classList.contains('hidden')) {
-            // Determine Date Label
             const parts = dateInput.value.split('-');
             const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
             const mon = SHORT_MONTH_NAMES[d.getMonth()];
@@ -500,16 +511,17 @@
             todayStart.setHours(0, 0, 0, 0);
             const isToday = dStart.getTime() === todayStart.getTime();
 
-            // Get current value
             const timeInput = document.getElementById('reschedule-time');
             const selectedTime = timeInput.value;
 
-            renderRescheduleTimePicker(content, dateInput.value, selectedTime, isToday, dateLabel);
+            await renderRescheduleTimePicker(content, dateInput.value, selectedTime, isToday, dateLabel);
+            dropdown.classList.remove('loading');
             dropdown.classList.remove('hidden');
             smartPosition(trigger, dropdown);
         } else {
             dropdown.classList.add('hidden');
             dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
+            dropdown.classList.remove('loading');
         }
     }
 
@@ -562,7 +574,7 @@
             </div>
             <div class="time-picker-footer">
                 <button type="button" class="time-btn-clear" onclick="clearRescheduleTime(this)">Clear</button>
-                <button type="button" class="time-btn-set" onclick="setRescheduleTime(this)">Set</button>
+                <button type="button" class="time-btn-set" onclick="event.stopPropagation(); setRescheduleTime(this)">Set</button>
             </div>
         `;
         wrapper.innerHTML = html;

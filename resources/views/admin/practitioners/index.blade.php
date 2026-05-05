@@ -651,7 +651,8 @@
             <div class="modal-body text-center p-4">
                 <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
                 <h5>Are you sure?</h5>
-                <p class="text-muted">This action cannot be undone. All data related to this practitioner will be permanently removed.</p>
+                <p class="text-danger fw-bold">This action cannot be undone and is permanent.</p>
+                <p>Deleting this practitioner will permanently remove their <strong>profile, services, availability, earned commissions, and past session records</strong>. Their account access will be immediately revoked.</p>
                 <input type="hidden" id="delete-practitioner-id">
             </div>
             <div class="modal-footer justify-content-center">
@@ -961,6 +962,7 @@
     let table;
     let toastInstance;
     let languageChoices;
+    let langSelect;
     let qualCount = 1;
     let cropper;
     let croppedFile;
@@ -1157,7 +1159,7 @@
 
 
         // Initialize Choices.js
-        const langSelect = document.getElementById('languages_select');
+        langSelect = document.getElementById('languages_select');
         if (langSelect) {
             languageChoices = new Choices(langSelect, {
                 removeItemButton: true,

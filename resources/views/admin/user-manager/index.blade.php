@@ -1017,7 +1017,7 @@
 
         // Delete User
         $(document).on('click', '.deleteUser', function() {
-            if (confirm('Are you sure you want to delete this user?')) {
+            if (confirm('Are you sure you want to delete this user manager? This action is permanent and will remove all their access and history from the system.')) {
                 let id = $(this).data('id');
                 $.ajax({
                     url: "{{ url('admin/user-managers') }}/" + id,

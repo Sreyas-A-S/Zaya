@@ -848,8 +848,11 @@
                 <h5 class="modal-title">Delete Practitioner</h5>
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this practitioner? This action cannot be undone.</p>
+            <div class="modal-body text-center p-4">
+                <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
+                <h5>Are you sure?</h5>
+                <p class="text-danger fw-bold">This action cannot be undone and is permanent.</p>
+                <p>Deleting this practitioner will permanently remove their <strong>profile, services, availability, earned commissions, and past session records</strong>. Their account access will be immediately revoked.</p>
                 <input type="hidden" id="delete-practitioner-id">
             </div>
             <div class="modal-footer">
@@ -918,6 +921,7 @@
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script>
     let table;
+    let languageChoices, langSelect;
     let currentStep = 1;
     const totalSteps = 6;
     let iti;
@@ -1025,9 +1029,9 @@
     });
 
     // Initialize Choices.js
-    let languageChoices = null;
-    if (document.getElementById('languages_select')) {
-        languageChoices = new Choices('#languages_select', {
+    langSelect = document.getElementById('languages_select');
+    if (langSelect) {
+        languageChoices = new Choices(langSelect, {
             removeItemButton: true,
             searchEnabled: true,
             shouldSort: false,
@@ -1035,11 +1039,11 @@
             itemSelectText: '',
         });
 
-        document.getElementById('languages_select').addEventListener('addItem', function(event) {
+        langSelect.addEventListener('addItem', function(event) {
             addLanguageCapabilityRow(event.detail.value, event.detail.label);
         });
 
-        document.getElementById('languages_select').addEventListener('removeItem', function(event) {
+        langSelect.addEventListener('removeItem', function(event) {
             $(`#lang-row-${event.detail.value.replace(/\s+/g, '_')}`).remove();
         });
     }

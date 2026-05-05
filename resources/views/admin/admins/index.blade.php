@@ -977,7 +977,7 @@
     // Delete Admin
     $(document).on('click', '.deleteUser', function() {
         let id = $(this).data('id');
-        if (confirm('Are you sure?')) {
+        if (confirm('Are you sure you want to delete this administrator? This action is permanent and will remove all their access and history from the system.')) {
             $.ajax({
                 url: "{{ url('admin/admins') }}/" + id,
                 type: 'DELETE',
