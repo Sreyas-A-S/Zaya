@@ -18,9 +18,6 @@
     <div class="bg-white rounded-[2.5rem] border border-[#2E4B3D]/12 shadow-sm overflow-hidden print:border-0 print:shadow-none">
         <!-- Header -->
         <div class="p-8 md:p-12 border-b border-gray-50 bg-[#F8FBF9]/50 relative">
-            <div class="absolute top-0 right-0 p-8 opacity-10 print:opacity-20">
-                <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" class="w-32">
-            </div>
             <div class="relative z-10">
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
@@ -28,9 +25,12 @@
                         <h1 class="text-3xl font-black text-secondary">{{ $prescription->title }}</h1>
                         <p class="text-sm text-gray-500 mt-1">Issued on {{ $prescription->prescription_date->format('F d, Y') }}</p>
                     </div>
-                    <div class="text-right md:text-right">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Reference</p>
-                        <p class="text-sm font-bold text-secondary">#RX-{{ str_pad($prescription->id, 6, '0', STR_PAD_LEFT) }}</p>
+                    <div class="flex items-center gap-4 md:justify-end">
+                        <img src="{{ asset('frontend/assets/zaya-logo.svg') }}" class="h-12 w-auto opacity-100">
+                        <div class="text-left">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Reference</p>
+                            <p class="text-sm font-bold text-secondary">#RX-{{ str_pad($prescription->id, 6, '0', STR_PAD_LEFT) }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
