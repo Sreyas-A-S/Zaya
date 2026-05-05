@@ -501,7 +501,9 @@
 
         if (dropdown.classList.contains('hidden')) {
             const parts = dateInput.value.split('-');
+            if (parts.length < 3) return;
             const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            if (isNaN(d.getTime())) return;
             const mon = SHORT_MONTH_NAMES[d.getMonth()];
             const dateLabel = `${mon} ${d.getDate()}, ${d.getFullYear()}`;
 
@@ -573,8 +575,8 @@
         html += `
             </div>
             <div class="time-picker-footer">
-                <button type="button" class="time-btn-clear" onclick="clearRescheduleTime(this)">Clear</button>
-                <button type="button" class="time-btn-set" onclick="event.stopPropagation(); setRescheduleTime(this)">Set</button>
+                <button type="button" class="time-btn-clear" onclick="clearRescheduleTime(event, this)">Clear</button>
+                <button type="button" class="time-btn-set" onclick="setRescheduleTime(event, this)">Set</button>
             </div>
         `;
         wrapper.innerHTML = html;
@@ -607,15 +609,19 @@
         slot.classList.add('selected');
     }
 
-    function setRescheduleTime(btn) {
+    function setRescheduleTime(e, btn) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        
         const container = btn.closest('.relative');
+        if (!container) return;
+
         const dropdown = container.querySelector('.time-picker-dropdown');
         const trigger = document.getElementById('reschedule-time-trigger');
-        const label = trigger.querySelector('.time-label');
+        const label = trigger ? trigger.querySelector('.time-label') : null;
         const hiddenInput = document.getElementById('reschedule-time');
 
         const selectedSlot = container.querySelector('.time-slot.selected');
-        if (selectedSlot) {
+        if (selectedSlot && label && hiddenInput) {
             const val = selectedSlot.textContent.trim();
             label.textContent = val;
             label.classList.remove('text-gray-400');
@@ -623,24 +629,34 @@
             hiddenInput.value = val;
         }
 
-        dropdown.classList.add('hidden');
-        dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
+        if (dropdown) {
+            dropdown.classList.add('hidden');
+            dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
+        }
     }
 
-    function clearRescheduleTime(btn) {
+    function clearRescheduleTime(e, btn) {
+        if (e && e.stopPropagation) e.stopPropagation();
+
         const container = btn.closest('.relative');
+        if (!container) return;
+
         const dropdown = container.querySelector('.time-picker-dropdown');
         const trigger = document.getElementById('reschedule-time-trigger');
-        const label = trigger.querySelector('.time-label');
+        const label = trigger ? trigger.querySelector('.time-label') : null;
         const hiddenInput = document.getElementById('reschedule-time');
 
-        label.textContent = "Select a time slot";
-        label.classList.remove('text-gray-700');
-        label.classList.add('text-gray-400');
-        hiddenInput.value = "";
+        if (label) {
+            label.textContent = "Select a time slot";
+            label.classList.remove('text-gray-700');
+            label.classList.add('text-gray-400');
+        }
+        if (hiddenInput) hiddenInput.value = "";
 
-        dropdown.classList.add('hidden');
-        dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
+        if (dropdown) {
+            dropdown.classList.add('hidden');
+            dropdown.classList.remove('cal-open-top', 'cal-open-bottom');
+        }
     }
 
     function smartPosition(trigger, dropdown) {

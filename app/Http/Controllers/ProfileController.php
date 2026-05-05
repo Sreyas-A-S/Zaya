@@ -2308,7 +2308,7 @@ class ProfileController extends Controller
 
         // List of professionals this user has had sessions with
         $reviewablePractitioners = Booking::where('user_id', $user->id)
-            ->where('status', 'completed')
+            ->whereIn('status', ['confirmed', 'paid', 'completed'])
             ->with('practitioner.user')
             ->get()
             ->pluck('practitioner')
@@ -2331,7 +2331,7 @@ class ProfileController extends Controller
         // Optional: Check if they actually had a session
         $hadSession = Booking::where('user_id', $user->id)
             ->where('profile_id', $request->practitioner_id)
-            ->whereIn('status', ['paid', 'completed'])
+            ->whereIn('status', ['confirmed', 'paid', 'completed'])
             ->exists();
 
         if (!$hadSession) {
