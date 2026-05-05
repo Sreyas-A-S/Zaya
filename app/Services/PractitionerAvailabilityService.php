@@ -161,8 +161,9 @@ class PractitionerAvailabilityService
             ->get();
 
         $busySlots = [];
+        $dateStr = Carbon::parse($date)->toDateString();
         foreach ($allBookings as $booking) {
-            if ($booking->booking_date->toDateString() === $date) {
+            if ($booking->booking_date->toDateString() === $dateStr) {
                 $busySlots[] = $booking->booking_time;
             }
             

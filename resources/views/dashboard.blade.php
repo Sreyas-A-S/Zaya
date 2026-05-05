@@ -228,7 +228,14 @@
                             <i class="ri-history-line"></i>
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-gray-800">{{ $req->booking->user->name }}</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-bold text-gray-800">{{ $req->booking->user->name }}</p>
+                                @if($req->expert_type)
+                                    <span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/5 text-secondary font-black uppercase tracking-widest border border-secondary/10">
+                                        {{ \Illuminate\Support\Str::headline($req->expert_type) }}
+                                    </span>
+                                @endif
+                            </div>
                             <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Requested by: {{ $req->requester->name }}</p>
                         </div>
                     </div>

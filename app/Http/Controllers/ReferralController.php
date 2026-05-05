@@ -626,6 +626,7 @@ class ReferralController extends Controller
         }
 
         $request->validate([
+            'expert_type' => 'required|string|in:practitioner,doctor,mindfulness_practitioner,yoga_therapist',
             'note' => 'required|string|max:1000',
         ]);
 
@@ -649,6 +650,7 @@ class ReferralController extends Controller
             'booking_id' => $booking->id,
             'requester_id' => $user->id,
             'recipient_id' => $recipientId,
+            'expert_type' => $request->expert_type,
             'note' => $request->note,
             'status' => 'pending',
         ]);

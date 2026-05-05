@@ -590,6 +590,15 @@
             const uploadRecordingUrl = "{{ route('conference.upload-recording') }}";
             const csrfToken = "{{ csrf_token() }}";
 
+            // Listen for messages from Consultation Form Iframe
+            window.addEventListener('message', function(event) {
+                if (event.data && event.data.type === 'CONSULTATION_FORM_SUBMITTED') {
+                    if (window.showZayaToast) {
+                        showZayaToast(event.data.message || 'Form saved successfully', 'success', 'Consultation Form');
+                    }
+                }
+            });
+
             let jitsiApi = null;
             let dailyCall = null;
             let meetingState = { audioMuted: false, videoMuted: false, screenSharing: false };
