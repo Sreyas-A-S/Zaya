@@ -333,9 +333,14 @@
                         <i class="ri-user-shared-2-line text-xl"></i>
                     </div>
                     <div>
-                        <div class="flex items-center gap-2 mb-1">
+                        <div class="flex flex-wrap items-center gap-2 mb-1">
                             <span class="text-sm font-black text-secondary">{{ $request->requester->name }}</span>
                             <span class="px-2 py-0.5 bg-white border border-gray-100 rounded-full text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{{ str_replace('_', ' ', $request->requester->role) }}</span>
+                            @if($request->expert_type)
+                                <span class="px-2 py-0.5 bg-secondary text-white rounded-full text-[9px] font-black uppercase tracking-widest">
+                                    Target: {{ \Illuminate\Support\Str::headline($request->expert_type) }}
+                                </span>
+                            @endif
                         </div>
                         <p class="text-xs text-gray-600 leading-relaxed italic">"{{ $request->note }}"</p>
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-2">{{ $request->created_at->format('M d, Y \a\t H:i') }}</p>
@@ -478,6 +483,23 @@
         switchTab(initialTab);
     };
 
+    // Helper to show toast and notify parent if in iframe
+    const notify = (msg, type = 'success', title = 'Consultation Form') => {
+        if (window.showZayaToast) {
+            showZayaToast(msg, type, title);
+        }
+        
+        // Send message to parent if in iframe (for video conference integration)
+        if (window.parent && window.parent !== window) {
+            window.parent.postMessage({
+                type: 'CONSULTATION_FORM_SUBMITTED',
+                message: msg,
+                success: type === 'success',
+                title: title
+            }, '*');
+        }
+    };
+
     const initFormSubmission = () => {
         document.querySelectorAll('.consultation-form-root').forEach(form => {
             form.onsubmit = function(e) {
@@ -501,18 +523,19 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        showZayaToast(data.message, 'success', 'Consultation Form');
+                        notify(data.message, 'success', 'Consultation Form');
+                        
                         const formIdInput = form.querySelector('input[name="form_id"]');
                         if (formIdInput && data.form_id) {
                             formIdInput.value = data.form_id;
                         }
                     } else {
-                        showZayaToast(data.message || data.error || 'Something went wrong.', 'error', 'Error');
+                        notify(data.message || data.error || 'Something went wrong.', 'error', 'Error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showZayaToast('Connection error.', 'error', 'Error');
+                    notify('Connection error.', 'error', 'Error');
                 })
                 .finally(() => {
                     submitBtn.disabled = false;
@@ -637,7 +660,7 @@
                 });
             });
 
-            if (window.showZayaToast) showZayaToast('Restored unsaved draft.', 'Consultation Form');
+            if (window.showZayaToast) notify('Restored unsaved draft.', 'success', 'Consultation Form');
         };
 
         form.addEventListener('input', debounce(saveDraft, 1000));
@@ -713,7 +736,7 @@
     window.submitReferralRequest = function() {
         const note = document.getElementById('refer-request-note').value;
         if (!note) {
-            showZayaToast('Please add a note explaining why re-referral is needed.', 'error', 'Error');
+            notify('Please add a note explaining why re-referral is needed.', 'error', 'Error');
             return;
         }
         fetch("{{ route('bookings.refer-request', $booking->id) }}", {
@@ -728,16 +751,16 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showZayaToast(data.success, 'success', 'Request Sent');
+                notify(data.success, 'success', 'Request Sent');
                 document.getElementById('refer-request-note').value = '';
                 setTimeout(() => location.reload(), 1500);
             } else {
-                showZayaToast(data.error || 'Something went wrong.', 'error', 'Error');
+                notify(data.error || 'Something went wrong.', 'error', 'Error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showZayaToast('Connection error.', 'error', 'Error');
+            notify('Connection error.', 'error', 'Error');
         });
     }
 
@@ -754,15 +777,15 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showZayaToast(data.success, 'success', 'Status Updated');
+                notify(data.success, 'success', 'Status Updated');
                 setTimeout(() => location.reload(), 1000);
             } else {
-                showZayaToast(data.error || 'Something went wrong.', 'error', 'Error');
+                notify(data.error || 'Something went wrong.', 'error', 'Error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showZayaToast('Connection error.', 'error', 'Error');
+            notify('Connection error.', 'error', 'Error');
         });
     }
 

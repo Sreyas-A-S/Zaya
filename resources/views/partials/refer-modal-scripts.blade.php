@@ -224,6 +224,17 @@
                     <form id="request-referral-form">
                         <input type="hidden" id="request-referral-booking-id">
                         
+                        <div class="mb-6">
+                            <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">Expert Type</label>
+                            <div class="flex flex-wrap gap-2" id="request-expert-tabs">
+                                <button type="button" onclick="selectRequestExpertType('practitioner')" data-expert-tab="practitioner" class="px-4 py-2 rounded-xl border border-[#2E4B3D]/12 text-[11px] font-bold text-gray-500 hover:bg-gray-50 transition-all active-tab">Practitioner</button>
+                                <button type="button" onclick="selectRequestExpertType('doctor')" data-expert-tab="doctor" class="px-4 py-2 rounded-xl border border-[#2E4B3D]/12 text-[11px] font-bold text-gray-500 hover:bg-gray-50 transition-all">Doctor</button>
+                                <button type="button" onclick="selectRequestExpertType('mindfulness_practitioner')" data-expert-tab="mindfulness_practitioner" class="px-4 py-2 rounded-xl border border-[#2E4B3D]/12 text-[11px] font-bold text-gray-500 hover:bg-gray-50 transition-all">Mindfulness</button>
+                                <button type="button" onclick="selectRequestExpertType('yoga_therapist')" data-expert-tab="yoga_therapist" class="px-4 py-2 rounded-xl border border-[#2E4B3D]/12 text-[11px] font-bold text-gray-500 hover:bg-gray-50 transition-all">Yoga</button>
+                                <input type="hidden" id="request-expert-type" value="practitioner">
+                            </div>
+                        </div>
+
                         <div class="mb-8">
                             <label class="block text-sm font-bold text-secondary mb-3 uppercase tracking-wider text-[10px] opacity-60">Referral Notes</label>
                             <textarea id="request-referral-note" rows="5" placeholder="Explain why you are requesting a referral for this client..." 
@@ -1028,6 +1039,19 @@
         }
     }
 
+    function selectRequestExpertType(type) {
+        document.getElementById('request-expert-type').value = type;
+        document.querySelectorAll('#request-expert-tabs [data-expert-tab]').forEach(btn => {
+            if (btn.dataset.expertTab === type) {
+                btn.classList.add('bg-secondary', 'text-white', 'border-secondary');
+                btn.classList.remove('text-gray-500', 'border-[#2E4B3D]/12');
+            } else {
+                btn.classList.remove('bg-secondary', 'text-white', 'border-secondary');
+                btn.classList.add('text-gray-500', 'border-[#2E4B3D]/12');
+            }
+        });
+    }
+
     function openRequestReferralModal(bookingId) {
         const modal = document.getElementById('request-referral-modal');
         const bookingIdInput = document.getElementById('request-referral-booking-id');
@@ -1036,6 +1060,10 @@
 
         bookingIdInput.value = bookingId;
         if (noteInput) noteInput.value = '';
+        
+        // Reset expert type to practitioner
+        selectRequestExpertType('practitioner');
+        
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     }
@@ -1054,6 +1082,7 @@
 
         const bookingId = bookingIdInput.value;
         const note = noteInput ? noteInput.value : '';
+        const expertType = document.getElementById('request-expert-type').value;
 
         if (!note.trim()) {
             alert('Please add a note for your referral request.');
@@ -1072,7 +1101,10 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ note: note })
+                body: JSON.stringify({ 
+                    note: note,
+                    expert_type: expertType
+                })
             });
             const data = await response.json();
             if (data.success) {
