@@ -175,42 +175,47 @@
 
 
 
-        @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']))
-        
-        @if(isset($pendingReferralRequests) && $pendingReferralRequests->isNotEmpty())
-        <!-- Referral Requests -->
-        <div id="section-referral-requests" class="bg-white rounded-2xl p-4 md:p-5 border border-amber-100 shadow-sm shadow-amber-50/50">
-            <h2 class="text-xl font-sans! font-medium text-secondary mb-4 flex items-center gap-2">
-                <i class="ri-user-shared-2-line text-amber-500"></i> Pending Referral Requests
-            </h2>
+
+
+
+        <!-- Transaction Vault Snippet -->
+        <div id="section-transactions" class="bg-white rounded-2xl p-4 md:p-5 border border-[#2E4B3D]/12">
+            <h2 id="client_panel_transaction_vault_title" class="text-xl font-sans! font-medium text-secondary mb-4" data-i18n="{{ $site_settings['client_panel_transaction_vault_title'] ?? 'Transaction Vault' }}">{{ __($site_settings['client_panel_transaction_vault_title'] ?? 'Transaction Vault') }}</h2>
             <div class="space-y-4">
-                @foreach($pendingReferralRequests as $req)
-                <div class="p-4 bg-amber-50/30 rounded-2xl border border-amber-50 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-amber-600 shadow-sm">
-                            <i class="ri-history-line"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <p class="text-sm font-bold text-gray-800">{{ $req->booking->user->name }}</p>
-                                @if($req->expert_type)
-                                    <span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/5 text-secondary font-black uppercase tracking-widest border border-secondary/10">
-                                        {{ \Illuminate\Support\Str::headline($req->expert_type) }}
-                                    </span>
-                                @endif
-                            </div>
-                            <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Requested by: {{ $req->requester->name }}</p>
-                        </div>
+                @forelse($invoices as $invoice)
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm font-normal text-gray-800 mb-0.5">
+                            {{ $invoice->transaction_no }}
+                        </p>
+                        <p class="text-xs text-gray-400">{{ $invoice->created_at->format('M d, Y') }}</p>
                     </div>
-                    <a href="{{ route('bookings.consultation-form.show', $req->booking_id) }}" class="px-4 py-1.5 bg-secondary text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-primary transition-all">Review</a>
+                    @php
+                        $displayAmount = $invoice->total_amount;
+                        if ($invoice->practitioner_id == $user->id) {
+                            $displayAmount = $invoice->practitioner_share;
+                        } elseif ($invoice->referrer_id == $user->id) {
+                            $displayAmount = $invoice->referrer_share;
+                        }
+                    @endphp
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-secondary">
+                            {{ get_currency_symbol($invoice->currency) }} {{ number_format($displayAmount, 2) }}
+                        </p>
+                        @if($invoice->transaction_no && ($invoice->user_id === $user->id))
+                        <a href="{{ route('invoice.show', $invoice->transaction_no) }}" target="_blank"
+                            class="text-[10px] text-secondary hover:underline font-bold uppercase tracking-tighter" data-i18n="{{ $site_settings['client_panel_open_invoice'] ?? 'Open' }}">{{ __($site_settings['client_panel_open_invoice'] ?? 'Open') }}</a>
+                        @endif
+                    </div>
                 </div>
-                @endforeach
+                @empty
+                <p id="client_panel_no_recent_invoices" class="text-center text-gray-500 text-xs py-4" data-i18n="{{ $site_settings['client_panel_no_recent_invoices'] ?? 'No recent transactions.' }}">{{ __($site_settings['client_panel_no_recent_invoices'] ?? 'No recent transactions.') }}</p>
+                @endforelse
+            </div>
+            <div class="mt-4 text-center">
+                <a id="client_panel_see_all" href="{{ route('transactions.index') }}" class="text-xs text-gray-400 hover:text-gray-800 font-normal tracking-wide" data-i18n="{{ $site_settings['client_panel_see_all'] ?? 'See all' }}">{{ __($site_settings['client_panel_see_all'] ?? 'See all') }}</a>
             </div>
         </div>
-        @endif
-        @endif
-
-
 
         @if($user->role === 'client' || $user->role === 'patient')
         <!-- GDPR Center -->
@@ -320,93 +325,128 @@
             <a id="client_panel_view_all_bookings" href="{{ route('bookings.index') }}" class="block text-center text-sm font-medium text-secondary hover:underline pt-3" data-i18n="{{ $site_settings['client_panel_view_all_bookings'] ?? 'View All Bookings' }}">{{ __($site_settings['client_panel_view_all_bookings'] ?? 'View All Bookings') }}</a>
         </div>
 
-        <!-- Transaction Vault Snippet -->
-        <div id="section-transactions" class="bg-white rounded-2xl p-4 md:p-5 border border-[#2E4B3D]/12">
-            <h2 id="client_panel_transaction_vault_title" class="text-xl font-sans! font-medium text-secondary mb-4" data-i18n="{{ $site_settings['client_panel_transaction_vault_title'] ?? 'Transaction Vault' }}">{{ __($site_settings['client_panel_transaction_vault_title'] ?? 'Transaction Vault') }}</h2>
-            <div class="space-y-4">
-                @forelse($invoices as $invoice)
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-sm font-normal text-gray-800 mb-0.5">
-                            {{ $invoice->transaction_no }}
-                        </p>
-                        <p class="text-xs text-gray-400">{{ $invoice->created_at->format('M d, Y') }}</p>
-                    </div>
-                    @php
-                        $displayAmount = $invoice->total_amount;
-                        if ($invoice->practitioner_id == $user->id) {
-                            $displayAmount = $invoice->practitioner_share;
-                        } elseif ($invoice->referrer_id == $user->id) {
-                            $displayAmount = $invoice->referrer_share;
-                        }
-                    @endphp
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-secondary">
-                            {{ get_currency_symbol($invoice->currency) }} {{ number_format($displayAmount, 2) }}
-                        </p>
-                        @if($invoice->transaction_no && ($invoice->user_id === $user->id))
-                        <a href="{{ route('invoice.show', $invoice->transaction_no) }}" target="_blank"
-                            class="text-[10px] text-secondary hover:underline font-bold uppercase tracking-tighter" data-i18n="{{ $site_settings['client_panel_open_invoice'] ?? 'Open' }}">{{ __($site_settings['client_panel_open_invoice'] ?? 'Open') }}</a>
-                        @endif
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
+            @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']))
+                @if(isset($pendingReferralRequests) && $pendingReferralRequests->isNotEmpty())
+                <!-- Referral Requests -->
+                <div id="section-referral-requests" class="bg-white rounded-2xl p-4 md:p-5 border border-amber-100 shadow-sm shadow-amber-50/50 h-full">
+                    <h2 class="text-xl font-sans! font-medium text-secondary mb-4 flex items-center gap-2">
+                        <i class="ri-user-shared-2-line text-amber-500"></i> Pending Referral Requests
+                    </h2>
+                    <div class="space-y-4">
+                        @foreach($pendingReferralRequests as $req)
+                        <div class="p-4 bg-amber-50/30 rounded-2xl border border-amber-50 flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-amber-600 shadow-sm">
+                                    <i class="ri-history-line"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <p class="text-sm font-bold text-gray-800">{{ $req->booking->user->name }}</p>
+                                        @if($req->expert_type)
+                                            <span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/5 text-secondary font-black uppercase tracking-widest border border-secondary/10">
+                                                {{ \Illuminate\Support\Str::headline($req->expert_type) }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Requested by: {{ $req->requester->name }}</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('bookings.consultation-form.show', $req->booking_id) }}" class="px-4 py-1.5 bg-secondary text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-primary transition-all">Review</a>
+                        </div>
+                        @endforeach
                     </div>
                 </div>
-                @empty
-                <p id="client_panel_no_recent_invoices" class="text-center text-gray-500 text-xs py-4" data-i18n="{{ $site_settings['client_panel_no_recent_invoices'] ?? 'No recent transactions.' }}">{{ __($site_settings['client_panel_no_recent_invoices'] ?? 'No recent transactions.') }}</p>
-                @endforelse
-            </div>
-            <div class="mt-4 text-center">
-                <a id="client_panel_see_all" href="{{ route('transactions.index') }}" class="text-xs text-gray-400 hover:text-gray-800 font-normal tracking-wide" data-i18n="{{ $site_settings['client_panel_see_all'] ?? 'See all' }}">{{ __($site_settings['client_panel_see_all'] ?? 'See all') }}</a>
-            </div>
+                @endif
+
+                <!-- Practitioner Referrals -->
+                <div id="section-referrals" class="bg-white rounded-2xl p-4 md:p-5 border border-[#2E4B3D]/12 h-full">
+                    <h2 class="text-xl font-sans! font-medium text-secondary mb-4 flex items-center gap-2">
+                        <i class="ri-user-shared-line"></i> My Referrals
+                    </h2>
+                    <div class="space-y-4">
+                        @forelse($referrals as $ref)
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-50 last:border-0 last:pb-0">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800 mb-0.5">{{ $ref->user->name }}</p>
+                                <p class="text-[10px] text-gray-400 uppercase font-bold">To: {{ $ref->referredTo->name }}</p>
+                            </div>
+                            <span class="px-3 py-1 text-[10px] font-bold rounded-full uppercase {{ $ref->status === 'paid' ? 'bg-green-50 text-green-600' : 'bg-yellow-50 text-yellow-600' }}">
+                                {{ $ref->status }}
+                            </span>
+                        </div>
+                        @empty
+                        <p class="text-center text-gray-500 text-xs py-4">No recent referrals.</p>
+                        @endforelse
+                    </div>
+                </div>
+            @endif
         </div>
 
-        @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']))
-        <!-- Practitioner Referrals -->
-        <div id="section-referrals" class="bg-white rounded-2xl p-4 md:p-5 border border-[#2E4B3D]/12">
-            <h2 class="text-xl font-sans! font-medium text-secondary mb-4 flex items-center gap-2">
-                <i class="ri-user-shared-line"></i> My Referrals
-            </h2>
-            <div class="space-y-4">
-                @forelse($referrals as $ref)
-                <div class="flex justify-between items-center pb-4 border-b border-gray-50 last:border-0 last:pb-0">
-                    <div>
-                        <p class="text-sm font-bold text-gray-800 mb-0.5">{{ $ref->user->name }}</p>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold">To: {{ $ref->referredTo->name }}</p>
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
+            @if(in_array($user->role, ['practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist']))
+                <!-- Client Data Access -->
+                <div id="section-client-access" class="bg-white rounded-2xl p-4 md:p-5 border border-[#2E4B3D]/12 h-full">
+                    <h2 class="text-xl font-sans! font-medium text-secondary mb-4 flex items-center gap-2">
+                        <i class="ri-shield-user-line"></i> Client Access
+                    </h2>
+                    <div class="space-y-4">
+                        @forelse($dataAccessRequests as $dar)
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+                                    <i class="ri-user-line text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-800">{{ $dar->client->name }}</p>
+                                    <p class="text-[10px] text-gray-400 uppercase font-bold">Since: {{ $dar->approved_at->format('M d') }}</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('client.profile.view', $dar->client_id) }}" class="px-3 py-1 bg-secondary text-white text-xs font-bold rounded-full">View</a>
+                        </div>
+                        @empty
+                        <p class="text-center text-gray-500 text-xs py-4">No active client data permissions.</p>
+                        @endforelse
                     </div>
-                    <span class="px-3 py-1 text-[10px] font-bold rounded-full uppercase {{ $ref->status === 'paid' ? 'bg-green-50 text-green-600' : 'bg-yellow-50 text-yellow-600' }}">
-                        {{ $ref->status }}
-                    </span>
                 </div>
-                @empty
-                <p class="text-center text-gray-500 text-xs py-4">No recent referrals.</p>
-                @endforelse
-            </div>
-        </div>
+            @endif
 
-        <!-- Client Data Access -->
-        <div id="section-client-access" class="bg-white rounded-2xl p-4 md:p-5 border border-[#2E4B3D]/12">
-            <h2 class="text-xl font-sans! font-medium text-secondary mb-4 flex items-center gap-2">
-                <i class="ri-shield-user-line"></i> Client Access
-            </h2>
-            <div class="space-y-4">
-                @forelse($dataAccessRequests as $dar)
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
-                            <i class="ri-user-line text-sm"></i>
+            <!-- Reviews -->
+            <div id="section-reviews" class="bg-white rounded-2xl p-4 md:p-5 border border-[#2E4B3D]/12 h-full">
+                <h2 id="client_panel_your_reviews_title" class="text-xl font-medium font-sans! text-secondary mb-4" data-i18n="{{ $site_settings['client_panel_your_reviews_title'] ?? 'Your Reviews' }}">{{ __($site_settings['client_panel_your_reviews_title'] ?? 'Your Reviews') }}</h2>
+                <div class="space-y-4">
+                    @forelse($reviews as $review)
+                    <div class="border-b border-[#DDDDDD] pb-4 last:border-0 last:pb-0">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <h3 class="font-sans! text-base font-medium text-gray-800">{{ $review->practitioner?->user?->name ?? 'Practitioner' }}</h3>
+                            <span class="text-xs md:text-sm text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
                         </div>
-                        <div>
-                            <p class="text-sm font-bold text-gray-800">{{ $dar->client->name }}</p>
-                            <p class="text-[10px] text-gray-400 uppercase font-bold">Since: {{ $dar->approved_at->format('M d') }}</p>
+                        <div class="flex flex-wrap gap-2 justify-between items-start">
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2 leading-relaxed">{{ __($site_settings['client_panel_comment_label'] ?? 'Comment') }}: "{{ $review->review }}"</p>
+                                <div class="flex items-center">
+                                    <span id="client_panel_rating_label" class="text-sm text-gray-500 mr-3" data-i18n="{{ $site_settings['client_panel_rating_label'] ?? 'Rating' }}">{{ __($site_settings['client_panel_rating_label'] ?? 'Rating') }}:</span>
+                                    <div class="flex text-[#FFD166] space-x-0.5">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            @if($i <=floor($review->rating))
+                                            <i class="ri-star-fill text-sm"></i>
+                                            @elseif($i - 0.5 <= $review->rating)
+                                                <i class="ri-star-half-fill text-sm"></i>
+                                                @else
+                                                <i class="ri-star-line text-sm text-gray-300"></i>
+                                                @endif
+                                                @endfor
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <a href="{{ route('client.profile.view', $dar->client_id) }}" class="px-3 py-1 bg-secondary text-white text-xs font-bold rounded-full">View</a>
+                    @empty
+                    <p id="client_panel_no_reviews_msg" class="text-center text-gray-500 text-sm py-6" data-i18n="{{ $site_settings['client_panel_no_reviews_msg'] ?? 'You haven\'t written any reviews yet.' }}">{{ __($site_settings['client_panel_no_reviews_msg'] ?? 'You haven\'t written any reviews yet.') }}</p>
+                    @endforelse
                 </div>
-                @empty
-                <p class="text-center text-gray-500 text-xs py-4">No active client data permissions.</p>
-                @endforelse
             </div>
         </div>
-        @endif
 
         @if($user->role === 'client' || $user->role === 'patient')
         <!-- Clinical Document Portal -->
@@ -473,45 +513,8 @@
         </div>
         @endif
 
-        <!-- Reviews -->
-        <div id="section-reviews" class="bg-white rounded-2xl p-5 md:p-6 border border-[#2E4B3D]/12">
-            <h2 id="client_panel_your_reviews_title" class="text-xl font-medium font-sans! text-secondary mb-4" data-i18n="{{ $site_settings['client_panel_your_reviews_title'] ?? 'Your Reviews' }}">{{ __($site_settings['client_panel_your_reviews_title'] ?? 'Your Reviews') }}</h2>
-            <div class="space-y-4">
-                @forelse($reviews as $review)
-                <div class="border-b border-[#DDDDDD] pb-4 last:border-0 last:pb-0">
-                    <div class="flex items-center space-x-3 mb-2">
-                        <h3 class="font-sans! text-base font-medium text-gray-800">{{ $review->practitioner?->user?->name ?? 'Practitioner' }}</h3>
-                        <span class="text-xs md:text-sm text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
-                    </div>
-                    <div class="flex flex-wrap gap-2 justify-between items-start">
-                        <div>
-                            <p class="text-sm text-gray-600 mb-2 leading-relaxed">{{ __($site_settings['client_panel_comment_label'] ?? 'Comment') }}: "{{ $review->review }}"</p>
-                            <div class="flex items-center">
-                                <span id="client_panel_rating_label" class="text-sm text-gray-500 mr-3" data-i18n="{{ $site_settings['client_panel_rating_label'] ?? 'Rating' }}">{{ __($site_settings['client_panel_rating_label'] ?? 'Rating') }}:</span>
-                                <div class="flex text-[#FFD166] space-x-0.5">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <=floor($review->rating))
-                                        <i class="ri-star-fill text-sm"></i>
-                                        @elseif($i - 0.5 <= $review->rating)
-                                            <i class="ri-star-half-fill text-sm"></i>
-                                            @else
-                                            <i class="ri-star-line text-sm text-gray-300"></i>
-                                            @endif
-                                            @endfor
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @empty
-                <p id="client_panel_no_reviews_msg" class="text-center text-gray-500 text-sm py-6" data-i18n="{{ $site_settings['client_panel_no_reviews_msg'] ?? 'You haven\'t written any reviews yet.' }}">{{ __($site_settings['client_panel_no_reviews_msg'] ?? 'You haven\'t written any reviews yet.') }}</p>
-                @endforelse
-            </div>
-        </div>
     </div>
 </div>
-
-
 
 <!-- GDPR Confirmation Modal -->
 <div id="gdpr-modal" class="fixed inset-0 z-[100002] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
