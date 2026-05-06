@@ -174,6 +174,7 @@
         background: white !important;
         padding: 0 !important;
         margin: 0 !important;
+        display: block !important;
     }
 
     main {
@@ -183,6 +184,7 @@
         padding: 0 !important;
         margin: 0 !important;
         width: 100% !important;
+        display: block !important;
     }
 
     main > div {
@@ -190,6 +192,7 @@
         margin: 0 !important;
         width: 100% !important;
         max-width: none !important;
+        display: block !important;
     }
 
     .w-full {
@@ -207,6 +210,11 @@
     .bg-white.rounded-\[2\.5rem\] {
         border-radius: 0 !important;
         border: 1px solid #eee !important;
+        overflow: visible !important;
+    }
+
+    .overflow-x-auto {
+        overflow: visible !important;
     }
 
     .p-8, .md\:p-12 {
