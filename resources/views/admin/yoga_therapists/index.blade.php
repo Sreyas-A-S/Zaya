@@ -1776,45 +1776,60 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     };
 
                     const renderBadges = (langs) => {
-                        if (!langs) return '<span class="text-muted">None</span>';
+                        if (!langs || (Array.isArray(langs) && langs.length === 0)) return '<span class="text-muted">None</span>';
+                        
                         let data = langs;
                         if (typeof data === 'string') {
                             try {
                                 data = JSON.parse(data);
                             } catch (e) {
-                                data = data.split(',').map(v => v.trim()).filter(Boolean);
+                                if (data.includes(',')) {
+                                    data = data.split(',').map(v => v.trim()).filter(Boolean);
+                                } else if (data.trim() !== '') {
+                                    data = [data.trim()];
+                                } else {
+                                    return '<span class="text-muted">None</span>';
+                                }
                             }
                         }
+
                         if (Array.isArray(data)) {
                             if (data.length === 0) return '<span class="text-muted">None</span>';
-                            if (typeof data[0] === 'object') {
+                            // Check if it's an array of objects (capability style)
+                            if (typeof data[0] === 'object' && data[0] !== null) {
                                 return data.map(item => {
-                                    const name = item.language || item.name || item.label;
-                                    if (!name) return '';
+                                    const name = item.language || item.name || item.label || 'Unknown';
                                     const caps = [];
-                                    if (item.read) caps.push('Read');
-                                    if (item.write) caps.push('Write');
-                                    if (item.speak) caps.push('Speak');
+                                    if (item.read || item.reading) caps.push('Read');
+                                    if (item.write || item.writing) caps.push('Write');
+                                    if (item.speak || item.speaking) caps.push('Speak');
                                     const capsStr = caps.length ? ` (${caps.join(', ')})` : '';
-                                    return `<span class="badge bg-light text-dark border me-1 mb-1">${name}${capsStr}</span>`;
+                                    return `<span class="badge bg-light text-dark border me-1 mb-1 shadow-xs">${name}${capsStr}</span>`;
                                 }).join('');
                             }
-                            return data.map(l => `<span class="badge bg-light text-dark border me-1 mb-1">${l}</span>`).join('');
+                            // Simple array of strings
+                            return data.map(l => `<span class="badge bg-light text-dark border me-1 mb-1 shadow-xs">${String(l)}</span>`).join('');
                         }
-                        if (typeof data === 'object') {
+
+                        if (typeof data === 'object' && data !== null) {
                             let html = '';
+                            let count = 0;
                             $.each(data, function(key, caps) {
-                                const name = (caps && caps.language) ? caps.language : key;
+                                count++;
+                                const name = (caps && typeof caps === 'object' && caps.language) ? caps.language : key;
                                 const capList = [];
-                                if (caps && caps.read) capList.push('Read');
-                                if (caps && caps.write) capList.push('Write');
-                                if (caps && caps.speak) capList.push('Speak');
+                                if (typeof caps === 'object' && caps !== null) {
+                                    if (caps.read || caps.reading) capList.push('Read');
+                                    if (caps.write || caps.writing) capList.push('Write');
+                                    if (caps.speak || caps.speaking) capList.push('Speak');
+                                }
                                 const capsStr = capList.length ? ` (${capList.join(', ')})` : '';
-                                html += `<span class="badge bg-light text-dark border me-1 mb-1">${name}${capsStr}</span>`;
+                                html += `<span class="badge bg-light text-dark border me-1 mb-1 shadow-xs">${name}${capsStr}</span>`;
                             });
-                            return html || '<span class="text-muted">None</span>';
+                            return count > 0 ? html : '<span class="text-muted">None</span>';
                         }
-                        return `<span class="badge bg-light text-dark border me-1 mb-1">${String(data)}</span>`;
+
+                        return `<span class="badge bg-light text-dark border me-1 mb-1 shadow-xs">${String(data)}</span>`;
                     };
 
                     let html = `
@@ -1852,7 +1867,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         </div>
                         <div class="mb-3">
                             <h6 class="f-w-600">Languages</h6>
-                            <div>${renderBadges(t.languages_spoken)}</div>
+                            <div>${renderBadges(t.languages_spoken || u.languages)}</div>
                         </div>
                     </div>
 
