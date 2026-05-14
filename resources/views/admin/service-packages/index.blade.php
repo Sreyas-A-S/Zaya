@@ -3,16 +3,109 @@
 @section('title', 'Service Packages')
 
 @section('styles')
-<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
 <style>
     /* TomSelect Fixes */
-    .ts-control {
-        border-radius: 8px !important;
-        padding: 8px 12px !important;
-        border: 1px solid #d9dde7 !important;
+    #service-package-modal .ts-wrapper {
+        width: 100%;
     }
-    .ts-dropdown {
+    #service-package-modal .ts-control {
+        border-radius: 8px !important;
+        border: 1px solid #d9dde7 !important;
+        padding: 8px 12px !important;
+        min-height: 44px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        align-content: center;
+        gap: 6px;
+    }
+    #service-package-modal .ts-wrapper.multi .ts-control > div {
+        background: #e2e8f0;
+        border: 1px solid #cbd5e1;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 13px;
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        line-height: 1.3;
+        max-width: 100%;
+    }
+    #service-package-modal .ts-control > input {
+        font-size: 14px !important;
+        height: 22px !important;
+        line-height: 22px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+    #service-package-modal .ts-wrapper.multi.has-items .ts-control > input {
+        flex: 0 1 160px;
+        width: auto !important;
+        min-width: 120px;
+    }
+    #service-package-modal .ts-dropdown {
         z-index: 1070 !important;
+    }
+    #service-package-modal .ts-dropdown .option,
+    #service-package-modal .ts-dropdown .create {
+        padding: 10px 12px;
+    }
+    #service-package-modal .ts-wrapper.plugin-remove_button .item .remove {
+        border-left: 0;
+        padding-left: 6px;
+        margin-left: 6px;
+    }
+
+    /* DataTable Search Fixes */
+    #service-packages-table_wrapper .dataTables_length,
+    #service-packages-table_wrapper .dataTables_filter {
+        margin-bottom: 1rem;
+    }
+    #service-packages-table_wrapper .dataTables_filter {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+    #service-packages-table_wrapper .dataTables_length label,
+    #service-packages-table_wrapper .dataTables_filter label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0;
+    }
+    #service-packages-table_wrapper .dataTables_filter input {
+        min-width: 240px;
+        height: 42px;
+        margin-left: 0;
+        padding: 8px 14px;
+        border: 1px solid #d9dde7;
+        border-radius: 8px;
+    }
+    #service-packages-table_wrapper .dataTables_paginate {
+        margin-top: 1rem;
+    }
+
+    @media (max-width: 767.98px) {
+        #service-packages-table_wrapper .dataTables_length,
+        #service-packages-table_wrapper .dataTables_filter {
+            width: 100%;
+        }
+        #service-packages-table_wrapper .dataTables_filter {
+            justify-content: flex-start;
+        }
+        #service-packages-table_wrapper .dataTables_filter label {
+            width: 100%;
+            flex-wrap: wrap;
+        }
+        #service-packages-table_wrapper .dataTables_filter input {
+            min-width: 0;
+            width: 100%;
+        }
     }
 
     /* Cropper Styles */
