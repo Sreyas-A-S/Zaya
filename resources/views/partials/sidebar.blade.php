@@ -152,7 +152,7 @@
                     @endif
                     @if(auth()->user()->hasPermission('financial-view'))
                     <li> <a href="{{ route('admin.financial.index') }}">Transactions</a></li>
-                    <li> <a href="{{ route('admin.financial.practitioners') }}">Practitioner Balances</a></li>
+                    {{-- <li class=""> <a href="{{ route('admin.financial.practitioners') }}">Practitioner Balances</a></li> --}}
                     @endif
                 </ul>
             </li>
