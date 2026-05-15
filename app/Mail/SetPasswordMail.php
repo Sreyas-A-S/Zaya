@@ -42,6 +42,8 @@ class SetPasswordMail extends Mailable
                     'email' => $this->email,
                     'login_url' => $this->setPasswordUrl,
                     'password' => null,
+                    'hide_table' => true,
+                    'button_text' => 'Set Password & Login',
                 ],
                 'outro' => 'This link is secure and expires after use. If you did not request this, please contact support.',
             ],

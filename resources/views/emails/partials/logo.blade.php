@@ -1,1 +1,1 @@
-<img src="https://demo.zayawellness.com/frontend/assets/zaya-logo.svg" alt="{{ config('app.name') }}" style="height: 72px; width: auto; display: block; margin: 0 auto;">
+<img class="logo" src="https://demo.zayawellness.com/frontend/assets/zaya-logo.svg" alt="{{ config('app.name') }}" style="height: 90px; width: auto; max-width: 240px; display: block; margin: 0 auto; border: 0; outline: none; text-decoration: none;">

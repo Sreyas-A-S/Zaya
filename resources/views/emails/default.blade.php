@@ -26,19 +26,19 @@
 
         .header {
             background-color: #ffffff;
-            padding: 40px 20px;
+            padding: 32px 24px 16px;
             text-align: center;
         }
 
         .logo {
-            height: 72px;
+            height: 90px;
             width: auto;
             display: block;
-            margin: 6px auto 0px auto; /* Adjusted from 6px auto */
+            margin: 0 auto;
         }
 
         .content {
-            padding: 40px;
+            padding: 24px 40px 40px;
             text-align: center;
         }
 
@@ -204,6 +204,7 @@
             @endif
 
             @if(!empty($credentials) && (!empty($credentials['password']) || !empty($credentials['login_url'])))
+                @if(empty($credentials['hide_table']))
                 <table class="table">
                     <tr>
                         <td class="label">Login URL:</td>
@@ -222,6 +223,7 @@
                         </tr>
                     @endif
                 </table>
+                @endif
 
                 @if(!empty($credentials['login_url']) && ($credentials['show_button'] ?? true))
                     <div style="margin-top: 28px;">

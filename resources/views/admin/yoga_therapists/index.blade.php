@@ -585,10 +585,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">SWIFT Code</label>
-                        <input class="form-control" type="text" name="swift_code" oninput="this.value = this.value.toUpperCase()">
-                    </div>
+                    
                     <div class="col-md-6">
                         <label class="form-label">UPI ID (optional)</label>
                         <input class="form-control" type="text" name="upi_id" 
@@ -687,72 +684,72 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
 </div>
 </div>
 
-<!-- View Modal -->
-<div class="modal fade" id="therapist-view-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Yoga Therapist Details</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="view-modal-content">
-                <!-- Content loaded via AJAX -->
+    <!-- View Modal -->
+    <div class="modal fade" id="therapist-view-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yoga Therapist Details</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" id="view-modal-content">
+                    <!-- Content will be injected by AJAX -->
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Status Confirmation Modal -->
-<div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Status Change</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-4">
-                <i class="iconly-Info-Square icli text-primary mb-3" style="font-size: 50px;"></i>
-                <h5>Update Therapist Status</h5>
-                <p id="status-confirmation-text">Select the new status for this practitioner:</p>
-                <div class="mb-3 px-5">
-                    <select id="status-select-input" class="form-select">
-                        <option value="approved">Active</option>
-                        <option value="rejected">Inactive</option>
+    <!-- Status Confirmation Modal -->
+    <div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Status</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="fa-solid fa-circle-info text-info mb-3" style="font-size: 50px;"></i>
+                    <h5>Change Status?</h5>
+                    <p>Are you sure you want to change the status for this therapist?</p>
+                    <input type="hidden" id="status-therapist-id">
+                    <select class="form-select mt-3" id="status-select-input-therapist">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
                     </select>
                 </div>
-                <input type="hidden" id="status-therapist-id">
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Delete Modal -->
-<div class="modal fade" id="therapist-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Delete Therapist</h5>
-                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-4">
-                <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
-                <h5>Are you sure?</h5>
-                <p class="text-danger fw-bold">This action cannot be undone and is permanent.</p>
-                <p>Deleting this therapist will permanently remove their <strong>profile, services, availability, earned commissions, and past session records</strong>. Their account access will be immediately revoked.</p>
-                <input type="hidden" id="delete-therapist-id">
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-danger" type="button" id="confirm-delete-btn">Delete</button>
+    <!-- Delete Modal -->
+    <div class="modal fade" id="therapist-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Therapist</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
+                    <h5>Are you sure?</h5>
+                    <p class="text-danger fw-bold">This action cannot be undone and is permanent.</p>
+                    <p>Deleting this therapist will permanently remove their profile and all associated data.</p>
+                    <input type="hidden" id="delete-therapist-id">
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete Now</button>
+                </div>
             </div>
         </div>
     </div>
+
     <!-- Call Confirmation Modal -->
-    <div class="modal fade" id="call-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="call-confirmation-modal-yoga" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -762,12 +759,35 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                 <div class="modal-body text-center p-4">
                     <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
                     <h5>Make a Call?</h5>
-                    <p>Do you want to call <span id="call-name" class="fw-bold"></span>?</p>
-                    <h4 class="text-primary" id="call-number"></h4>
+                    <p>Do you want to call <span id="call-name-yoga" class="fw-bold"></span>?</p>
+                    <h4 class="text-primary" id="call-number-yoga"></h4>
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                    <a href="#" id="confirm-call-btn" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+                    <a href="#" id="confirm-call-btn-yoga" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Master Data Delete Modal -->
+    <div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
+                    <h5>Are you sure?</h5>
+                    <p class="text-muted">Do you want to delete this specific item? This action is permanent.</p>
+                    <input type="hidden" id="delete-master-id">
+                    <input type="hidden" id="delete-master-type">
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirm-master-delete-btn">Delete Now</button>
                 </div>
             </div>
         </div>
@@ -791,9 +811,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             </div>
         </div>
     </div>
-
-
-    @endsection
+@endsection
 
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
@@ -1758,45 +1776,60 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                     };
 
                     const renderBadges = (langs) => {
-                        if (!langs) return '<span class="text-muted">None</span>';
+                        if (!langs || (Array.isArray(langs) && langs.length === 0)) return '<span class="text-muted">None</span>';
+                        
                         let data = langs;
                         if (typeof data === 'string') {
                             try {
                                 data = JSON.parse(data);
                             } catch (e) {
-                                data = data.split(',').map(v => v.trim()).filter(Boolean);
+                                if (data.includes(',')) {
+                                    data = data.split(',').map(v => v.trim()).filter(Boolean);
+                                } else if (data.trim() !== '') {
+                                    data = [data.trim()];
+                                } else {
+                                    return '<span class="text-muted">None</span>';
+                                }
                             }
                         }
+
                         if (Array.isArray(data)) {
                             if (data.length === 0) return '<span class="text-muted">None</span>';
-                            if (typeof data[0] === 'object') {
+                            // Check if it's an array of objects (capability style)
+                            if (typeof data[0] === 'object' && data[0] !== null) {
                                 return data.map(item => {
-                                    const name = item.language || item.name || item.label;
-                                    if (!name) return '';
+                                    const name = item.language || item.name || item.label || 'Unknown';
                                     const caps = [];
-                                    if (item.read) caps.push('Read');
-                                    if (item.write) caps.push('Write');
-                                    if (item.speak) caps.push('Speak');
+                                    if (item.read || item.reading) caps.push('Read');
+                                    if (item.write || item.writing) caps.push('Write');
+                                    if (item.speak || item.speaking) caps.push('Speak');
                                     const capsStr = caps.length ? ` (${caps.join(', ')})` : '';
-                                    return `<span class="badge bg-light text-dark border me-1 mb-1">${name}${capsStr}</span>`;
+                                    return `<span class="badge bg-light text-dark border me-1 mb-1 shadow-xs">${name}${capsStr}</span>`;
                                 }).join('');
                             }
-                            return data.map(l => `<span class="badge bg-light text-dark border me-1 mb-1">${l}</span>`).join('');
+                            // Simple array of strings
+                            return data.map(l => `<span class="badge bg-light text-dark border me-1 mb-1 shadow-xs">${String(l)}</span>`).join('');
                         }
-                        if (typeof data === 'object') {
+
+                        if (typeof data === 'object' && data !== null) {
                             let html = '';
+                            let count = 0;
                             $.each(data, function(key, caps) {
-                                const name = (caps && caps.language) ? caps.language : key;
+                                count++;
+                                const name = (caps && typeof caps === 'object' && caps.language) ? caps.language : key;
                                 const capList = [];
-                                if (caps && caps.read) capList.push('Read');
-                                if (caps && caps.write) capList.push('Write');
-                                if (caps && caps.speak) capList.push('Speak');
+                                if (typeof caps === 'object' && caps !== null) {
+                                    if (caps.read || caps.reading) capList.push('Read');
+                                    if (caps.write || caps.writing) capList.push('Write');
+                                    if (caps.speak || caps.speaking) capList.push('Speak');
+                                }
                                 const capsStr = capList.length ? ` (${capList.join(', ')})` : '';
-                                html += `<span class="badge bg-light text-dark border me-1 mb-1">${name}${capsStr}</span>`;
+                                html += `<span class="badge bg-light text-dark border me-1 mb-1 shadow-xs">${name}${capsStr}</span>`;
                             });
-                            return html || '<span class="text-muted">None</span>';
+                            return count > 0 ? html : '<span class="text-muted">None</span>';
                         }
-                        return `<span class="badge bg-light text-dark border me-1 mb-1">${String(data)}</span>`;
+
+                        return `<span class="badge bg-light text-dark border me-1 mb-1 shadow-xs">${String(data)}</span>`;
                     };
 
                     let html = `
@@ -1834,7 +1867,7 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
                         </div>
                         <div class="mb-3">
                             <h6 class="f-w-600">Languages</h6>
-                            <div>${renderBadges(t.languages_spoken)}</div>
+                            <div>${renderBadges(t.languages_spoken || u.languages)}</div>
                         </div>
                     </div>
 
@@ -2207,105 +2240,4 @@ style="background-image:url('{{ asset('admiro/assets/images/user/user.png') }}')
             display: none !important;
         }
     </style>
-    <!-- View Modal -->
-    <div class="modal fade" id="therapist-view-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Yoga Therapist Details</h5>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4" id="view-modal-content">
-                    <!-- Content will be injected by AJAX -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Status Confirmation Modal -->
-    <div class="modal fade" id="status-confirmation-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Update Status</h5>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center p-4">
-                    <i class="fa-solid fa-circle-info text-info mb-3" style="font-size: 50px;"></i>
-                    <h5>Change Status?</h5>
-                    <p>Are you sure you want to change the status for this therapist?</p>
-                    <input type="hidden" id="status-therapist-id">
-                    <select class="form-select mt-3" id="status-select-input-therapist">
-                        <option value="approved">Active</option>
-                        <option value="rejected">Inactive</option>
-                    </select>                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="confirm-status-btn">Confirm Change</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Call Confirmation Modal -->
-
-    <div class="modal fade" id="call-confirmation-modal-yoga" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Call</h5>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center p-4">
-                    <i class="iconly-Call icli text-success mb-3" style="font-size: 50px;"></i>
-                    <h5>Make a Call?</h5>
-                    <p>Do you want to call <span id="call-name-yoga" class="fw-bold"></span>?</p>
-                    <h4 class="text-primary" id="call-number-yoga"></h4>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                    <a href="#" id="confirm-call-btn-yoga" class="btn btn-success"><i class="iconly-Call icli me-2"></i>Call Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Master Data Delete Modal -->
-    <div class="modal fade" id="master-data-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Delete</h5>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center p-4">
-                    <i class="fa-solid fa-trash-can text-danger mb-3" style="font-size: 50px;"></i>
-                    <h5>Are you sure?</h5>
-                    <p class="text-muted">Do you want to delete this specific item? This action is permanent.</p>
-                    <input type="hidden" id="delete-master-id">
-                    <input type="hidden" id="delete-master-type">
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirm-master-delete-btn">Delete Now</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <style>
-        /* Fix for browser validation on hidden file input */
-        .avatar-upload .avatar-edit input {
-            display: block !important;
-            width: 1px !important;
-            height: 1px !important;
-            opacity: 0 !important;
-            position: absolute !important;
-            left: 50% !important;
-            bottom: 0 !important;
-            transform: translateX(-50%);
-            pointer-events: none;
-            /* Let clicks pass through to label */
-        }
-    </style>
-    @endsection
+@endsection

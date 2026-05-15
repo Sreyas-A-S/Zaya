@@ -303,14 +303,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::resource('finance-managers', \App\Http\Controllers\Admin\FinanceManagerController::class);
     Route::get('finance-manager', function() { return redirect()->route('admin.finance-managers.index'); });
     Route::post('finance-managers/{id}/status', [\App\Http\Controllers\Admin\FinanceManagerController::class, 'updateStatus'])->name('finance-managers.status');
+    Route::post('finance-managers/{id}/assign-countries', [\App\Http\Controllers\Admin\FinanceManagerController::class, 'assignCountries'])->name('finance-managers.assign-countries');
 
     Route::resource('content-managers', \App\Http\Controllers\Admin\ContentManagerController::class);
     Route::get('content-manager', function() { return redirect()->route('admin.content-managers.index'); });
     Route::post('content-managers/{id}/status', [\App\Http\Controllers\Admin\ContentManagerController::class, 'updateStatus'])->name('content-managers.status');
+    Route::post('content-managers/{id}/assign-countries', [\App\Http\Controllers\Admin\ContentManagerController::class, 'assignCountries'])->name('content-managers.assign-countries');
 
     Route::resource('user-managers', \App\Http\Controllers\Admin\UserManagerController::class);
     Route::get('user-manager', function() { return redirect()->route('admin.user-managers.index'); });
     Route::post('user-managers/{id}/status', [\App\Http\Controllers\Admin\UserManagerController::class, 'updateStatus'])->name('user-managers.status');
+    Route::post('user-managers/{id}/assign-countries', [\App\Http\Controllers\Admin\UserManagerController::class, 'assignCountries'])->name('user-managers.assign-countries');
 
     Route::resource('languages', \App\Http\Controllers\Admin\LanguageController::class);
     Route::post('languages/{id}/status', [\App\Http\Controllers\Admin\LanguageController::class, 'updateStatus'])->name('languages.status');
