@@ -167,7 +167,11 @@ class BookingController extends Controller
             return response()->json(['success' => false, 'message' => 'This slot was just taken. Please choose another time.'], 422);
         }
 
-        // 5. Handle Zero-Payable Bookings (Bypass Razorpay only if 0)
+        // 5. Handle Zero-Payable or below-minimum Bookings (Razorpay min is 1.00)
+        if ($finalPayable > 0 && $finalPayable < 1.00) {
+            $finalPayable = 0;
+        }
+
         if ($finalPayable <= 0) {
             $booking = Booking::create([
                 'invoice_no' => 'ZAYA-FREE-' . date('Ymd') . '-' . strtoupper(Str::random(4)),

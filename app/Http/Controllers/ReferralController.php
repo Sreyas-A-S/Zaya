@@ -426,6 +426,11 @@ class ReferralController extends Controller
                 'amount' => $subtotal,    // Subtotal in payment currency
             ]);
 
+            // If final payable is below Razorpay minimum (1.00), treat as 0
+            if ($finalPayable > 0 && $finalPayable < 1.00) {
+                $finalPayable = 0;
+            }
+
             // If final payable is 0, we can skip Razorpay
             if ($finalPayable <= 0) {
                 return $this->processZeroPaymentReferral($referral);
