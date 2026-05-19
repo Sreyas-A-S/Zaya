@@ -367,14 +367,30 @@
                 @endphp
 
                 @forelse($currentDocs as $field => $label)
+                    @php
+                        $val = $profile ? $profile->$field : null;
+                        $filesArray = [];
+                        if ($val) {
+                            if (is_array($val)) {
+                                $filesArray = $val;
+                            } elseif (is_string($val)) {
+                                $decoded = json_decode($val, true);
+                                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                    $filesArray = $decoded;
+                                } else {
+                                    $filesArray = [$val];
+                                }
+                            }
+                        }
+                    @endphp
                     <div class="p-5 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col justify-between">
                         <div class="mb-4">
                             <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">{{ $label }}</p>
-                            @if($profile && $profile->$field)
-                                @if(is_array($profile->$field))
+                            @if(!empty($filesArray))
+                                @if(count($filesArray) > 1)
                                     <div class="text-xs text-green-600 font-bold flex items-center gap-1">
                                         <i class="ri-checkbox-circle-fill"></i>
-                                        {{ count($profile->$field) }} {{ __('Files Uploaded') }}
+                                        {{ count($filesArray) }} {{ __('Files Uploaded') }}
                                     </div>
                                 @else
                                     <div class="text-xs text-green-600 font-bold flex items-center gap-1">
@@ -390,33 +406,21 @@
                             @endif
                         </div>
 
-                        @if($profile && $profile->$field)
+                        @if(!empty($filesArray))
                             <div class="flex flex-wrap gap-2">
-                                @if(is_array($profile->$field))
-                                    @foreach($profile->$field as $idx => $path)
-                                        <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-100 shadow-sm">
-                                            <span class="text-[10px] font-bold text-gray-500">File {{ $idx + 1 }}</span>
-                                            <a href="{{ asset('storage/' . $path) }}" target="_blank" class="text-secondary hover:text-opacity-80 transition-colors">
-                                                <i class="ri-eye-line"></i>
-                                            </a>
-                                            <a href="{{ asset('storage/' . $path) }}" download class="text-secondary hover:text-opacity-80 transition-colors">
-                                                <i class="ri-download-line"></i>
-                                            </a>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm">
-                                        <a href="{{ asset('storage/' . $profile->$field) }}" target="_blank" class="flex items-center gap-2 text-sm font-bold text-secondary hover:underline">
-                                            <i class="ri-eye-line text-lg"></i>
-                                            View
+                                @foreach($filesArray as $idx => $path)
+                                    <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-100 shadow-sm max-w-full">
+                                        <span class="text-[10px] font-bold text-gray-500 truncate max-w-[120px]" title="{{ basename($path) }}">
+                                            {{ count($filesArray) > 1 ? 'File ' . ($idx + 1) : basename($path) }}
+                                        </span>
+                                        <a href="{{ asset('storage/' . $path) }}" target="_blank" class="text-secondary hover:text-opacity-80 transition-colors">
+                                            <i class="ri-eye-line"></i>
                                         </a>
-                                        <div class="w-px h-4 bg-gray-200"></div>
-                                        <a href="{{ asset('storage/' . $profile->$field) }}" download class="flex items-center gap-2 text-sm font-bold text-secondary hover:underline">
-                                            <i class="ri-download-line text-lg"></i>
-                                            Download
+                                        <a href="{{ asset('storage/' . $path) }}" download class="text-secondary hover:text-opacity-80 transition-colors">
+                                            <i class="ri-download-line"></i>
                                         </a>
                                     </div>
-                                @endif
+                                @endforeach
                             </div>
                         @else
                             <a href="{{ route('profile.complete') }}?tab=documents" class="text-xs font-bold text-secondary hover:underline flex items-center gap-1">
@@ -572,7 +576,7 @@
                         <option value="{{ $item }}" {{ in_array($item, $specialities) ? 'selected' : '' }}>{{ $item }}</option>
                     @endforeach
                     @foreach($specialities as $item)
-                        @if(!$allSpecialities->contains($item))
+                        @if(!collect($allSpecialities)->contains($item))
                             <option value="{{ $item }}" selected>{{ $item }}</option>
                         @endif
                     @endforeach
@@ -605,7 +609,7 @@
                         <option value="{{ $item }}" {{ in_array($item, $conditions) ? 'selected' : '' }}>{{ $item }}</option>
                     @endforeach
                     @foreach($conditions as $item)
-                        @if(!$allConditions->contains($item))
+                        @if(!collect($allConditions)->contains($item))
                             <option value="{{ $item }}" selected>{{ $item }}</option>
                         @endif
                     @endforeach
@@ -638,7 +642,7 @@
                         <option value="{{ $item }}" {{ in_array($item, $modalities) ? 'selected' : '' }}>{{ $item }}</option>
                     @endforeach
                     @foreach($modalities as $item)
-                        @if(!$allModalities->contains($item))
+                        @if(!collect($allModalities)->contains($item))
                             <option value="{{ $item }}" selected>{{ $item }}</option>
                         @endif
                     @endforeach

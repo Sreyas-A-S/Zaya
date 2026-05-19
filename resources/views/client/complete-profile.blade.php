@@ -626,22 +626,38 @@
                     <div class="p-6 bg-gray-50 rounded-2xl border border-gray-100">
                         <label class="block text-sm font-bold text-secondary mb-3">{{ $label }}</label>
                         <div class="flex flex-col gap-4">
-                            @if($profile->$field)
+                            @php
+                                $val = $profile->$field;
+                                $filesArray = [];
+                                if ($val) {
+                                    if (is_array($val)) {
+                                        $filesArray = $val;
+                                    } elseif (is_string($val)) {
+                                        $decoded = json_decode($val, true);
+                                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                            $filesArray = $decoded;
+                                        } else {
+                                            $filesArray = [$val];
+                                        }
+                                    }
+                                }
+                            @endphp
+                            @foreach($filesArray as $fileItem)
                             <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-secondary/10">
-                                <div class="flex items-center gap-2 text-xs text-green-600 font-bold">
-                                    <i class="ri-checkbox-circle-fill text-lg"></i>
-                                    {{ __('Uploaded') }}
+                                <div class="flex items-center gap-2 text-xs text-green-600 font-bold truncate pr-2">
+                                    <i class="ri-checkbox-circle-fill text-lg flex-shrink-0"></i>
+                                    <span class="truncate">{{ basename($fileItem) }}</span>
                                 </div>
-                                <div class="flex gap-2">
-                                    <a href="{{ asset('storage/' . $profile->$field) }}" target="_blank" class="p-2 bg-secondary/5 text-secondary rounded-lg hover:bg-secondary/10 transition-all" title="Preview">
+                                <div class="flex gap-2 flex-shrink-0">
+                                    <a href="{{ asset('storage/' . $fileItem) }}" target="_blank" class="p-2 bg-secondary/5 text-secondary rounded-lg hover:bg-secondary/10 transition-all" title="Preview">
                                         <i class="ri-eye-line"></i>
                                     </a>
-                                    <a href="{{ asset('storage/' . $profile->$field) }}" download class="p-2 bg-secondary/5 text-secondary rounded-lg hover:bg-secondary/10 transition-all" title="Download">
+                                    <a href="{{ asset('storage/' . $fileItem) }}" download class="p-2 bg-secondary/5 text-secondary rounded-lg hover:bg-secondary/10 transition-all" title="Download">
                                         <i class="ri-download-line"></i>
                                     </a>
                                 </div>
                             </div>
-                            @endif
+                            @endforeach
                             <input type="file" name="{{ $field }}" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-secondary file:text-white hover:file:bg-opacity-90">
                         </div>
                     </div>
