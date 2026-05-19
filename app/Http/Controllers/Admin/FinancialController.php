@@ -23,6 +23,23 @@ class FinancialController extends Controller
         if ($request->ajax()) {
             $data = Transaction::with(['user', 'practitioner', 'booking', 'referral'])->latest();
 
+            if ($request->filled('type_filter')) {
+                $data->where('type', $request->type_filter);
+            }
+
+            if ($request->filled('user_filter')) {
+                $data->where('user_id', $request->user_filter);
+            }
+
+            // Calculate dynamic filtered balances
+            $balancesQuery = clone $data;
+            $filteredBalances = $balancesQuery->select('currency', 
+                DB::raw('SUM(total_amount) as total_revenue'),
+                DB::raw('SUM(company_share) as total_company'),
+                DB::raw('SUM(practitioner_share) as total_practitioners'),
+                DB::raw('SUM(referrer_share) as total_referrers')
+            )->groupBy('currency')->get();
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('client_name', function ($row) {
@@ -72,6 +89,7 @@ class FinancialController extends Controller
                     return $btns;
                 })
                 ->rawColumns(['action', 'type'])
+                ->with('balances', $filteredBalances)
                 ->make(true);
         }
 
@@ -83,15 +101,22 @@ class FinancialController extends Controller
             DB::raw('SUM(referrer_share) as total_referrers')
         )->groupBy('currency')->get();
 
-        return view('admin.financial.index', compact('balances'));
+        $users = User::whereIn('id', Transaction::select('user_id')->distinct()->whereNotNull('user_id'))
+            ->orderBy('name')
+            ->get(['id', 'name', 'email']);
+
+        return view('admin.financial.index', compact('balances', 'users'));
     }
 
     /**
      * Export transactions as Excel.
      */
-    public function export()
+    public function export(Request $request)
     {
-        return Excel::download(new TransactionsExport, 'transactions.xlsx');
+        $type = $request->input('type_filter');
+        $userId = $request->input('user_filter');
+
+        return Excel::download(new TransactionsExport($type, $userId), 'transactions.xlsx');
     }
 
     /**

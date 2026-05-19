@@ -9,12 +9,31 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class TransactionsExport implements FromCollection, WithHeadings, WithMapping
 {
+    protected $type;
+    protected $userId;
+
+    public function __construct($type = null, $userId = null)
+    {
+        $this->type = $type;
+        $this->userId = $userId;
+    }
+
     /**
     * @return \Illuminate\Support\Collection
     */
     public function collection()
     {
-        return Transaction::with(['user', 'practitioner', 'referrer'])->latest()->get();
+        $query = Transaction::with(['user', 'practitioner', 'referrer'])->latest();
+
+        if ($this->type) {
+            $query->where('type', $this->type);
+        }
+
+        if ($this->userId) {
+            $query->where('user_id', $this->userId);
+        }
+
+        return $query->get();
     }
 
     public function headings(): array
