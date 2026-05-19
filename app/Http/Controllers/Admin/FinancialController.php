@@ -31,8 +31,14 @@ class FinancialController extends Controller
                 $data->where('user_id', $request->user_filter);
             }
 
-            // Calculate dynamic filtered balances
-            $balancesQuery = clone $data;
+            // Calculate dynamic filtered balances without inheriting order clauses from latest()
+            $balancesQuery = Transaction::query();
+            if ($request->filled('type_filter')) {
+                $balancesQuery->where('type', $request->type_filter);
+            }
+            if ($request->filled('user_filter')) {
+                $balancesQuery->where('user_id', $request->user_filter);
+            }
             $filteredBalances = $balancesQuery->select('currency', 
                 DB::raw('SUM(total_amount) as total_revenue'),
                 DB::raw('SUM(company_share) as total_company'),
