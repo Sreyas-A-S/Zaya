@@ -127,9 +127,9 @@
                                 <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-2">Available for you</p>
                                 <div class="flex flex-wrap gap-2">
                                     @foreach($userPromoCodes as $upc)
-                                    <button type="button" onclick="usePromo('{{ $upc->promoCode->code }}')"
+                                    <button type="button" onclick="usePromo('{{ $upc->promo_code }}')"
                                         class="px-3 py-1.5 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold hover:bg-emerald-100 transition-colors uppercase">
-                                        {{ $upc->promoCode->code }}
+                                        {{ $upc->promo_code }}
                                     </button>
                                     @endforeach
                                 </div>
