@@ -34,6 +34,7 @@ class Doctor extends Model
 
     protected $casts = [
         'specialization' => 'array',
+        'other_modalities' => 'array',
         'degree_certificates_path' => 'array',
         'consultation_expertise' => 'array',
         'health_conditions_treated' => 'array',

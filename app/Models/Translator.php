@@ -17,6 +17,7 @@ class Translator extends Model
         'certificates_path' => 'array',
         'sample_work_path' => 'array',
         'services_offered' => 'array',
+        'other_modalities' => 'array',
     ];
 
     public function user()

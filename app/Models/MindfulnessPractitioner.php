@@ -82,6 +82,7 @@ class MindfulnessPractitioner extends Model
         'default_slot_duration',
         'reminder_lead_time',
         'status',
+        'other_modalities',
     ];
 
     protected $casts = [
@@ -93,6 +94,7 @@ class MindfulnessPractitioner extends Model
         'consultation_modes' => 'array',
         'languages_spoken' => 'array',
         'practitioner_type' => 'array',
+        'other_modalities' => 'array',
         'booking_window_days' => 'integer',
         'default_slot_duration' => 'integer',
         'reminder_lead_time' => 'integer',

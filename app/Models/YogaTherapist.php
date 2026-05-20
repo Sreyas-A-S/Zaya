@@ -78,6 +78,7 @@ class YogaTherapist extends Model
         'default_slot_duration',
         'reminder_lead_time',
         'status',
+        'other_modalities',
     ];
 
     protected $casts = [
@@ -87,6 +88,7 @@ class YogaTherapist extends Model
         'areas_of_expertise' => 'array',
         'consultation_modes' => 'array',
         'languages_spoken' => 'array',
+        'other_modalities' => 'array',
         'booking_window_days' => 'integer',
         'default_slot_duration' => 'integer',
         'reminder_lead_time' => 'integer',
