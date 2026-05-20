@@ -55,17 +55,17 @@ class ZayaReviewController extends Controller
                 return [
                     'id' => $r->id,
                     'type' => 'Professional Review',
-                    'reviewer_name' => $r->user->name ?? 'Anonymous',
-                    'reviewer_role' => $r->user->role ? str_replace('_', ' ', ucfirst($r->user->role)) : 'N/A',
-                    'target_name' => $profile->user->name ?? 'N/A',
-                    'target_role' => $profile->user->role ? str_replace('_', ' ', ucfirst($profile->user->role)) : 'Professional',
-                    'target_country' => $profile->country ?? null,
+                    'reviewer_name' => $r->user?->name ?? 'Anonymous',
+                    'reviewer_role' => $r->user?->role ? str_replace('_', ' ', ucfirst($r->user->role)) : 'N/A',
+                    'target_name' => $profile?->user?->name ?? 'N/A',
+                    'target_role' => $profile?->user?->role ? str_replace('_', ' ', ucfirst($profile->user->role)) : 'Professional',
+                    'target_country' => $profile?->country ?? null,
                     'rating' => $r->rating,
                     'review' => $r->review,
                     'status' => $r->status ? 'approved' : 'pending',
                     'created_at' => $r->created_at,
                     'model' => 'PractitionerReview',
-                    'reviewer_country_ids' => $r->user->national_id ?? []
+                    'reviewer_country_ids' => $r->user?->national_id ?? []
                 ];
             })->concat($zayaReviews->map(function ($t) {
                 return [
@@ -81,7 +81,7 @@ class ZayaReviewController extends Controller
                     'status' => $t->status,
                     'created_at' => $t->created_at,
                     'model' => 'Testimonial',
-                    'reviewer_country_ids' => $t->user->national_id ?? []
+                    'reviewer_country_ids' => $t->user?->national_id ?? []
                 ];
             }));
 
