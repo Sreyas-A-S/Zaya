@@ -1684,7 +1684,10 @@ class ProfileController extends Controller
             $booking = \App\Models\Booking::with(['user', 'practitioner.user'])
                 ->where(function($q) use ($user) {
                     $q->where('user_id', $user->id)
-                      ->orWhereHas('practitioner', fn($p) => $p->where('user_id', $user->id));
+                      ->orWhereHasMorph('practitioner', [
+                          'practitioner', 'doctor', 'mindfulness_practitioner', 'yoga_therapist', 'translator',
+                          'AppModelsPractitioner', 'AppModelsDoctor', 'AppModelsMindfulnessPractitioner', 'AppModelsYogaTherapist', 'AppModelsTranslator'
+                      ], fn($p) => $p->where('user_id', $user->id));
                 })
                 ->latest()
                 ->first();
