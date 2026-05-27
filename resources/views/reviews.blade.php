@@ -61,6 +61,17 @@
             </div>
             <div class="mt-6 pt-6 border-t border-gray-50">
                 <p class="text-gray-600 leading-relaxed font-medium italic">"{{ $review->review }}"</p>
+                @if(!empty($review->reply))
+                <div class="mt-4 rounded-2xl bg-[#F9FBF9] border border-[#2E4B3D]/10 p-4">
+                    <div class="flex items-center justify-between gap-3">
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-secondary">Reply from {{ $review->target_name }}</p>
+                        @if($review->reply_at)
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ $review->reply_at->format('M d, Y • h:i A') }}</p>
+                        @endif
+                    </div>
+                    <p class="mt-3 text-sm text-gray-600 leading-relaxed">{{ $review->reply }}</p>
+                </div>
+                @endif
             </div>
         </div>
         @empty
@@ -128,6 +139,27 @@
             </div>
             <div class="mt-6 pt-6 border-t border-gray-50">
                 <p class="text-gray-600 leading-relaxed font-medium italic">"{{ $review->review }}"</p>
+                @if(!empty($review->reply))
+                <div class="mt-4 rounded-2xl bg-[#F9FBF9] border border-[#2E4B3D]/10 p-4">
+                    <div class="flex items-center justify-between gap-3">
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-secondary">Your Reply</p>
+                        @if($review->reply_at)
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ $review->reply_at->format('M d, Y • h:i A') }}</p>
+                        @endif
+                    </div>
+                    <p class="mt-3 text-sm text-gray-600 leading-relaxed">{{ $review->reply }}</p>
+                </div>
+                @elseif($user->profile_id && (int) $review->practitioner_id === (int) $user->profile_id && in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
+                <form action="{{ route('reviews.reply', $review->id) }}" method="POST" class="mt-4">
+                    @csrf
+                    <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-secondary mb-2">Add Reply</label>
+                    <textarea name="reply" rows="3" required placeholder="Reply to this review..."
+                        class="w-full rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 text-sm py-4 px-5 transition-all shadow-sm resize-none"></textarea>
+                    <button type="submit" class="mt-3 inline-flex items-center justify-center px-5 py-3 bg-secondary text-white rounded-[1rem] font-black text-xs hover:bg-primary transition-all uppercase tracking-[0.2em]">
+                        Post Reply
+                    </button>
+                </form>
+                @endif
             </div>
         </div>
         @empty

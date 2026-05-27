@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TransactionsExport;
+use Illuminate\Database\Eloquent\Builder;
 
 class FinancialController extends Controller
 {
@@ -22,47 +23,11 @@ class FinancialController extends Controller
     {
         if ($request->ajax()) {
             $data = Transaction::with(['user', 'practitioner', 'booking', 'referral'])->latest();
+            $this->applyTransactionFilters($data, $request);
 
-            if ($request->filled('type_filter')) {
-                $data->where('type', $request->type_filter);
-            }
-
-            if ($request->filled('user_filter')) {
-                $selectedRole = $request->user_filter;
-                $data->where(function ($query) use ($selectedRole) {
-                    $query->whereHas('user', function ($subQuery) use ($selectedRole) {
-                        $subQuery->where('role', $selectedRole);
-                    })->orWhereHas('practitioner', function ($subQuery) use ($selectedRole) {
-                        $subQuery->where('role', $selectedRole);
-                    })->orWhereHas('referrer', function ($subQuery) use ($selectedRole) {
-                        $subQuery->where('role', $selectedRole);
-                    });
-                });
-            }
-
-            // Calculate dynamic filtered balances without inheriting order clauses from latest()
-            $balancesQuery = Transaction::query();
-            if ($request->filled('type_filter')) {
-                $balancesQuery->where('type', $request->type_filter);
-            }
-            if ($request->filled('user_filter')) {
-                $selectedRole = $request->user_filter;
-                $balancesQuery->where(function ($query) use ($selectedRole) {
-                    $query->whereHas('user', function ($subQuery) use ($selectedRole) {
-                        $subQuery->where('role', $selectedRole);
-                    })->orWhereHas('practitioner', function ($subQuery) use ($selectedRole) {
-                        $subQuery->where('role', $selectedRole);
-                    })->orWhereHas('referrer', function ($subQuery) use ($selectedRole) {
-                        $subQuery->where('role', $selectedRole);
-                    });
-                });
-            }
-            $filteredBalances = $balancesQuery->select('currency', 
-                DB::raw('SUM(total_amount) as total_revenue'),
-                DB::raw('SUM(company_share) as total_company'),
-                DB::raw('SUM(practitioner_share) as total_practitioners'),
-                DB::raw('SUM(referrer_share) as total_referrers')
-            )->groupBy('currency')->get();
+            $overviewQuery = Transaction::query();
+            $this->applyTransactionFilters($overviewQuery, $request);
+            $filteredBalances = $this->buildOverviewMetrics($overviewQuery);
 
             return DataTables::of($data)
                 ->addIndexColumn()
@@ -113,17 +78,11 @@ class FinancialController extends Controller
                     return $btns;
                 })
                 ->rawColumns(['action', 'type'])
-                ->with('balances', $filteredBalances)
+                ->with('overview', $filteredBalances)
                 ->make(true);
         }
 
-        // Global Balances (simplified, assuming one currency for now or summing them)
-        $balances = Transaction::select('currency', 
-            DB::raw('SUM(total_amount) as total_revenue'),
-            DB::raw('SUM(company_share) as total_company'),
-            DB::raw('SUM(practitioner_share) as total_practitioners'),
-            DB::raw('SUM(referrer_share) as total_referrers')
-        )->groupBy('currency')->get();
+        $overview = $this->buildOverviewMetrics(Transaction::query());
 
         $userRoles = collect([
             'doctor',
@@ -133,7 +92,20 @@ class FinancialController extends Controller
             'translator',
         ]);
 
-        return view('admin.financial.index', compact('balances', 'userRoles'));
+        $years = Transaction::query()
+            ->selectRaw('YEAR(created_at) as year')
+            ->whereNotNull('created_at')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year')
+            ->filter()
+            ->values();
+
+        $months = collect(range(1, 12))->mapWithKeys(function ($month) {
+            return [$month => now()->startOfYear()->month($month)->format('F')];
+        });
+
+        return view('admin.financial.index', compact('overview', 'userRoles', 'years', 'months'));
     }
 
     /**
@@ -143,8 +115,10 @@ class FinancialController extends Controller
     {
         $type = $request->input('type_filter');
         $userId = $request->input('user_filter');
+        $month = $request->input('month_filter');
+        $year = $request->input('year_filter');
 
-        return Excel::download(new TransactionsExport($type, $userId), 'transactions.xlsx');
+        return Excel::download(new TransactionsExport($type, $userId, $month, $year), 'transactions.xlsx');
     }
 
     /**
@@ -213,5 +187,77 @@ class FinancialController extends Controller
         }
 
         return view('admin.financial.practitioners');
+    }
+
+    protected function applyTransactionFilters(Builder $query, Request $request): void
+    {
+        if ($request->filled('type_filter')) {
+            $query->where('type', $request->type_filter);
+        }
+
+        if ($request->filled('user_filter')) {
+            $selectedRole = $request->user_filter;
+            $query->where(function ($subQuery) use ($selectedRole) {
+                $subQuery->whereHas('user', function ($roleQuery) use ($selectedRole) {
+                    $roleQuery->where('role', $selectedRole);
+                })->orWhereHas('practitioner', function ($roleQuery) use ($selectedRole) {
+                    $roleQuery->where('role', $selectedRole);
+                })->orWhereHas('referrer', function ($roleQuery) use ($selectedRole) {
+                    $roleQuery->where('role', $selectedRole);
+                });
+            });
+        }
+
+        if ($request->filled('month_filter')) {
+            $query->whereMonth('created_at', (int) $request->month_filter);
+        }
+
+        if ($request->filled('year_filter')) {
+            $query->whereYear('created_at', (int) $request->year_filter);
+        }
+    }
+
+    protected function buildOverviewMetrics(Builder $query): array
+    {
+        $rows = $query
+            ->select(
+                'currency',
+                DB::raw('SUM(total_amount) as total_revenue'),
+                DB::raw('SUM(company_share) as total_company'),
+                DB::raw('SUM(practitioner_share) as total_practitioners')
+            )
+            ->groupBy('currency')
+            ->orderBy('currency')
+            ->get();
+
+        $formatMetric = function (string $key) use ($rows) {
+            return $rows->map(function ($row) use ($key) {
+                return [
+                    'currency' => $row->currency,
+                    'amount' => (float) ($row->{$key} ?? 0),
+                ];
+            })->values()->all();
+        };
+
+        return [
+            [
+                'title' => 'Total Revenue',
+                'icon' => 'database',
+                'color' => 'primary',
+                'amounts' => $formatMetric('total_revenue'),
+            ],
+            [
+                'title' => 'Company Share',
+                'icon' => 'briefcase',
+                'color' => 'secondary',
+                'amounts' => $formatMetric('total_company'),
+            ],
+            [
+                'title' => 'Practitioner Share',
+                'icon' => 'user-check',
+                'color' => 'success',
+                'amounts' => $formatMetric('total_practitioners'),
+            ],
+        ];
     }
 }

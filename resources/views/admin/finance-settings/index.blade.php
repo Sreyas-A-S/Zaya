@@ -2,6 +2,32 @@
 
 @section('title', 'Finance Settings')
 
+@push('styles')
+<style>
+    .finance-toggle-field {
+        min-height: calc(1.5rem + 38px);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    .finance-toggle-field .form-check {
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 0;
+    }
+
+    .finance-toggle-field .form-check-input {
+        margin-top: 0;
+    }
+
+    .finance-toggle-field .form-check-label {
+        margin-bottom: 0;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="container-fluid">
     <div class="page-title">
@@ -86,7 +112,7 @@
                                             $isCurrencyDisabled = true;
                                         }
                                     @endphp
-                                    <div class="col-md-6 d-flex align-items-start justify-content-between gap-3 flex-wrap">
+                                    <div class="col-md-6 d-flex align-items-end justify-content-between gap-3 flex-wrap">
                                         <div class="flex-grow-1">
                                             <label class="form-label fw-bold" for="{{ $feeId }}">{{ ucwords(str_replace('_', ' ', $feeKey)) }}</label>
                                             <div class="input-group">
@@ -108,7 +134,7 @@
                                             </div>
                                         </div>
                                         @if($enableSetting)
-                                        <div class="ms-auto pt-4">
+                                        <div class="ms-auto finance-toggle-field">
                                             <div class="form-check form-switch">
                                                 <input type="hidden" name="{{ $enableKey }}" value="0">
                                                 <input class="form-check-input" type="checkbox" role="switch"
@@ -196,7 +222,7 @@
                                             placeholder="Enter {{ $placeholder }}..."
                                             {{ $isDisabled ? 'disabled' : '' }}>
                                     @elseif($setting->type === 'boolean')
-                                        <div class="ms-auto">
+                                        <div class="ms-auto finance-toggle-field">
                                             <div class="form-check form-switch mt-0">
                                                 <input type="hidden" name="{{ $setting->key }}" value="0">
                                                 <input class="form-check-input" type="checkbox"

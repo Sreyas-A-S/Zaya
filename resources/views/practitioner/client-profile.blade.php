@@ -150,7 +150,10 @@
                         <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
                             <div class="overflow-hidden">
                                 <p class="text-xs font-bold text-secondary truncate">{{ $form->booking->invoice_no ?? 'Z-FORM' }}</p>
-                                <p class="text-[10px] text-gray-400 uppercase font-black">{{ $form->created_at->format('M d, Y') }}</p>
+                                <p class="text-[10px] text-gray-400 uppercase font-black">Created {{ $form->created_at->format('M d, Y \a\t H:i') }}</p>
+                                @if($form->updated_at->gt($form->created_at))
+                                    <p class="text-[10px] text-gray-400 uppercase font-black">Edited {{ $form->updated_at->format('M d, Y \a\t H:i') }}</p>
+                                @endif
                             </div>
                             <a href="{{ route('bookings.consultation-form.show', $form->booking_id) }}" class="px-3 py-1 bg-white text-primary text-[10px] font-black rounded-lg shadow-sm uppercase tracking-wider hover:bg-primary hover:text-white transition-all">
                                 View

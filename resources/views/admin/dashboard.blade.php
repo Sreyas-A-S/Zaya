@@ -138,7 +138,7 @@
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div class="flex-grow-1">
                                         <h2 class="mb-1">{{ $stats['total_patients'] }}</h2>
-                                        <p class="mb-0 font-roboto">Patients</p>
+                                        <p class="mb-0 font-roboto">Clients</p>
                                     </div>
                                     <div class="flex-shrink-0 bg-light-warning p-3 rounded-pill">
                                         <i class="fa fa-user text-warning fa-2x"></i>

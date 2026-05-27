@@ -328,11 +328,10 @@ class ProfileController extends Controller
 
         // Check for OTP-verified data access
         $hasOTPAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id, $booking->id);
-
-        $canEdit = ($isPractitioner || $isTranslator || $isReferredTo) && $hasOTPAccess && $request->query('view') != '1';
+        $canCreateForm = ($isPractitioner || $isTranslator || $isReferredTo) && $hasOTPAccess;
         
-        // Referred experts and practitioners now require additional OTP verification
-        $canView = $isClient || $isReferrer || $hasOTPAccess || $request->query('view') == '1';
+        // Referred experts and practitioners require OTP verification; `view=1` only forces read-only mode.
+        $canView = $isClient || $isReferrer || $hasOTPAccess;
 
         if (!$canView) {
             if ($isPractitioner || $isTranslator || $isReferredTo) {
@@ -382,6 +381,10 @@ class ProfileController extends Controller
             $existingForm = $allForms->first();
         }
 
+        $canEdit = $canCreateForm
+            && $request->query('view') != '1'
+            && (!$existingForm || (int) $existingForm->doctor_id === (int) $user->id);
+
         $consultationPayload = $existingForm->payload ?? [];
 
         if ($request->ajax() || $request->wantsJson()) {
@@ -395,7 +398,7 @@ class ProfileController extends Controller
 
         return view('consultation-form', compact(
             'user', 'booking', 'isPractitioner', 'isTranslator', 'isClient', 'isReferrer', 'isReferredTo',
-            'canEdit', 'isMinimal', 'consultationSchema', 'allForms', 'existingForm', 'isNew', 
+            'canEdit', 'canCreateForm', 'isMinimal', 'consultationSchema', 'allForms', 'existingForm', 'isNew', 
             'referralRequests', 'consultationPayload', 'roleForSchema'
         ));
     }
@@ -407,8 +410,11 @@ class ProfileController extends Controller
 
         $isPractitioner = ($booking->practitioner && $booking->practitioner->user_id === $user->id);
         $isTranslator = ($booking->translator && $booking->translator->user_id === $user->id);
-        
-        if (!$isPractitioner && !$isTranslator) {
+        $isReferredTo = Referral::where('referral_no', $booking->invoice_no)->where('referred_to_id', $user->id)->exists();
+        $hasOTPAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id, $booking->id);
+        $canCreateForm = ($isPractitioner || $isTranslator || $isReferredTo) && $hasOTPAccess;
+
+        if (!$canCreateForm) {
             abort(403, 'You do not have permission to update this consultation record.');
         }
 
@@ -418,6 +424,9 @@ class ProfileController extends Controller
 
         if ($formId) {
             $form = ConsultationForm::where('booking_id', $booking->id)->findOrFail($formId);
+            if ((int) $form->doctor_id !== (int) $user->id) {
+                abort(403, 'Only the creator of this consultation form can edit it.');
+            }
             $form->update([
                 'payload' => $payload,
                 'title' => $title ?: $form->title,
@@ -535,15 +544,21 @@ class ProfileController extends Controller
     public function deleteConsultationForm($id, $form_id)
     {
         $user = Auth::user();
-        $booking = Booking::findOrFail($id);
+        $booking = Booking::with(['practitioner.user', 'translator.user'])->findOrFail($id);
 
         $isPractitioner = ($booking->practitioner && $booking->practitioner->user_id === $user->id);
-        
-        if (!$isPractitioner) {
+        $isTranslator = ($booking->translator && $booking->translator->user_id === $user->id);
+        $isReferredTo = Referral::where('referral_no', $booking->invoice_no)->where('referred_to_id', $user->id)->exists();
+        $hasOTPAccess = \App\Http\Controllers\DataAccessController::hasAccess($user->id, $booking->user_id, $booking->id);
+
+        if (!(($isPractitioner || $isTranslator || $isReferredTo) && $hasOTPAccess)) {
             abort(403, 'You do not have permission to delete this consultation record.');
         }
 
         $form = ConsultationForm::where('booking_id', $booking->id)->findOrFail($form_id);
+        if ((int) $form->doctor_id !== (int) $user->id) {
+            abort(403, 'Only the creator of this consultation form can delete it.');
+        }
         $form->delete();
 
         return back()->with('status', 'Consultation record deleted successfully.');
@@ -897,7 +912,7 @@ class ProfileController extends Controller
         // Get consultation forms for this client
         $consultationForms = \App\Models\ConsultationForm::whereHas('booking', function($query) use ($client) {
             $query->where('user_id', $client->id);
-        })->with(['booking'])->latest()->get();
+        })->with(['booking', 'doctor'])->latest()->get();
 
         // Get prescriptions for this client
         $prescriptions = \App\Models\Prescription::where('user_id', $client->id)
@@ -2366,6 +2381,34 @@ class ProfileController extends Controller
         }
 
         return back()->with('status', 'Review submitted successfully!');
+    }
+
+    public function replyToReview(Request $request, $id)
+    {
+        $request->validate([
+            'reply' => 'required|string|max:2000',
+        ]);
+
+        $user = Auth::user();
+        if (!$user->profile_id || !in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist'])) {
+            abort(403, 'Only experts can reply to reviews.');
+        }
+
+        $review = PractitionerReview::findOrFail($id);
+        if ((int) $review->practitioner_id !== (int) $user->profile_id) {
+            abort(403, 'You can only reply to reviews written for your profile.');
+        }
+
+        $review->update([
+            'reply' => $request->reply,
+            'reply_at' => now(),
+        ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Reply posted successfully.']);
+        }
+
+        return back()->with('status', 'Reply posted successfully.');
     }
 
     public function storeZayaReview(Request $request)

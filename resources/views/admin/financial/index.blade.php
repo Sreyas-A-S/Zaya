@@ -38,6 +38,15 @@
     #transactions-table_wrapper .select2-container .select2-selection__arrow {
         height: 29px !important;
     }
+    .overview-card-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        line-height: 1.4;
+    }
+    .overview-card-value small {
+        font-size: 0.8rem;
+        opacity: 0.75;
+    }
 </style>
 
 <div class="container-fluid">
@@ -58,54 +67,23 @@
 
     <!-- Balance Cards -->
     <div class="row" id="balances-cards-container">
-        @foreach($balances as $balance)
-        <div class="col-sm-6 col-xl-3 col-lg-6">
+        @foreach($overview as $card)
+        <div class="col-sm-6 col-xl-4 col-lg-6">
             <div class="card o-hidden border-0">
-                <div class="bg-primary b-r-4 card-body">
-                    <div class="media static-top-widget">
-                        <div class="align-self-center text-center"><i data-feather="database"></i></div>
+                <div class="bg-{{ $card['color'] }} b-r-4 card-body">
+                    <div class="media static-top-widget align-items-start">
+                        <div class="align-self-center text-center"><i data-feather="{{ $card['icon'] }}"></i></div>
                         <div class="media-body">
-                            <span class="m-0">Total Revenue ({{ $balance->currency }})</span>
-                            <h4 class="mb-0 counter">{{ number_format($balance->total_revenue, 2) }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3 col-lg-6">
-            <div class="card o-hidden border-0">
-                <div class="bg-secondary b-r-4 card-body">
-                    <div class="media static-top-widget">
-                        <div class="align-self-center text-center"><i data-feather="shopping-bag"></i></div>
-                        <div class="media-body">
-                            <span class="m-0">Company Share</span>
-                            <h4 class="mb-0 counter">{{ number_format($balance->total_company, 2) }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3 col-lg-6">
-            <div class="card o-hidden border-0">
-                <div class="bg-success b-r-4 card-body">
-                    <div class="media static-top-widget">
-                        <div class="align-self-center text-center"><i data-feather="user-check"></i></div>
-                        <div class="media-body">
-                            <span class="m-0">Specialist Shares</span>
-                            <h4 class="mb-0 counter">{{ number_format($balance->total_practitioners, 2) }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3 col-lg-6">
-            <div class="card o-hidden border-0">
-                <div class="bg-warning b-r-4 card-body">
-                    <div class="media static-top-widget">
-                        <div class="align-self-center text-center"><i data-feather="users"></i></div>
-                        <div class="media-body">
-                            <span class="m-0">Referrer Shares</span>
-                            <h4 class="mb-0 counter">{{ number_format($balance->total_referrers, 2) }}</h4>
+                            <span class="m-0">{{ $card['title'] }}</span>
+                            @if(!empty($card['amounts']))
+                                @foreach($card['amounts'] as $amount)
+                                    <div class="overview-card-value {{ !$loop->first ? 'mt-1' : 'mt-2' }}">
+                                        {{ $amount['currency'] }} {{ number_format($amount['amount'], 2) }}
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="overview-card-value mt-2">0.00</div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -144,6 +122,24 @@
                                     <option value="{{ $role }}">
                                         {{ ucwords(str_replace('_', ' ', $role)) }}
                                     </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 small fw-bold text-muted text-nowrap">MONTH:</label>
+                            <select id="month-filter" class="form-select form-select-sm" style="width: 150px;">
+                                <option value="">All Months</option>
+                                @foreach($months as $monthValue => $monthLabel)
+                                    <option value="{{ $monthValue }}">{{ $monthLabel }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 small fw-bold text-muted text-nowrap">YEAR:</label>
+                            <select id="year-filter" class="form-select form-select-sm" style="width: 140px;">
+                                <option value="">All Years</option>
+                                @foreach($years as $year)
+                                    <option value="{{ $year }}">{{ $year }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -190,11 +186,31 @@
             if ($userFilter.hasClass('select2-hidden-accessible')) {
                 $userFilter.select2('destroy');
             }
+            const $monthFilter = $('#month-filter');
+            if ($monthFilter.hasClass('select2-hidden-accessible')) {
+                $monthFilter.select2('destroy');
+            }
+            const $yearFilter = $('#year-filter');
+            if ($yearFilter.hasClass('select2-hidden-accessible')) {
+                $yearFilter.select2('destroy');
+            }
 
             $userFilter.select2({
                 placeholder: 'All Users',
                 allowClear: true,
                 width: '220px'
+            });
+
+            $monthFilter.select2({
+                placeholder: 'All Months',
+                allowClear: true,
+                width: '150px'
+            });
+
+            $yearFilter.select2({
+                placeholder: 'All Years',
+                allowClear: true,
+                width: '140px'
             });
         }
 
@@ -206,6 +222,8 @@
                 data: function (d) {
                     d.type_filter = $('#type-filter').val();
                     d.user_filter = $('#user-filter').val();
+                    d.month_filter = $('#month-filter').val();
+                    d.year_filter = $('#year-filter').val();
                 }
             },
             initComplete: function() {
@@ -229,71 +247,42 @@
             order: [[1, 'desc']]
         });
 
-        // Dynamic Balance Card Updates from AJAX Response
+        // Dynamic Overview Card Updates from AJAX Response
         $('#transactions-table').on('xhr.dt', function (e, settings, json, xhr) {
-            if (json && json.balances) {
-                updateBalanceCards(json.balances);
+            if (json && json.overview) {
+                updateBalanceCards(json.overview);
             }
         });
 
-        function updateBalanceCards(balances) {
+        function formatOverviewAmounts(amounts) {
+            if (!amounts || amounts.length === 0) {
+                return '<div class="overview-card-value mt-2">0.00</div>';
+            }
+
+            return amounts.map(function(amount, index) {
+                return `<div class="overview-card-value ${index > 0 ? 'mt-1' : 'mt-2'}">${amount.currency} ${parseFloat(amount.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>`;
+            }).join('');
+        }
+
+        function updateBalanceCards(overview) {
             let container = $('#balances-cards-container');
             container.empty();
             
-            if (balances.length === 0) {
+            if (!overview || overview.length === 0) {
                 container.append('<div class="col-12"><div class="alert alert-light-primary text-center">No transactions found for the selected filters.</div></div>');
                 return;
             }
 
-            balances.forEach(function(balance) {
+            overview.forEach(function(card) {
                 let cards = `
-                <div class="col-sm-6 col-xl-3 col-lg-6">
+                <div class="col-sm-6 col-xl-4 col-lg-6">
                     <div class="card o-hidden border-0">
-                        <div class="bg-primary b-r-4 card-body">
-                            <div class="media static-top-widget">
-                                <div class="align-self-center text-center"><i data-feather="database"></i></div>
+                        <div class="bg-${card.color} b-r-4 card-body">
+                            <div class="media static-top-widget align-items-start">
+                                <div class="align-self-center text-center"><i data-feather="${card.icon}"></i></div>
                                 <div class="media-body">
-                                    <span class="m-0">Total Revenue (${balance.currency})</span>
-                                    <h4 class="mb-0 counter">${parseFloat(balance.total_revenue).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3 col-lg-6">
-                    <div class="card o-hidden border-0">
-                        <div class="bg-secondary b-r-4 card-body">
-                            <div class="media static-top-widget">
-                                <div class="align-self-center text-center"><i data-feather="shopping-bag"></i></div>
-                                <div class="media-body">
-                                    <span class="m-0">Company Share</span>
-                                    <h4 class="mb-0 counter">${parseFloat(balance.total_company).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3 col-lg-6">
-                    <div class="card o-hidden border-0">
-                        <div class="bg-success b-r-4 card-body">
-                            <div class="media static-top-widget">
-                                <div class="align-self-center text-center"><i data-feather="user-check"></i></div>
-                                <div class="media-body">
-                                    <span class="m-0">Specialist Shares</span>
-                                    <h4 class="mb-0 counter">${parseFloat(balance.total_practitioners).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3 col-lg-6">
-                    <div class="card o-hidden border-0">
-                        <div class="bg-warning b-r-4 card-body">
-                            <div class="media static-top-widget">
-                                <div class="align-self-center text-center"><i data-feather="users"></i></div>
-                                <div class="media-body">
-                                    <span class="m-0">Referrer Shares</span>
-                                    <h4 class="mb-0 counter">${parseFloat(balance.total_referrers).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h4>
+                                    <span class="m-0">${card.title}</span>
+                                    ${formatOverviewAmounts(card.amounts)}
                                 </div>
                             </div>
                         </div>
@@ -312,13 +301,19 @@
         function updateExportUrl() {
             let type = $('#type-filter').val() || '';
             let user = $('#user-filter').val() || '';
+            let month = $('#month-filter').val() || '';
+            let year = $('#year-filter').val() || '';
             let baseUrl = "{{ route('admin.financial.export') }}";
-            let newUrl = baseUrl + '?type_filter=' + encodeURIComponent(type) + '&user_filter=' + encodeURIComponent(user);
+            let newUrl = baseUrl
+                + '?type_filter=' + encodeURIComponent(type)
+                + '&user_filter=' + encodeURIComponent(user)
+                + '&month_filter=' + encodeURIComponent(month)
+                + '&year_filter=' + encodeURIComponent(year);
             $('#export-excel-btn').attr('href', newUrl);
         }
 
         // Filter events
-        $('#type-filter, #user-filter').on('change', function() {
+        $('#type-filter, #user-filter, #month-filter, #year-filter').on('change', function() {
             table.ajax.reload();
             updateExportUrl();
         });
@@ -326,8 +321,16 @@
         $('#reset-filters').on('click', function() {
             $('#type-filter').val('');
             $('#user-filter').val('');
+            $('#month-filter').val('');
+            $('#year-filter').val('');
             if ($('#user-filter').hasClass('select2-hidden-accessible')) {
                 $('#user-filter').trigger('change.select2');
+            }
+            if ($('#month-filter').hasClass('select2-hidden-accessible')) {
+                $('#month-filter').trigger('change.select2');
+            }
+            if ($('#year-filter').hasClass('select2-hidden-accessible')) {
+                $('#year-filter').trigger('change.select2');
             }
             table.ajax.reload();
             updateExportUrl();

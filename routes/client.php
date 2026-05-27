@@ -101,6 +101,7 @@ Route::middleware(['auth', 'isClient'])->group(function () {
     // Reviews
     Route::get('/reviews', [ProfileController::class, 'reviews'])->name('reviews.index');
     Route::post('/reviews', [ProfileController::class, 'storeReview'])->name('reviews.store');
+    Route::post('/reviews/{id}/reply', [ProfileController::class, 'replyToReview'])->name('reviews.reply');
     Route::post('/reviews/zaya', [ProfileController::class, 'storeZayaReview'])->name('reviews.zaya.store');
 
     // Notifications

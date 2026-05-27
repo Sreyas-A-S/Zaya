@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class PractitionerReview extends Model
 {
-    protected $fillable = ['practitioner_id', 'user_id', 'rating', 'review', 'status'];
+    protected $fillable = ['practitioner_id', 'user_id', 'rating', 'review', 'status', 'reply', 'reply_at'];
+
+    protected $casts = [
+        'reply_at' => 'datetime',
+    ];
 
     public function practitioner()
     {

@@ -170,9 +170,9 @@
                 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Or Send Direct Email</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                        <input type="email" class="form-control" id="share_email_input" placeholder="Enter recipient email">
+                    <textarea class="form-control" id="share_email_input" rows="3" placeholder="Enter one or more email addresses, separated by commas or new lines"></textarea>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <div class="small text-muted">Enable generated form links to be shared with and sent to multiple email addresses.</div>
                         <button class="btn btn-primary" type="button" id="btn-send-share-email">
                             <i class="fa-solid fa-paper-plane me-1"></i>Send
                         </button>
@@ -471,11 +471,11 @@
         });
 
         $('#btn-send-share-email').on('click', function() {
-            const email = $('#share_email_input').val().trim();
+            const emails = $('#share_email_input').val().trim();
             const link = $('#share_generated_link').val().trim();
             
-            if (!email) {
-                $('#share_hint').text('Please enter an email address.').addClass('text-danger');
+            if (!emails) {
+                $('#share_hint').text('Please enter at least one email address.').addClass('text-danger');
                 return;
             }
             
@@ -487,16 +487,17 @@
                 url: "{{ route('admin.forms.share-email') }}",
                 method: 'POST',
                 data: {
-                    email: email,
+                    emails: emails,
                     link: link
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(resp) {
-                    if (window.showToast) window.showToast('Email sent successfully!', 'success');
+                    const msg = (resp && resp.message) ? resp.message : 'Registration link sent successfully!';
+                    if (window.showToast) window.showToast(msg, 'success');
                     $('#share_email_input').val('');
-                    $('#share_hint').text('Email sent successfully!').addClass('text-success');
+                    $('#share_hint').text(msg).addClass('text-success');
                 },
                 error: function(xhr) {
                     const msg = (xhr.responseJSON && (xhr.responseJSON.message || xhr.responseJSON.error)) ? (xhr.responseJSON.message || xhr.responseJSON.error) : 'Failed to send email.';

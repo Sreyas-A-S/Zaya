@@ -306,11 +306,13 @@
                    class="px-5 py-2.5 rounded-full text-xs font-bold transition-all border {{ ($existingForm && $existingForm->id === $f->id) ? 'bg-secondary text-white border-secondary shadow-lg' : 'bg-white text-gray-500 border-gray-200 hover:border-secondary/30 hover:text-secondary' }}">
                     <i class="ri-file-list-3-line mr-1.5"></i>
                     {{ $f->title ?: 'Consultation Record #'.$loop->iteration }}
-                    <span class="opacity-50 ml-1 font-normal text-[10px]">{{ $f->created_at->format('M d') }}</span>
+                    <span class="opacity-50 ml-1 font-normal text-[10px]">
+                        {{ $f->updated_at->gt($f->created_at) ? 'Edited ' . $f->updated_at->format('M d') : $f->created_at->format('M d') }}
+                    </span>
                 </a>
             @endforeach
             
-            @if($allForms->isNotEmpty())
+            @if($allForms->isNotEmpty() && $canCreateForm)
             <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'new' => 1]) }}" 
                data-consultation-switch
                class="px-5 py-2.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-all {{ $isNew ? 'ring-2 ring-emerald-400 ring-offset-2' : '' }}">
@@ -373,21 +375,34 @@
         </div>
     </div>
 
-    @if($existingForm && !$isNew)
+@if($existingForm && !$isNew)
     <div class="mb-6 p-6 bg-secondary/5 border border-secondary/10 rounded-[2rem] flex items-center justify-between">
         <div class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-secondary shadow-sm">
                 <i class="ri-edit-2-line text-xl"></i>
             </div>
             <div>
-                <h4 class="text-sm font-black text-secondary">Editing: {{ $existingForm->title ?: 'Consultation Form' }}</h4>
-                <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-0.5">Created on {{ $existingForm->created_at->format('F d, Y at H:i') }}</p>
+                <h4 class="text-sm font-black text-secondary">{{ $canEdit ? 'Editing' : 'Viewing' }}: {{ $existingForm->title ?: 'Consultation Form' }}</h4>
+                <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-0.5">
+                    Created on {{ $existingForm->created_at->format('F d, Y \a\t H:i') }}
+                    @if($existingForm->doctor)
+                        by {{ $existingForm->doctor->name }}
+                    @endif
+                </p>
+                @if($existingForm->updated_at->gt($existingForm->created_at))
+                    <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-1">
+                        Last edited on {{ $existingForm->updated_at->format('F d, Y \a\t H:i') }}
+                    </p>
+                @endif
             </div>
         </div>
+        @if($canEdit)
         <button type="button" onclick="toggleTitleEdit()" class="text-xs font-bold text-secondary hover:underline">Rename Form</button>
+        @endif
     </div>
 @endif
 
+@if($canEdit)
 <div id="title-edit-box" class="hidden mb-6 p-6 bg-white border border-[#2E4B3D]/12 rounded-[2rem] shadow-sm">
     <label class="block text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3">Form Title / Reference</label>
     <div class="flex gap-3">
@@ -396,6 +411,7 @@
         <button type="button" onclick="applyTitle()" class="px-6 py-3 bg-secondary text-white rounded-xl font-bold text-sm">Apply</button>
     </div>
 </div>
+@endif
 
 @if(!in_array($roleForSchema, ['doctor', 'practitioner', 'yoga_therapist', 'mindfulness_practitioner'], true))
 @include('consultation-forms.' . $roleForSchema, [

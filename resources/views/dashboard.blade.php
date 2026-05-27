@@ -292,31 +292,64 @@
             <!-- Completed Sessions -->
             <div id="content-completed" class="space-y-4 hidden">
                 @forelse($completedBookings as $booking)
-                <div class="flex gap-2 justify-between items-center">
-                    <div>
-                        <div class="flex flex-wrap items-center space-x-2 mb-1">
-                            @php
-                            $sNames = [];
-                            foreach($booking->service_ids ?? [] as $sid) {
-                            if(isset($allServices[$sid])) $sNames[] = $allServices[$sid]->title;
-                            }
-                            @endphp
-                            <p class="text-base font-normal text-gray-800">{{ implode(', ', $sNames) }}</p>
-                            <span class="text-gray-800 text-base">•</span>
-                            <p class="text-xs text-gray-600 font-normal">
-                                @if($user->role === 'client' || $user->role === 'patient')
-                                    ({{ __($site_settings['client_panel_session_with'] ?? 'Session with') }} {{ $booking->practitioner?->user?->name ?? 'Practitioner' }})
-                                @else
-                                    ({{ __($site_settings['client_panel_client_label'] ?? 'Client') }}: {{ $booking->user->name ?? 'Patient' }})
-                                @endif
-                            </p>
+                <div class="rounded-2xl border border-[#2E4B3D]/10 p-4">
+                    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <div class="flex flex-wrap items-center space-x-2 mb-1">
+                                @php
+                                $sNames = [];
+                                foreach($booking->service_ids ?? [] as $sid) {
+                                if(isset($allServices[$sid])) $sNames[] = $allServices[$sid]->title;
+                                }
+                                @endphp
+                                <p class="text-base font-normal text-gray-800">{{ implode(', ', $sNames) }}</p>
+                                <span class="text-gray-800 text-base">•</span>
+                                <p class="text-xs text-gray-600 font-normal">
+                                    @if($user->role === 'client' || $user->role === 'patient')
+                                        ({{ __($site_settings['client_panel_session_with'] ?? 'Session with') }} {{ $booking->practitioner?->user?->name ?? 'Practitioner' }})
+                                    @else
+                                        ({{ __($site_settings['client_panel_client_label'] ?? 'Client') }}: {{ $booking->user->name ?? 'Patient' }})
+                                    @endif
+                                </p>
+                            </div>
+                            <p class="text-xs text-gray-400">{{ $booking->booking_date->translatedFormat('M d, Y') }} - {{ $booking->booking_time }}</p>
                         </div>
-                        <p class="text-xs text-gray-400">{{ $booking->booking_date->translatedFormat('M d, Y') }} - {{ $booking->booking_time }}</p>
+                        <div class="flex items-center gap-3">
+                            <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-normal rounded-full capitalize">{{ __('Completed') }}</span>
+                            <a href="{{ route('bookings.details-view', $booking->id) }}" class="text-[10px] font-bold text-secondary hover:underline uppercase tracking-tighter">View Details</a>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-normal rounded-full capitalize">{{ __('Completed') }}</span>
-                        <a href="{{ route('bookings.details-view', $booking->id) }}" class="text-[10px] font-bold text-secondary hover:underline uppercase tracking-tighter">View Details</a>
-                    </div>
+
+                    @if(($user->role === 'client' || $user->role === 'patient') && !empty($booking->profile_id))
+                    <form action="{{ route('reviews.store') }}" method="POST" class="mt-4 rounded-2xl bg-[#F9FBF9] border border-[#2E4B3D]/10 p-4">
+                        @csrf
+                        <input type="hidden" name="practitioner_id" value="{{ $booking->profile_id }}">
+
+                        <div class="flex flex-col gap-3 lg:flex-row lg:items-end">
+                            <div class="w-full lg:w-40">
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-secondary mb-2">{{ __('Rating') }}</label>
+                                <select name="rating" class="w-full rounded-xl border border-[#2E4B3D]/15 px-3 py-2 text-sm text-gray-700 focus:border-secondary focus:ring-secondary" required>
+                                    <option value="5">{{ __('5 Stars') }}</option>
+                                    <option value="4">{{ __('4 Stars') }}</option>
+                                    <option value="3">{{ __('3 Stars') }}</option>
+                                    <option value="2">{{ __('2 Stars') }}</option>
+                                    <option value="1">{{ __('1 Star') }}</option>
+                                </select>
+                            </div>
+
+                            <div class="flex-1">
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-secondary mb-2">{{ __('Add Review') }}</label>
+                                <textarea name="review" rows="2" required placeholder="{{ __('Share your experience for this consultation...') }}" class="w-full rounded-xl border border-[#2E4B3D]/15 px-4 py-3 text-sm text-gray-700 focus:border-secondary focus:ring-secondary"></textarea>
+                            </div>
+
+                            <div class="lg:shrink-0">
+                                <button type="submit" class="w-full lg:w-auto px-5 py-3 bg-secondary text-white text-xs font-black uppercase tracking-[0.2em] rounded-xl hover:bg-primary transition-all">
+                                    {{ __('Submit Review') }}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    @endif
                 </div>
                 @empty
                 <p id="client_panel_no_completed_msg" class="text-center text-gray-500 text-sm py-10" data-i18n="{{ $site_settings['client_panel_no_completed_msg'] ?? 'No completed sessions recently.' }}">{{ __($site_settings['client_panel_no_completed_msg'] ?? 'No completed sessions recently.') }}</p>
@@ -422,8 +455,19 @@
                             <span class="text-xs md:text-sm text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
                         </div>
                         <div class="flex flex-wrap gap-2 justify-between items-start">
-                            <div>
+                            <div class="w-full">
                                 <p class="text-sm text-gray-600 mb-2 leading-relaxed">{{ __($site_settings['client_panel_comment_label'] ?? 'Comment') }}: "{{ $review->review }}"</p>
+                                @if(!empty($review->reply))
+                                <div class="mb-3 rounded-2xl bg-[#F9FBF9] border border-[#2E4B3D]/10 p-3">
+                                    <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-secondary">{{ __('Expert Reply') }}</p>
+                                        @if($review->reply_at)
+                                        <p class="text-[10px] text-gray-400 uppercase tracking-[0.14em]">{{ $review->reply_at->format('M d, Y h:i A') }}</p>
+                                        @endif
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed">{{ $review->reply }}</p>
+                                </div>
+                                @endif
                                 <div class="flex items-center">
                                     <span id="client_panel_rating_label" class="text-sm text-gray-500 mr-3" data-i18n="{{ $site_settings['client_panel_rating_label'] ?? 'Rating' }}">{{ __($site_settings['client_panel_rating_label'] ?? 'Rating') }}:</span>
                                     <div class="flex text-[#FFD166] space-x-0.5">

@@ -294,6 +294,17 @@
                                 </div>
                             </div>
                             <p class="text-gray-600 text-sm leading-relaxed mb-6 italic">"{{ $review->review }}"</p>
+                            @if(!empty($review->reply))
+                            <div class="mb-6 rounded-2xl border border-[#2E4B3D]/10 bg-[#F9FBF9] p-4">
+                                <div class="flex items-center justify-between gap-3 mb-2">
+                                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-secondary">{{ __('Expert Reply') }}</p>
+                                    @if($review->reply_at)
+                                    <span class="text-[10px] text-gray-400 uppercase tracking-[0.14em]">{{ $review->reply_at->format('M d, Y') }}</span>
+                                    @endif
+                                </div>
+                                <p class="text-sm text-gray-600 leading-relaxed">{{ $review->reply }}</p>
+                            </div>
+                            @endif
                             <div class="flex text-[#DEDD66] gap-1 text-lg">
                                 @for($i = 1; $i <= 5; $i++) @if($i <= $review->rating) <i class="ri-star-fill"></i> @else <i class="ri-star-line"></i> @endif @endfor
                             </div>

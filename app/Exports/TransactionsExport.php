@@ -11,11 +11,15 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping
 {
     protected $type;
     protected $userId;
+    protected $month;
+    protected $year;
 
-    public function __construct($type = null, $userId = null)
+    public function __construct($type = null, $userId = null, $month = null, $year = null)
     {
         $this->type = $type;
         $this->userId = $userId;
+        $this->month = $month;
+        $this->year = $year;
     }
 
     /**
@@ -40,6 +44,14 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping
                     $roleQuery->where('role', $selectedRole);
                 });
             });
+        }
+
+        if ($this->month) {
+            $query->whereMonth('created_at', (int) $this->month);
+        }
+
+        if ($this->year) {
+            $query->whereYear('created_at', (int) $this->year);
         }
 
         return $query->get();

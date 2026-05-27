@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use App\Mail\ShareRegistrationLinkMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 
 class FormController extends Controller
@@ -181,13 +182,41 @@ class FormController extends Controller
     public function shareEmail(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'link' => 'required|url',
+            'emails' => ['required', 'string'],
+            'link' => ['required', 'url'],
         ]);
 
+        $emails = preg_split('/[\s,;]+/', (string) $request->emails, -1, PREG_SPLIT_NO_EMPTY);
+        $emails = collect($emails)
+            ->map(fn ($email) => trim($email))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($emails)) {
+            return response()->json(['error' => 'Please enter at least one valid email address.'], 422);
+        }
+
+        $validator = Validator::make(
+            ['emails' => $emails],
+            ['emails' => ['required', 'array', 'max:50'], 'emails.*' => ['email']]
+        );
+
+        if ($validator->fails()) {
+            return response()->json(['error' => 'One or more email addresses are invalid.'], 422);
+        }
+
         try {
-            Mail::to($request->email)->send(new ShareRegistrationLinkMail($request->link));
-            return response()->json(['success' => true]);
+            foreach ($emails as $email) {
+                Mail::to($email)->send(new ShareRegistrationLinkMail($request->link));
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Registration link sent successfully to ' . count($emails) . ' email address(es).',
+                'sent_count' => count($emails),
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to send email: ' . $e->getMessage()], 500);
         }

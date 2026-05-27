@@ -402,9 +402,14 @@
                         <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Consultation Records</h3>
                         <p class="text-[10px] text-gray-400 font-bold mt-1">Clinical notes and follow-up records</p>
                     </div>
+                    @php
+                        $canCreateConsultationForm = $isExpert && ($hasConsent || $booking->profile_id === $user->profile_id);
+                    @endphp
+                    @if($canCreateConsultationForm)
                     <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'new' => 1]) }}" class="w-10 h-10 rounded-full bg-secondary/5 text-secondary flex items-center justify-center hover:bg-secondary hover:text-white transition-all">
                         <i class="ri-add-line text-xl"></i>
                     </a>
+                    @endif
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -417,7 +422,10 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-black text-secondary">{{ $form->title ?: 'Consultation Form' }}</p>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{{ $form->created_at->format('M d, Y') }}</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">Created {{ $form->created_at->format('M d, Y \a\t H:i') }}</p>
+                                    @if($form->updated_at->gt($form->created_at))
+                                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">Edited {{ $form->updated_at->format('M d, Y \a\t H:i') }}</p>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -427,7 +435,7 @@
                                class="flex-1 py-2 px-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-secondary uppercase tracking-widest hover:bg-secondary hover:text-white transition-all text-center">
                                 <i class="ri-eye-line mr-1"></i> View
                             </a>
-                            @if($isExpert)
+                            @if($isExpert && (int) $form->doctor_id === (int) $user->id)
                             <a href="{{ route('bookings.consultation-form.show', ['id' => $booking->id, 'form_id' => $form->id]) }}" 
                                class="flex-1 py-2 px-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-secondary uppercase tracking-widest hover:bg-secondary hover:text-white transition-all text-center">
                                 <i class="ri-edit-line mr-1"></i> Edit

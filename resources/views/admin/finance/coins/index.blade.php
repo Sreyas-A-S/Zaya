@@ -91,9 +91,27 @@
                     <div class="card shadow-sm border-0" style="border-radius: 15px;">
                         <div class="card-header pb-4 card-no-border border-bottom">
                             <h5 class="mb-1 text-dark">Client Coin Balances</h5>
-                            <p class="text-muted small mb-0">Overview of available coins for clients in <strong>{{ $isGlobalView ? 'All Regions' : strtoupper($adminCountry) }}</strong>.</p>
+                            <p class="text-muted small mb-0">Overview of available coins for clients in <strong id="coins-region-label">{{ $selectedCountry !== '' ? $selectedCountry : ($isGlobalView ? 'All Regions' : strtoupper($adminCountry)) }}</strong>.</p>
                         </div>
                         <div class="card-body py-4">
+                            <div class="row g-3 align-items-end mb-4">
+                                <div class="col-md-5 col-lg-4">
+                                    <label for="coins-country-filter" class="form-label fw-bold text-uppercase text-muted small">Country Filter</label>
+                                    <select id="coins-country-filter" class="form-select">
+                                        <option value="">{{ __('All Countries') }}</option>
+                                        @foreach($countryOptions as $countryOption)
+                                            <option value="{{ $countryOption }}" {{ strcasecmp((string) $selectedCountry, (string) $countryOption) === 0 ? 'selected' : '' }}>
+                                                {{ $countryOption }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-auto">
+                                    <button type="button" id="coins-country-reset" class="btn btn-outline-secondary">
+                                        <i class="fa-solid fa-rotate-left me-2"></i>Reset
+                                    </button>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table class="table table-bordered align-middle" id="users-coins-table">
                                     <thead class="bg-light">
@@ -252,10 +270,25 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
+        const defaultCountryFilter = @json($selectedCountry);
+        const defaultRegionLabel = @json($isGlobalView ? 'All Regions' : strtoupper($adminCountry));
+        const $countryFilter = $('#coins-country-filter');
+        const $regionLabel = $('#coins-region-label');
+
+        function updateRegionLabel() {
+            const selectedCountry = $countryFilter.val();
+            $regionLabel.text(selectedCountry || defaultRegionLabel);
+        }
+
         const table = $('#users-coins-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('admin.coins') }}",
+            ajax: {
+                url: "{{ route('admin.coins') }}",
+                data: function(data) {
+                    data.country = $countryFilter.val();
+                }
+            },
             columns: [
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },
@@ -277,6 +310,17 @@
                     previous: '<i class="fa fa-chevron-left"></i>'
                 }
             }
+        });
+
+        $countryFilter.on('change', function() {
+            updateRegionLabel();
+            table.ajax.reload();
+        });
+
+        $('#coins-country-reset').on('click', function() {
+            $countryFilter.val(defaultCountryFilter);
+            updateRegionLabel();
+            table.ajax.reload();
         });
 
         $(document).on('click', '.editCoins', function() {
