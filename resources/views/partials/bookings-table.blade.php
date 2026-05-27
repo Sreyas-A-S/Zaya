@@ -30,12 +30,12 @@
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">SL No.</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">ID</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">{{ ($user->role === 'client' || $user->role === 'patient') ? 'Practitioner' : 'Client' }}</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Services</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Date & Time</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Services / Date & Time</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Mode</th>
+                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'mindfulness-practitioner', 'yoga_therapist', 'yoga-therapist']))
+                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Amount / Share</th>
+                        @else
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Amount</th>
-                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
-                        <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Your Share</th>
                         @endif
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Status</th>
                         <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right whitespace-nowrap">Actions</th>
@@ -64,7 +64,7 @@
                             <div class="flex items-center gap-2">
                                 <span class="flex items-center gap-2">
                                     {{ $booking->invoice_no }}
-                                    @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id !== $user->profile_id)
+                                    @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'mindfulness-practitioner', 'yoga_therapist', 'yoga-therapist']) && $booking->profile_id !== $user->profile_id)
                                         <span class="px-1.5 py-0.5 bg-orange-50 text-orange-600 text-[9px] font-black uppercase tracking-tighter rounded border border-orange-100">Referred</span>
                                     @endif
                                 </span>
@@ -104,7 +104,8 @@
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            <div class="flex flex-wrap gap-1 max-w-[200px]">
+                            <!-- Services -->
+                            <div class="flex flex-wrap gap-1 max-w-[200px] mb-2">
                                 @php
                                     $s_ids = is_array($booking->service_ids) ? $booking->service_ids : [];
                                 @endphp
@@ -118,8 +119,8 @@
                                     <span class="text-xs text-gray-400">No services</span>
                                 @endforelse
                             </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                            
+                            <!-- Date & Time -->
                             @php
                                 $sessions = $booking->additional_info['sessions'] ?? [];
                                 $uniqueTimes = collect($sessions)->pluck('time')->unique()->filter(fn($t) => !empty($t) && $t !== 'Time');
@@ -159,35 +160,39 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 text-sm text-secondary font-medium">
-                            {{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}
-                        </td>
-                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']))
-                        <td class="px-6 py-4 text-sm font-bold text-emerald-600">
-                            @php
-                                // Find if user is practitioner or referrer in any transaction linked to this booking
-                                $userTransaction = $booking->transactions->first(function($t) use ($user) {
-                                    return $t->practitioner_id === $user->id || $t->referrer_id === $user->id;
-                                });
+                            <div class="font-bold text-secondary">
+                                {{ get_currency_symbol($booking->currency) }} {{ number_format($booking->total_price, 2) }}
+                            </div>
+                            @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'mindfulness-practitioner', 'yoga_therapist', 'yoga-therapist']))
+                                @php
+                                    // Find if user is practitioner or referrer in any transaction linked to this booking
+                                    $userTransaction = $booking->transactions->first(function($t) use ($user) {
+                                        return $t->practitioner_id === $user->id || $t->referrer_id === $user->id;
+                                    });
 
-                                $shareAmount = 0;
-                                if ($userTransaction) {
-                                    if ($userTransaction->practitioner_id === $user->id) {
-                                        $shareAmount = $userTransaction->practitioner_share;
-                                    } elseif ($userTransaction->referrer_id === $user->id) {
-                                        $shareAmount = $userTransaction->referrer_share;
+                                    $shareAmount = 0;
+                                    if ($userTransaction) {
+                                        if ($userTransaction->practitioner_id === $user->id) {
+                                            $shareAmount = $userTransaction->practitioner_share;
+                                        } elseif ($userTransaction->referrer_id === $user->id) {
+                                            $shareAmount = $userTransaction->referrer_share;
+                                        }
                                     }
-                                }
-                            @endphp
-                            @if($userTransaction && $shareAmount > 0)
-                                {{ get_currency_symbol($userTransaction->currency) }} {{ number_format($shareAmount, 2) }}
-                                @if($userTransaction->referrer_id === $user->id)
-                                    <div class="text-[9px] font-normal text-gray-400 mt-0.5">Referral Fee</div>
+                                @endphp
+                                @if($userTransaction && $shareAmount > 0)
+                                    <div class="text-xs font-bold text-emerald-600 mt-1">
+                                        <span class="text-gray-400 font-medium">Share:</span> {{ get_currency_symbol($userTransaction->currency) }}{{ number_format($shareAmount, 2) }}
+                                        @if($userTransaction->referrer_id === $user->id)
+                                            <span class="text-[9px] font-normal text-gray-400 block">(Referral Fee)</span>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="text-xs text-gray-400 mt-1">
+                                        <span class="text-gray-400 font-medium">Share:</span> <span class="text-gray-300">--</span>
+                                    </div>
                                 @endif
-                            @else
-                                <span class="text-gray-300 font-normal">--</span>
                             @endif
                         </td>
-                        @endif
                         <td class="px-6 py-4">
                             @php
                                 $status = $booking->effective_status;
@@ -220,7 +225,7 @@
                                         </a>
                                         @endif
 
-                                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+                                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'mindfulness-practitioner', 'yoga_therapist', 'yoga-therapist']) && $booking->profile_id === $user->profile_id)
                                         <a href="{{ route('bookings.consultation-form.show', $booking->id) }}" class="group flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                                             <i class="ri-file-list-3-line mr-3 text-lg text-emerald-600"></i>
                                             Consultation Form
@@ -232,7 +237,7 @@
                                             View Details
                                         </a>
 
-                                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'yoga_therapist']) && $booking->profile_id === $user->profile_id)
+                                        @if(in_array($user->role, ['doctor', 'practitioner', 'mindfulness_practitioner', 'mindfulness-practitioner', 'yoga_therapist', 'yoga-therapist']) && $booking->profile_id === $user->profile_id)
                                         <button onclick="openRescheduleModal({{ $booking->id }}, '{{ $booking->booking_date->toDateString() }}', '{{ $booking->booking_time }}', {{ $booking->profile_id }})" class="group flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors text-left">
                                             <i class="ri-calendar-event-line mr-3 text-lg text-amber-500"></i>
                                             Reschedule
@@ -271,7 +276,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="10" class="px-4 md:px-6 py-12 md:py-20 text-center text-gray-500">
+                        <td colspan="8" class="px-4 md:px-6 py-12 md:py-20 text-center text-gray-500">
                             <div class="flex flex-col items-center">
                                 <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                                     <i class="ri-calendar-line text-3xl text-gray-300"></i>
