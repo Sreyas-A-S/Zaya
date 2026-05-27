@@ -226,23 +226,12 @@
                 <i class="ri-shield-user-line text-blue-600 text-xl"></i>
                 <h4 class="text-sm font-bold text-blue-900">Client Data Access</h4>
             </div>
-            <p class="text-xs text-blue-700 mb-4 leading-relaxed">To view this client's full profile, health history, and previous recordings, you need their permission via OTP verification.</p>
+            <p class="text-xs text-blue-700 mb-4 leading-relaxed">To view this client's full profile, health history, and previous recordings, you need to request access.</p>
             
             <div id="otp-request-box">
                 <button onclick="requestDataAccess({{ $booking->user_id }})" id="request-otp-btn" class="w-full py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md shadow-blue-200">
-                    Request Access via OTP
+                    Request Access
                 </button>
-            </div>
-
-            <div id="otp-verify-box" class="hidden space-y-3">
-                <label class="text-[10px] text-blue-900 font-bold uppercase">Enter OTP sent to client</label>
-                <div class="flex gap-2">
-                    <input type="text" id="access-otp" placeholder="6-digit code" class="flex-1 border border-blue-200 rounded-xl px-4 py-2.5 text-sm focus:border-blue-600 outline-none">
-                    <button onclick="verifyDataAccess({{ $booking->user_id }})" id="verify-otp-btn" class="px-6 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md">
-                        Verify
-                    </button>
-                </div>
-                <button onclick="requestDataAccess({{ $booking->user_id }})" class="text-[10px] text-blue-600 font-bold uppercase hover:underline">Resend OTP</button>
             </div>
         </div>
         @else
@@ -271,7 +260,7 @@
             const btn = document.getElementById('request-otp-btn');
             if (!btn) return;
             btn.disabled = true;
-            btn.innerText = 'Sending OTP...';
+            btn.innerText = 'Requesting Access...';
 
             try {
                 const response = await fetch('{{ route("data-access.request") }}', {
@@ -286,44 +275,6 @@
                 const result = await response.json();
                 if (result.success) {
                     alert(result.success);
-                    document.getElementById('otp-request-box').classList.add('hidden');
-                    document.getElementById('otp-verify-box').classList.remove('hidden');
-                } else {
-                    alert(result.error || 'Failed to send OTP.');
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Error requesting access.');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'Request Access via OTP';
-            }
-        }
-
-        async function verifyDataAccess(clientId) {
-            const otpEl = document.getElementById('access-otp');
-            const btn = document.getElementById('verify-otp-btn');
-            if (!otpEl || !btn) return;
-
-            const otp = otpEl.value;
-            if (!otp) return alert('Please enter the OTP.');
-
-            btn.disabled = true;
-            btn.innerText = '...';
-
-            try {
-                const response = await fetch('{{ route("data-access.verify") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ client_id: clientId, otp: otp })
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    alert(result.success);
                     // Refresh modal content to show "Access Granted"
                     if (typeof viewBookingDetails === 'function') {
                         viewBookingDetails({{ $booking->id }});
@@ -331,14 +282,14 @@
                         location.reload();
                     }
                 } else {
-                    alert(result.error || 'Verification failed.');
+                    alert(result.error || 'Failed to request access.');
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error verifying OTP.');
+                alert('Error requesting access.');
             } finally {
                 btn.disabled = false;
-                btn.innerText = 'Verify';
+                btn.innerText = 'Request Access';
             }
         }
     </script>

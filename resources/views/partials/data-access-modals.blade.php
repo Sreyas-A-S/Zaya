@@ -10,11 +10,11 @@
                     </div>
                     <h3 class="text-xl font-black text-secondary tracking-tight mb-4">Authorize Data Access</h3>
                     <p class="text-sm text-gray-500 leading-relaxed mb-8">
-                        This will send a secure OTP to the client to authorize your access to their health journey and historical records.
+                        This will request authorization to access the client's health journey and historical records.
                     </p>
                     <div class="flex flex-col gap-3">
                         <button type="button" id="data-access-confirm-btn" onclick="executeDataAccessRequest()" class="w-full py-4 bg-secondary text-white rounded-2xl font-black text-sm hover:bg-primary transition-all shadow-lg uppercase tracking-widest">
-                            Proceed & Send OTP
+                            Proceed & Request Access
                         </button>
                         <button type="button" onclick="closeDataAccessRequestModal()" class="w-full py-4 bg-gray-50 text-gray-500 rounded-2xl font-bold text-sm hover:bg-gray-100 transition-all uppercase tracking-widest">
                             Cancel
@@ -131,7 +131,7 @@
 
         btn.disabled = true;
         const originalText = btn.innerText;
-        btn.innerText = 'Sending OTP...';
+        btn.innerText = 'Requesting Access...';
 
         try {
             const response = await fetch("{{ route('data-access.request') }}", {
@@ -150,12 +150,15 @@
             const data = await response.json();
             if (response.ok) {
                 closeDataAccessRequestModal();
-                document.getElementById('data-access-otp-input').value = '';
-                document.getElementById('data-access-otp-message').innerText = data.success || 'Enter the 6-digit code';
-                document.getElementById('data-access-otp-modal').classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
+                if (window.showZayaToast) showZayaToast('Access Granted!', 'Success');
+                
+                if (typeof dataAccessOnSuccess === 'function') {
+                    dataAccessOnSuccess(currentDataAccessClientId);
+                } else {
+                    location.reload();
+                }
             } else {
-                alert(data.error || 'Failed to send OTP.');
+                alert(data.error || 'Failed to request access.');
             }
         } catch (error) {
             console.error('Error:', error);

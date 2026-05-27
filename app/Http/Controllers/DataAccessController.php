@@ -25,10 +25,7 @@ class DataAccessController extends Controller
         $type = $request->input('type', 'access');
         $meta = $request->input('meta'); // array of names or similar
 
-        // Generate 6-digit OTP
-        $otp = rand(100000, 999999);
-
-        // Create or update request
+        // Create or update request - instantly approved!
         $accessRequest = DataAccessRequest::updateOrCreate(
             [
                 'requester_id' => $practitioner->id,
@@ -37,26 +34,15 @@ class DataAccessController extends Controller
                 'type' => $type,
             ],
             [
-                'otp' => $otp,
+                'otp' => null,
                 'meta' => $meta,
-                'status' => 'pending',
-                'expires_at' => Carbon::now()->addMinutes(15),
-                'approved_at' => null,
+                'status' => 'approved',
+                'expires_at' => Carbon::now()->addYears(1),
+                'approved_at' => Carbon::now(),
             ]
         );
 
-        try {
-            if ($type === 'referral' && !empty($meta)) {
-                $proNames = is_array($meta) ? implode(', ', $meta) : $meta;
-                Mail::to($client->email)->send(new ReferralOTPMail($otp, $practitioner->name, $proNames));
-            } else {
-                Mail::to($client->email)->send(new DataAccessOTPMail($otp, $practitioner->name));
-            }
-            return response()->json(['success' => 'OTP has been sent to the client\'s email.']);
-        } catch (\Throwable $e) {
-            Log::error('Data Access OTP Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to send OTP. Please try again.'], 500);
-        }
+        return response()->json(['success' => 'Access granted successfully!']);
     }
 
     /**
@@ -158,7 +144,10 @@ class DataAccessController extends Controller
             ->where('status', 'approved');
             
         if ($bookingId) {
-            $accessQuery->where('booking_id', $bookingId);
+            $accessQuery->where(function($q) use ($bookingId) {
+                $q->where('booking_id', $bookingId)
+                  ->orWhereNull('booking_id');
+            });
         }
 
         if ($type) {
