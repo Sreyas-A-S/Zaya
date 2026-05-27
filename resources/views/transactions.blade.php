@@ -4,28 +4,63 @@
 
 @section('content')
 
+@php
+    $summaryCurrency = $transactions->first()->currency ?? ($user->currency ?? 'INR');
+@endphp
+
 @if(!in_array($user->role, ['client', 'patient']))
-<!-- Summary Card -->
 <div class="mb-8">
-    <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-8 shadow-sm relative overflow-hidden group">
-        <div class="flex items-center justify-between relative z-10">
-            <div>
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Wallet Balance</p>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-black text-secondary tracking-tight">₹ {{ number_format($totalBalance, 2) }}</span>
-                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">INR</span>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-6 shadow-sm relative overflow-hidden group">
+            <div class="flex items-center justify-between relative z-10">
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Consultation Earnings</p>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-black text-secondary tracking-tight">{{ get_currency_symbol($summaryCurrency) }} {{ number_format($transactionStats['consultation_earnings'], 2) }}</span>
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $summaryCurrency }}</span>
+                    </div>
+                </div>
+                <div class="w-14 h-14 bg-[#EEF4FF] rounded-2xl flex items-center justify-center text-[#4F7CFF] shadow-lg shadow-blue-100/60 group-hover:scale-110 transition-transform duration-500">
+                    <i class="ri-stethoscope-line text-2xl"></i>
                 </div>
             </div>
-            <div class="w-16 h-16 bg-[#FFD166] rounded-2xl flex items-center justify-center text-white shadow-xl shadow-yellow-200/50 group-hover:scale-110 transition-transform duration-500">
-                <i class="ri-wallet-3-fill text-3xl"></i>
-            </div>
+            <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-[#F9FBF9] rounded-full opacity-50 group-hover:scale-125 transition-transform duration-700"></div>
         </div>
-        <!-- Decorative bg -->
-        <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-[#F9FBF9] rounded-full opacity-50 group-hover:scale-125 transition-transform duration-700"></div>
+
+        <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-6 shadow-sm relative overflow-hidden group">
+            <div class="flex items-center justify-between relative z-10">
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Referral Earnings</p>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-black text-secondary tracking-tight">{{ get_currency_symbol($summaryCurrency) }} {{ number_format($transactionStats['referral_earnings'], 2) }}</span>
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $summaryCurrency }}</span>
+                    </div>
+                </div>
+                <div class="w-14 h-14 bg-[#FFF4E6] rounded-2xl flex items-center justify-center text-[#F59E0B] shadow-lg shadow-orange-100/60 group-hover:scale-110 transition-transform duration-500">
+                    <i class="ri-share-forward-line text-2xl"></i>
+                </div>
+            </div>
+            <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-[#F9FBF9] rounded-full opacity-50 group-hover:scale-125 transition-transform duration-700"></div>
+        </div>
+
+        <div class="bg-white rounded-[2rem] border border-[#2E4B3D]/12 p-6 shadow-sm relative overflow-hidden group">
+            <div class="flex items-center justify-between relative z-10">
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Wallet Balance</p>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-black text-secondary tracking-tight">{{ get_currency_symbol($summaryCurrency) }} {{ number_format($transactionStats['wallet_balance'], 2) }}</span>
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $summaryCurrency }}</span>
+                    </div>
+                </div>
+                <div class="w-14 h-14 bg-[#FFD166] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-yellow-200/60 group-hover:scale-110 transition-transform duration-500">
+                    <i class="ri-wallet-3-fill text-2xl"></i>
+                </div>
+            </div>
+            <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-[#F9FBF9] rounded-full opacity-50 group-hover:scale-125 transition-transform duration-700"></div>
+        </div>
     </div>
 </div>
 @endif
-
 
 <!-- Transactions Content -->
 <div id="table-wrapper" class="transition-opacity duration-300">
@@ -101,7 +136,7 @@
                 
                 <div class="p-8 bg-secondary rounded-[2.5rem] text-center shadow-2xl shadow-secondary/20 relative overflow-hidden group">
                     <p class="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-3 relative z-10">${shareLabel}</p>
-                    <p class="text-4xl font-black text-white tracking-tight relative z-10">₹ ${parseFloat(shareValue).toFixed(2)}</p>
+                    <p class="text-4xl font-black text-white tracking-tight relative z-10">{{ get_currency_symbol($summaryCurrency) }} ${parseFloat(shareValue).toFixed(2)}</p>
                     
                     ${isExpert ? `
                     <button onclick="toggleTrxDistribution()" class="mt-4 px-4 py-1.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-[9px] font-black text-white uppercase tracking-widest transition-all relative z-10">
@@ -115,16 +150,16 @@
                 <div id="trx-distribution" class="hidden space-y-4 pt-2 animate-in fade-in slide-in-from-top-4 duration-300">
                     <div class="flex items-center justify-between p-4 bg-[#F9FBF9] rounded-2xl border border-[#2E4B3D]/5">
                         <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Gross Booking Amount</span>
-                        <span class="text-xs font-bold text-gray-600">₹ ${parseFloat(data.total_amount).toFixed(2)}</span>
+                        <span class="text-xs font-bold text-gray-600">{{ get_currency_symbol($summaryCurrency) }} ${parseFloat(data.total_amount).toFixed(2)}</span>
                     </div>
                     <div class="flex items-center justify-between p-4 bg-[#F9FBF9] rounded-2xl border border-[#2E4B3D]/5">
                         <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Platform Fee (${parseFloat(data.company_commission_percent).toFixed(1)}%)</span>
-                        <span class="text-xs font-bold text-red-500">- ₹ ${parseFloat(data.company_share).toFixed(2)}</span>
+                        <span class="text-xs font-bold text-red-500">- {{ get_currency_symbol($summaryCurrency) }} ${parseFloat(data.company_share).toFixed(2)}</span>
                     </div>
                     ${data.referrer_share > 0 ? `
                     <div class="flex items-center justify-between p-4 bg-[#F9FBF9] rounded-2xl border border-[#2E4B3D]/5">
                         <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Referral Fee (${parseFloat(data.referrer_commission_percent).toFixed(1)}%)</span>
-                        <span class="text-xs font-bold text-orange-500">- ₹ ${parseFloat(data.referrer_share).toFixed(2)}</span>
+                        <span class="text-xs font-bold text-orange-500">- {{ get_currency_symbol($summaryCurrency) }} ${parseFloat(data.referrer_share).toFixed(2)}</span>
                     </div>
                     ` : ''}
                 </div>

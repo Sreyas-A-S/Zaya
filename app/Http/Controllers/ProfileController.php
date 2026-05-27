@@ -563,16 +563,25 @@ class ProfileController extends Controller
 
         $transactions = $query->latest()->paginate(15);
 
-        // Calculate balance for the summary card
-        $earned = \App\Models\Transaction::where('practitioner_id', $user->id)->sum('practitioner_share');
-        $referralEarned = \App\Models\Transaction::where('referrer_id', $user->id)->sum('referrer_share');
+        // Calculate top summary metrics for professionals.
+        $consultationQuery = \App\Models\Transaction::where('practitioner_id', $user->id);
+        $referralQuery = \App\Models\Transaction::where('referrer_id', $user->id);
+
+        $earned = (clone $consultationQuery)->sum('practitioner_share');
+        $referralEarned = (clone $referralQuery)->sum('referrer_share');
         $totalBalance = $earned + $referralEarned;
+
+        $transactionStats = [
+            'consultation_earnings' => $earned,
+            'referral_earnings' => $referralEarned,
+            'wallet_balance' => $totalBalance,
+        ];
 
         if ($request->ajax()) {
             return view('partials.transactions-table', compact('user', 'transactions'))->render();
         }
 
-        return view('transactions', compact('user', 'transactions', 'totalBalance'));
+        return view('transactions', compact('user', 'transactions', 'totalBalance', 'transactionStats'));
     }
 
     public function promoCodes()

@@ -28,7 +28,16 @@ class FinancialController extends Controller
             }
 
             if ($request->filled('user_filter')) {
-                $data->where('user_id', $request->user_filter);
+                $selectedRole = $request->user_filter;
+                $data->where(function ($query) use ($selectedRole) {
+                    $query->whereHas('user', function ($subQuery) use ($selectedRole) {
+                        $subQuery->where('role', $selectedRole);
+                    })->orWhereHas('practitioner', function ($subQuery) use ($selectedRole) {
+                        $subQuery->where('role', $selectedRole);
+                    })->orWhereHas('referrer', function ($subQuery) use ($selectedRole) {
+                        $subQuery->where('role', $selectedRole);
+                    });
+                });
             }
 
             // Calculate dynamic filtered balances without inheriting order clauses from latest()
@@ -37,7 +46,16 @@ class FinancialController extends Controller
                 $balancesQuery->where('type', $request->type_filter);
             }
             if ($request->filled('user_filter')) {
-                $balancesQuery->where('user_id', $request->user_filter);
+                $selectedRole = $request->user_filter;
+                $balancesQuery->where(function ($query) use ($selectedRole) {
+                    $query->whereHas('user', function ($subQuery) use ($selectedRole) {
+                        $subQuery->where('role', $selectedRole);
+                    })->orWhereHas('practitioner', function ($subQuery) use ($selectedRole) {
+                        $subQuery->where('role', $selectedRole);
+                    })->orWhereHas('referrer', function ($subQuery) use ($selectedRole) {
+                        $subQuery->where('role', $selectedRole);
+                    });
+                });
             }
             $filteredBalances = $balancesQuery->select('currency', 
                 DB::raw('SUM(total_amount) as total_revenue'),
@@ -107,11 +125,15 @@ class FinancialController extends Controller
             DB::raw('SUM(referrer_share) as total_referrers')
         )->groupBy('currency')->get();
 
-        $users = User::whereIn('id', Transaction::select('user_id')->distinct()->whereNotNull('user_id'))
-            ->orderBy('name')
-            ->get(['id', 'name', 'email']);
+        $userRoles = collect([
+            'doctor',
+            'practitioner',
+            'mindfulness_practitioner',
+            'yoga_therapist',
+            'translator',
+        ]);
 
-        return view('admin.financial.index', compact('balances', 'users'));
+        return view('admin.financial.index', compact('balances', 'userRoles'));
     }
 
     /**

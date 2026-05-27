@@ -40,7 +40,7 @@
                     <p id="data-access-otp-message" class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-6">Enter the 6-digit code</p>
                     
                     <div class="mb-8">
-                        <input type="text" id="data-access-otp-input" maxlength="6" placeholder="000000" 
+                        <input type="text" id="data-access-otp-input" maxlength="6" placeholder="------" 
                             class="w-full text-center text-3xl font-black tracking-[0.5em] py-4 rounded-2xl border-[#2E4B3D]/12 focus:border-secondary focus:ring-0 transition-all bg-gray-50/50">
                     </div>
 

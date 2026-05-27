@@ -2,6 +2,10 @@
 
 @section('title', 'Financial Transactions')
 
+@push('css')
+<link rel="stylesheet" type="text/css" href="{{ asset('admiro/assets/css/vendors/select2.css') }}">
+@endpush
+
 @section('content')
 <style>
     #transactions-table_wrapper .dataTables_filter {
@@ -15,6 +19,24 @@
     }
     #custom-filters-container {
         margin-bottom: 0 !important;
+    }
+    #transactions-table_wrapper .select2-container {
+        min-width: 220px;
+    }
+    #transactions-table_wrapper .select2-container .select2-selection--single {
+        height: 31px !important;
+        border: 1px solid #ced4da !important;
+        border-radius: 0.2rem !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+    #transactions-table_wrapper .select2-container .select2-selection__rendered {
+        line-height: 29px !important;
+        padding-left: 0.75rem !important;
+        padding-right: 2rem !important;
+    }
+    #transactions-table_wrapper .select2-container .select2-selection__arrow {
+        height: 29px !important;
     }
 </style>
 
@@ -115,11 +137,13 @@
                             </select>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <label class="mb-0 small fw-bold text-muted text-nowrap">CLIENT:</label>
+                            <label class="mb-0 small fw-bold text-muted text-nowrap">USER TYPE:</label>
                             <select id="user-filter" class="form-select form-select-sm" style="width: 220px;">
-                                <option value="">All Clients</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                <option value="">All Users</option>
+                                @foreach($userRoles as $role)
+                                    <option value="{{ $role }}">
+                                        {{ ucwords(str_replace('_', ' ', $role)) }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -154,8 +178,26 @@
 @endsection
 
 @push('scripts')
+<script src="{{ asset('admiro/assets/js/select2/select2.full.min.js') }}"></script>
 <script>
     $(document).ready(function() {
+        function initFinancialFilters() {
+            if (!$.fn.select2) {
+                return;
+            }
+
+            const $userFilter = $('#user-filter');
+            if ($userFilter.hasClass('select2-hidden-accessible')) {
+                $userFilter.select2('destroy');
+            }
+
+            $userFilter.select2({
+                placeholder: 'All Users',
+                allowClear: true,
+                width: '220px'
+            });
+        }
+
         let table = $('#transactions-table').DataTable({
             processing: true,
             serverSide: true,
@@ -169,6 +211,7 @@
             initComplete: function() {
                 const filterHtml = $('#custom-filters-container').removeClass('d-none').detach();
                 $('#transactions-table_wrapper .dataTables_filter').prepend(filterHtml);
+                initFinancialFilters();
             },
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
@@ -283,6 +326,9 @@
         $('#reset-filters').on('click', function() {
             $('#type-filter').val('');
             $('#user-filter').val('');
+            if ($('#user-filter').hasClass('select2-hidden-accessible')) {
+                $('#user-filter').trigger('change.select2');
+            }
             table.ajax.reload();
             updateExportUrl();
         });

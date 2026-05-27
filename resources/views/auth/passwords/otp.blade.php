@@ -30,7 +30,7 @@
 
               <div class="form-group">
                 <label class="col-form-label">Enter OTP</label>
-                <input class="form-control @error('otp') is-invalid @enderror" type="text" name="otp" required autofocus placeholder="123456" maxlength="6">
+                <input class="form-control @error('otp') is-invalid @enderror" type="text" name="otp" required autofocus placeholder="------" maxlength="6">
                 @error('otp')
                 <span class="invalid-feedback" role="alert">
                   <strong>{{ $message }}</strong>

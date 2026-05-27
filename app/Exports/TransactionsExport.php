@@ -30,7 +30,16 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping
         }
 
         if ($this->userId) {
-            $query->where('user_id', $this->userId);
+            $selectedRole = $this->userId;
+            $query->where(function ($subQuery) use ($selectedRole) {
+                $subQuery->whereHas('user', function ($roleQuery) use ($selectedRole) {
+                    $roleQuery->where('role', $selectedRole);
+                })->orWhereHas('practitioner', function ($roleQuery) use ($selectedRole) {
+                    $roleQuery->where('role', $selectedRole);
+                })->orWhereHas('referrer', function ($roleQuery) use ($selectedRole) {
+                    $roleQuery->where('role', $selectedRole);
+                });
+            });
         }
 
         return $query->get();

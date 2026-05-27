@@ -130,7 +130,7 @@
                                 <p class="text-xs text-gray-500 font-medium">{{ __('We have sent a 6-digit code to your email address.') }}</p>
                             </div>
                             <div class="flex items-center gap-2">
-                                <input type="text" id="otp-input" maxlength="6" placeholder="000000" class="w-32 px-4 py-2 rounded-xl border border-amber-200 text-center font-black tracking-[0.5em] focus:ring-2 focus:ring-amber-500 outline-none">
+                                <input type="text" id="otp-input" maxlength="6" placeholder="------" class="w-32 px-4 py-2 rounded-xl border border-amber-200 text-center font-black tracking-[0.5em] focus:ring-2 focus:ring-amber-500 outline-none">
                                 <button type="button" onclick="verifyOTP()" id="verify-otp-btn" class="px-6 py-2 bg-amber-500 text-white text-xs font-black uppercase rounded-xl hover:bg-amber-600 transition-all">
                                     {{ __('Verify') }}
                                 </button>
