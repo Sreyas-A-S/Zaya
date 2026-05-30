@@ -185,6 +185,11 @@
                     <li> <a href="{{ route('admin.general-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_site_settings'] ?? 'Site Settings' }}</a></li>
                     @endif
 
+                    @if(auth()->user()->role === 'super-admin')
+                    <li> <a href="{{ route('admin.reminder-mail-settings.index') }}">Reminder Mail Settings</a></li>
+                    @endif
+
+
                     @if(auth()->user()->hasPermission('master-data-view'))
                     <li>
                         <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"

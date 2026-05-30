@@ -41,6 +41,27 @@ class GeneralSettingSeeder extends Seeder
                 'section' => 'general',
                 'max_length' => 255
             ],
+            [
+                'key' => 'reminder_mail_advance',
+                'value' => '1440', // 24 hours in minutes
+                'type' => 'number',
+                'section' => 'general',
+                'max_length' => null
+            ],
+            [
+                'key' => 'reminder_mail_one_hour',
+                'value' => '60', // 1 hour in minutes
+                'type' => 'number',
+                'section' => 'general',
+                'max_length' => null
+            ],
+            [
+                'key' => 'reminder_mail_final',
+                'value' => '10', // 10 minutes
+                'type' => 'number',
+                'section' => 'general',
+                'max_length' => null
+            ],
         ];
 
         foreach ($settings as $setting) {

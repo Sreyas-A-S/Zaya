@@ -299,6 +299,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'isAdmin'])->group(f
     Route::get('general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'index'])->name('general-settings.index');
     Route::post('general-settings', [\App\Http\Controllers\Admin\GeneralSettingController::class, 'update'])->name('general-settings.update');
 
+    // Reminder Mail Settings
+    Route::get('reminder-mail-settings', [\App\Http\Controllers\Admin\ReminderMailSettingController::class, 'index'])->name('reminder-mail-settings.index');
+    Route::post('reminder-mail-settings', [\App\Http\Controllers\Admin\ReminderMailSettingController::class, 'update'])->name('reminder-mail-settings.update');
+
      
     Route::resource('finance-managers', \App\Http\Controllers\Admin\FinanceManagerController::class);
     Route::get('finance-manager', function() { return redirect()->route('admin.finance-managers.index'); });
