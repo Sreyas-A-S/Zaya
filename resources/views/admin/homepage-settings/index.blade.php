@@ -74,19 +74,10 @@
                     <form id="homepageSettingsForm" action="{{ route('admin.homepage-settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row g-3">
-                            <div class="col-md-3">
-                                <ul class="nav nav-pills flex-column h-100" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                                    @foreach($settings as $section => $group)
-                                    <button class="nav-link {{ $loop->first ? 'active' : '' }} text-start mb-2" id="v-pills-{{ $section }}-tab" data-bs-toggle="pill" data-bs-target="#v-pills-{{ $section }}" type="button" role="tab" aria-controls="v-pills-{{ $section }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}">
-                                        <i class="fa-solid fa-layer-group me-2"></i> {{ ucwords(str_replace('_', ' ', $section)) }}
-                                    </button>
-                                    @endforeach
-                                </ul>
-                            </div>
-                            <div class="col-md-9 border-start">
+                            <div class="col-md-12">
                                 <div class="tab-content" id="v-pills-tabContent">
                                     @foreach($settings as $section => $group)
-                                    <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }} p-3" id="v-pills-{{ $section }}" role="tabpanel" aria-labelledby="v-pills-{{ $section }}-tab">
+                                    <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }} p-3" id="v-pills-{{ $section }}" role="tabpanel">
                                         <div class="row g-4">
                                             @foreach($group as $setting)
                                             <div class="col-12">
@@ -155,12 +146,11 @@
         // Function to activate tab based on hash
         function activateTabFromHash() {
             let hash = window.location.hash;
-            if (hash) {
-                // Find button that targets this hash
-                let tabBtn = $(`button[data-bs-target="${hash}"]`);
-                if (tabBtn.length) {
-                    tabBtn.trigger('click');
-                }
+            $('.tab-pane').removeClass('show active');
+            if (hash && $(hash).length) {
+                $(hash).addClass('show active');
+            } else {
+                $('.tab-pane').first().addClass('show active');
             }
         }
 

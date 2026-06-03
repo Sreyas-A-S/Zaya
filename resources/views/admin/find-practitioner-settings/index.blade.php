@@ -66,20 +66,7 @@
                     <form id="findPractitionerSettingsForm" action="{{ route('admin.find-practitioner-settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row g-3">
-                            <div class="col-md-3">
-                                <ul class="nav nav-pills flex-column h-100" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                                    <button class="nav-link active text-start mb-2" id="v-pills-hero-tab" data-bs-toggle="pill" data-bs-target="#v-pills-hero" type="button" role="tab" aria-controls="v-pills-hero" aria-selected="true">
-                                        <i class="fa-solid fa-circle-info me-2"></i> Hero Section
-                                    </button>
-                                    <button class="nav-link text-start mb-2" id="v-pills-search-tab" data-bs-toggle="pill" data-bs-target="#v-pills-search" type="button" role="tab" aria-controls="v-pills-search" aria-selected="false">
-                                        <i class="fa-solid fa-magnifying-glass me-2"></i> Search & Filters
-                                    </button>
-                                    <button class="nav-link text-start mb-2" id="v-pills-results-tab" data-bs-toggle="pill" data-bs-target="#v-pills-results" type="button" role="tab" aria-controls="v-pills-results" aria-selected="false">
-                                        <i class="fa-solid fa-list me-2"></i> Results
-                                    </button>
-                                </ul>
-                            </div>
-                            <div class="col-md-9 border-start">
+                            <div class="col-md-12">
                                 <div class="tab-content" id="v-pills-tabContent">
                                     @php
                                     $heroSettings = $settings->filter(fn($s) => Str::contains($s->key, ['title', 'subtitle', 'description']));
@@ -88,7 +75,7 @@
                                     @endphp
 
                                     <!-- Hero Section Tab -->
-                                    <div class="tab-pane fade show active p-3" id="v-pills-hero" role="tabpanel" aria-labelledby="v-pills-hero-tab">
+                                    <div class="tab-pane fade show active p-3" id="v-pills-hero" role="tabpanel">
                                         <div class="row g-4">
                                             @foreach($heroSettings as $setting)
                                             <div class="col-12">
@@ -112,7 +99,7 @@
                                     </div>
 
                                     <!-- Search & Filters Tab -->
-                                    <div class="tab-pane fade p-3" id="v-pills-search" role="tabpanel" aria-labelledby="v-pills-search-tab">
+                                    <div class="tab-pane fade p-3" id="v-pills-search" role="tabpanel">
                                         <div class="row g-4">
                                             @foreach($searchSettings as $setting)
                                             <div class="col-12">
@@ -127,7 +114,7 @@
                                     </div>
 
                                     <!-- Results Tab -->
-                                    <div class="tab-pane fade p-3" id="v-pills-results" role="tabpanel" aria-labelledby="v-pills-results-tab">
+                                    <div class="tab-pane fade p-3" id="v-pills-results" role="tabpanel">
                                         <div class="row g-4">
                                             @foreach($resultSettings as $setting)
                                             <div class="col-12">
@@ -161,11 +148,11 @@
         // Handle hash navigation
         function activateTabFromHash() {
             let hash = window.location.hash;
-            if (hash) {
-                let tabBtn = $(`button[data-bs-target="${hash}"]`);
-                if (tabBtn.length) {
-                    tabBtn.trigger('click');
-                }
+            $('.tab-pane').removeClass('show active');
+            if (hash && $(hash).length) {
+                $(hash).addClass('show active');
+            } else {
+                $('.tab-pane').first().addClass('show active');
             }
         }
 

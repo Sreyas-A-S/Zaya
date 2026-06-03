@@ -66,26 +66,7 @@
                     <form id="gallerySettingsForm" action="{{ route('admin.gallery-settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row g-3">
-                            <div class="col-md-3">
-                                <ul class="nav nav-pills flex-column h-100" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                                    <button class="nav-link active text-start mb-2" id="v-pills-general-tab" data-bs-toggle="pill" data-bs-target="#v-pills-general" type="button" role="tab" aria-controls="v-pills-general" aria-selected="true">
-                                        <i class="fa-solid fa-circle-info me-2"></i> General & CTA
-                                    </button>
-                                    <button class="nav-link text-start mb-2" id="v-pills-sanctuary-tab" data-bs-toggle="pill" data-bs-target="#v-pills-sanctuary" type="button" role="tab" aria-controls="v-pills-sanctuary" aria-selected="false">
-                                        <i class="fa-solid fa-hotel me-2"></i> The Sanctuary
-                                    </button>
-                                    <button class="nav-link text-start mb-2" id="v-pills-movement-tab" data-bs-toggle="pill" data-bs-target="#v-pills-movement" type="button" role="tab" aria-controls="v-pills-movement" aria-selected="false">
-                                        <i class="fa-solid fa-person-walking me-2"></i> Sacred Movement
-                                    </button>
-                                    <button class="nav-link text-start mb-2" id="v-pills-rituals-tab" data-bs-toggle="pill" data-bs-target="#v-pills-rituals" type="button" role="tab" aria-controls="v-pills-rituals" aria-selected="false">
-                                        <i class="fa-solid fa-leaf me-2"></i> Ayurvedic Rituals
-                                    </button>
-                                    <button class="nav-link text-start mb-2" id="v-pills-retreats-tab" data-bs-toggle="pill" data-bs-target="#v-pills-retreats" type="button" role="tab" aria-controls="v-pills-retreats" aria-selected="false">
-                                        <i class="fa-solid fa-users-rays me-2"></i> Community Retreats
-                                    </button>
-                                </ul>
-                            </div>
-                            <div class="col-md-9 border-start">
+                            <div class="col-md-12">
                                 <div class="tab-content" id="v-pills-tabContent">
                                     @php
                                     $generalSettings = $settings->filter(fn($s) => !Str::contains($s->key, '_img_'));
@@ -96,7 +77,7 @@
                                     @endphp
 
                                     <!-- General Tab -->
-                                    <div class="tab-pane fade show active p-3" id="v-pills-general" role="tabpanel" aria-labelledby="v-pills-general-tab">
+                                    <div class="tab-pane fade show active p-3" id="v-pills-general" role="tabpanel">
                                         <div class="row g-4">
                                             @foreach($generalSettings as $setting)
                                             @include('admin.services-settings.partials.field', ['setting' => $setting])
@@ -105,7 +86,7 @@
                                     </div>
 
                                     <!-- Sanctuary Tab -->
-                                    <div class="tab-pane fade p-3" id="v-pills-sanctuary" role="tabpanel" aria-labelledby="v-pills-sanctuary-tab">
+                                    <div class="tab-pane fade p-3" id="v-pills-sanctuary" role="tabpanel">
                                         <div class="row g-4">
                                             @foreach($sanctuarySettings as $setting)
                                             @include('admin.services-settings.partials.field', ['setting' => $setting, 'aspectRatio' => '1.33'])
@@ -114,7 +95,7 @@
                                     </div>
 
                                     <!-- Movement Tab -->
-                                    <div class="tab-pane fade p-3" id="v-pills-movement" role="tabpanel" aria-labelledby="v-pills-movement-tab">
+                                    <div class="tab-pane fade p-3" id="v-pills-movement" role="tabpanel">
                                         <div class="row g-4">
                                             @foreach($movementSettings as $setting)
                                             @include('admin.services-settings.partials.field', ['setting' => $setting, 'aspectRatio' => '0.75'])
@@ -123,7 +104,7 @@
                                     </div>
 
                                     <!-- Rituals Tab -->
-                                    <div class="tab-pane fade p-3" id="v-pills-rituals" role="tabpanel" aria-labelledby="v-pills-rituals-tab">
+                                    <div class="tab-pane fade p-3" id="v-pills-rituals" role="tabpanel">
                                         <div class="row g-4">
                                             @foreach($ritualsSettings as $setting)
                                             @include('admin.services-settings.partials.field', ['setting' => $setting, 'aspectRatio' => '1.33'])
@@ -132,7 +113,7 @@
                                     </div>
 
                                     <!-- Retreats Tab -->
-                                    <div class="tab-pane fade p-3" id="v-pills-retreats" role="tabpanel" aria-labelledby="v-pills-retreats-tab">
+                                    <div class="tab-pane fade p-3" id="v-pills-retreats" role="tabpanel">
                                         <div class="row g-4">
                                             @foreach($retreatsSettings as $setting)
                                             @include('admin.services-settings.partials.field', ['setting' => $setting, 'aspectRatio' => '1.33'])
@@ -160,11 +141,11 @@
         // Handle hash navigation
         function activateTabFromHash() {
             let hash = window.location.hash;
-            if (hash) {
-                let tabBtn = $(`button[data-bs-target="${hash}"]`);
-                if (tabBtn.length) {
-                    tabBtn.trigger('click');
-                }
+            $('.tab-pane').removeClass('show active');
+            if (hash && $(hash).length) {
+                $(hash).addClass('show active');
+            } else {
+                $('.tab-pane').first().addClass('show active');
             }
         }
 

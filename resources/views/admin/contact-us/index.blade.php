@@ -50,30 +50,11 @@
                     <form id="contactSettingsForm" action="{{ route('admin.contact-settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row g-3">
-                            <div class="col-md-3">
-                                <ul class="nav nav-pills flex-column h-100" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                                    <button class="nav-link active text-start mb-2" id="v-pills-hero_banner-tab" data-bs-toggle="pill" data-bs-target="#v-pills-hero_banner" type="button" role="tab" aria-controls="v-pills-hero_banner" aria-selected="true">
-                                        <i class="fa-solid fa-image me-2"></i> Hero Banner
-                                    </button>
-                                    <button class="nav-link text-start mb-2" id="v-pills-contact_information-tab" data-bs-toggle="pill" data-bs-target="#v-pills-contact_information" type="button" role="tab" aria-controls="v-pills-contact_information" aria-selected="false">
-                                        <i class="fa-solid fa-address-book me-2"></i> Contact Info
-                                    </button>
-                                    <button class="nav-link text-start mb-2" id="v-pills-message_form-tab" data-bs-toggle="pill" data-bs-target="#v-pills-message_form" type="button" role="tab" aria-controls="v-pills-message_form" aria-selected="false">
-                                        <i class="fa-solid fa-envelope me-2"></i> Message Form
-                                    </button>
-                                    <button class="nav-link text-start mb-2" id="v-pills-support_section-tab" data-bs-toggle="pill" data-bs-target="#v-pills-support_section" type="button" role="tab" aria-controls="v-pills-support_section" aria-selected="false">
-                                        <i class="fa-solid fa-user-tie me-2"></i> Support Desk
-                                    </button>
-                                    <button class="nav-link text-start mb-2" id="v-pills-faqs-tab" data-bs-toggle="pill" data-bs-target="#v-pills-faqs" type="button" role="tab" aria-controls="v-pills-faqs" aria-selected="false">
-                                        <i class="fa-solid fa-circle-question me-2"></i> FAQ Section
-                                    </button>
-                                </ul>
-                            </div>
-                            <div class="col-md-9 border-start">
+                            <div class="col-md-12">
                                 <div class="tab-content" id="v-pills-tabContent">
 
                                     <!-- Hero Banner Tab -->
-                                    <div class="tab-pane fade show active p-3" id="v-pills-hero_banner" role="tabpanel" aria-labelledby="v-pills-hero_banner-tab">
+                                    <div class="tab-pane fade show active p-3" id="v-pills-hero_banner" role="tabpanel">
                                         <div class="row g-4">
                                            
                                             @foreach($settings['hero_banner'] as $setting)
@@ -255,11 +236,11 @@
         // Handle hash navigation
         function activateTabFromHash() {
             let hash = window.location.hash;
-            if (hash) {
-                let tabBtn = $(`button[data-bs-target="${hash}"]`);
-                if (tabBtn.length) {
-                    tabBtn.trigger('click');
-                }
+            $('.tab-pane').removeClass('show active');
+            if (hash && $(hash).length) {
+                $(hash).addClass('show active');
+            } else {
+                $('.tab-pane').first().addClass('show active');
             }
         }
 
