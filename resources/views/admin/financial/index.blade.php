@@ -11,6 +11,8 @@
     #transactions-table_wrapper .dataTables_filter {
         display: flex;
         align-items: center;
+        justify-content: space-between;
+        width: 100%;
         gap: 15px;
         flex-wrap: wrap;
     }
@@ -19,9 +21,6 @@
     }
     #custom-filters-container {
         margin-bottom: 0 !important;
-    }
-    #transactions-table_wrapper .select2-container {
-        min-width: 220px;
     }
     #transactions-table_wrapper .select2-container .select2-selection--single {
         height: 31px !important;
@@ -182,6 +181,10 @@
                 return;
             }
 
+            const $typeFilter = $('#type-filter');
+            if ($typeFilter.hasClass('select2-hidden-accessible')) {
+                $typeFilter.select2('destroy');
+            }
             const $userFilter = $('#user-filter');
             if ($userFilter.hasClass('select2-hidden-accessible')) {
                 $userFilter.select2('destroy');
@@ -194,6 +197,12 @@
             if ($yearFilter.hasClass('select2-hidden-accessible')) {
                 $yearFilter.select2('destroy');
             }
+
+            $typeFilter.select2({
+                placeholder: 'All Types',
+                allowClear: true,
+                width: '150px'
+            });
 
             $userFilter.select2({
                 placeholder: 'All Users',
@@ -323,6 +332,9 @@
             $('#user-filter').val('');
             $('#month-filter').val('');
             $('#year-filter').val('');
+            if ($('#type-filter').hasClass('select2-hidden-accessible')) {
+                $('#type-filter').trigger('change.select2');
+            }
             if ($('#user-filter').hasClass('select2-hidden-accessible')) {
                 $('#user-filter').trigger('change.select2');
             }
