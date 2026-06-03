@@ -117,8 +117,9 @@
                             <label class="mb-0 small fw-bold text-muted text-nowrap">CURRENCY:</label>
                             <select id="currency-filter" class="form-select form-select-sm" style="width: 160px;">
                                 <option value="">Select Currency</option>
-                                <option value="EUR">EUR</option>
-                                <option value="INR">INR</option>
+                                @foreach($currencies as $currency)
+                                    <option value="{{ $currency }}">{{ $currency }}</option>
+                                @endforeach
                             </select>
                         </div>
                         @endif

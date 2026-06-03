@@ -122,7 +122,14 @@ class FinancialController extends Controller
             return [$month => now()->startOfYear()->month($month)->format('F')];
         });
 
-        return view('admin.financial.index', compact('overview', 'userRoles', 'years', 'months'));
+        $currencies = Transaction::query()
+            ->whereNotNull('currency')
+            ->distinct()
+            ->pluck('currency')
+            ->filter()
+            ->values();
+
+        return view('admin.financial.index', compact('overview', 'userRoles', 'years', 'months', 'currencies'));
     }
 
     /**
