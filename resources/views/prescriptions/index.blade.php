@@ -43,7 +43,7 @@
                                 </div>
                                 <span class="text-sm font-medium text-gray-600">
                                     @if(auth()->user()->role === 'client' || auth()->user()->role === 'patient')
-                                        {{ $rx->practitioner->user->name ?? $rx->practitioner->name ?? 'Professional' }}
+                                        {{ $rx->practitioner?->user?->name ?? $rx->practitioner?->name ?? 'Professional' }}
                                     @else
                                         {{ $rx->patient->name }}
                                     @endif

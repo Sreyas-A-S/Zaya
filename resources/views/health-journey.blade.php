@@ -197,7 +197,7 @@
                 <div class="space-y-2 mb-6">
                     <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Issued By</p>
                     <div class="flex items-center gap-2">
-                        <span class="text-xs font-bold text-secondary">{{ $rx->practitioner->name }}</span>
+                        <span class="text-xs font-bold text-secondary">{{ $rx->practitioner?->user?->name ?? $rx->practitioner?->name ?? 'Professional' }}</span>
                     </div>
                 </div>
                 <a href="{{ route('prescriptions.show', $rx->id) }}" class="w-full py-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black text-secondary uppercase tracking-widest hover:bg-secondary hover:text-white transition-all text-center">

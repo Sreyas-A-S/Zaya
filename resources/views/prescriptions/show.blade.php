@@ -45,7 +45,7 @@
                         <i class="ri-stethoscope-line text-2xl"></i>
                     </div>
                     <div>
-                        <h3 class="font-black text-secondary">{{ $prescription->practitioner->user->name ?? $prescription->practitioner->name ?? 'Professional' }}</h3>
+                        <h3 class="font-black text-secondary">{{ $prescription->practitioner?->user?->name ?? $prescription->practitioner?->name ?? 'Professional' }}</h3>
                         <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">{{ $prescription->practitioner->subtitle_display ?? str_replace('_', ' ', $prescription->practitioner_type) }}</p>
                     </div>
                 </div>
@@ -134,7 +134,7 @@
                     <img src="{{ asset('storage/' . $prescription->practitioner->signature_path) }}" class="h-12 mx-auto md:ml-auto mb-2 print:block">
                 @else
                     <div class="mb-2 italic font-serif text-secondary text-xl opacity-80 print:opacity-100">
-                        {{ $prescription->practitioner->user->name ?? $prescription->practitioner->name ?? 'Professional' }}
+                        {{ $prescription->practitioner?->user?->name ?? $prescription->practitioner?->name ?? 'Professional' }}
                     </div>
                 @endif
                 <div class="h-px bg-gray-200 w-48 ml-auto mb-2 print:block hidden"></div>
