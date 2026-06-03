@@ -21,7 +21,17 @@ class FinancialController extends Controller
      */
     public function index(Request $request)
     {
+        $countryCode = session('admin_country', 'all');
+        if (!$countryCode) $countryCode = 'all';
+
         if ($request->ajax()) {
+            if ($countryCode === 'all' && !$request->filled('currency_filter')) {
+                return DataTables::of(Transaction::query()->whereRaw('1 = 0'))
+                    ->addIndexColumn()
+                    ->with('overview', [])
+                    ->make(true);
+            }
+
             $data = Transaction::with(['user', 'practitioner', 'booking', 'referral'])->latest();
             $this->applyTransactionFilters($data, $request);
 
@@ -82,7 +92,12 @@ class FinancialController extends Controller
                 ->make(true);
         }
 
-        $overview = $this->buildOverviewMetrics(Transaction::query());
+        $overview = [];
+        if ($countryCode !== 'all') {
+            $overviewQuery = Transaction::query();
+            $this->applyTransactionFilters($overviewQuery, $request);
+            $overview = $this->buildOverviewMetrics($overviewQuery);
+        }
 
         $userRoles = collect([
             'doctor',
@@ -92,7 +107,9 @@ class FinancialController extends Controller
             'translator',
         ]);
 
-        $years = Transaction::query()
+        $yearsQuery = Transaction::query();
+        $this->applyTransactionFilters($yearsQuery, $request);
+        $years = $yearsQuery
             ->selectRaw('YEAR(created_at) as year')
             ->whereNotNull('created_at')
             ->distinct()
@@ -117,8 +134,9 @@ class FinancialController extends Controller
         $userId = $request->input('user_filter');
         $month = $request->input('month_filter');
         $year = $request->input('year_filter');
+        $currency = $request->input('currency_filter');
 
-        return Excel::download(new TransactionsExport($type, $userId, $month, $year), 'transactions.xlsx');
+        return Excel::download(new TransactionsExport($type, $userId, $month, $year, $currency), 'transactions.xlsx');
     }
 
     /**
@@ -191,6 +209,15 @@ class FinancialController extends Controller
 
     protected function applyTransactionFilters(Builder $query, Request $request): void
     {
+        $countryCode = session('admin_country', 'all');
+        if ($countryCode && $countryCode !== 'all') {
+            $query->whereHas('country', function ($q) use ($countryCode) {
+                $q->where('code', strtoupper($countryCode));
+            });
+        } elseif ($countryCode === 'all' && $request->filled('currency_filter')) {
+            $query->where('currency', $request->currency_filter);
+        }
+
         if ($request->filled('type_filter')) {
             $query->where('type', $request->type_filter);
         }

@@ -13,13 +13,15 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping
     protected $userId;
     protected $month;
     protected $year;
+    protected $currency;
 
-    public function __construct($type = null, $userId = null, $month = null, $year = null)
+    public function __construct($type = null, $userId = null, $month = null, $year = null, $currency = null)
     {
         $this->type = $type;
         $this->userId = $userId;
         $this->month = $month;
         $this->year = $year;
+        $this->currency = $currency;
     }
 
     /**
@@ -28,6 +30,15 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping
     public function collection()
     {
         $query = Transaction::with(['user', 'practitioner', 'referrer'])->latest();
+
+        $countryCode = session('admin_country', 'all');
+        if ($countryCode && $countryCode !== 'all') {
+            $query->whereHas('country', function ($q) use ($countryCode) {
+                $q->where('code', strtoupper($countryCode));
+            });
+        } elseif ($countryCode === 'all' && $this->currency) {
+            $query->where('currency', $this->currency);
+        }
 
         if ($this->type) {
             $query->where('type', $this->type);

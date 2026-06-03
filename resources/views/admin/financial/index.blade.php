@@ -66,29 +66,37 @@
 
     <!-- Balance Cards -->
     <div class="row" id="balances-cards-container">
-        @foreach($overview as $card)
-        <div class="col-sm-6 col-xl-4 col-lg-6">
-            <div class="card o-hidden border-0">
-                <div class="bg-{{ $card['color'] }} b-r-4 card-body">
-                    <div class="media static-top-widget align-items-start">
-                        <div class="align-self-center text-center"><i data-feather="{{ $card['icon'] }}"></i></div>
-                        <div class="media-body">
-                            <span class="m-0">{{ $card['title'] }}</span>
-                            @if(!empty($card['amounts']))
-                                @foreach($card['amounts'] as $amount)
-                                    <div class="overview-card-value {{ !$loop->first ? 'mt-1' : 'mt-2' }}">
-                                        {{ $amount['currency'] }} {{ number_format($amount['amount'], 2) }}
-                                    </div>
-                                @endforeach
-                            @else
-                                <div class="overview-card-value mt-2">0.00</div>
-                            @endif
+        @if(session('admin_country', 'all') === 'all')
+        <div class="col-12" id="currency-prompt-alert">
+            <div class="alert alert-warning text-center fw-bold border-warning">
+                <i class="fa fa-exclamation-triangle me-2"></i> Please select a currency from the filter dropdown below to load the transaction history and metrics.
+            </div>
+        </div>
+        @else
+            @foreach($overview as $card)
+            <div class="col-sm-6 col-xl-4 col-lg-6">
+                <div class="card o-hidden border-0">
+                    <div class="bg-{{ $card['color'] }} b-r-4 card-body">
+                        <div class="media static-top-widget align-items-start">
+                            <div class="align-self-center text-center"><i data-feather="{{ $card['icon'] }}"></i></div>
+                            <div class="media-body">
+                                <span class="m-0">{{ $card['title'] }}</span>
+                                @if(!empty($card['amounts']))
+                                    @foreach($card['amounts'] as $amount)
+                                        <div class="overview-card-value {{ !$loop->first ? 'mt-1' : 'mt-2' }}">
+                                            {{ $amount['currency'] }} {{ number_format($amount['amount'], 2) }}
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="overview-card-value mt-2">0.00</div>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        @endforeach
+            @endforeach
+        @endif
     </div>
 
     <!-- Transactions Table -->
@@ -104,6 +112,16 @@
                 </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-start align-items-center mb-3 gap-3 d-none" id="custom-filters-container">
+                        @if(session('admin_country', 'all') === 'all')
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 small fw-bold text-muted text-nowrap">CURRENCY:</label>
+                            <select id="currency-filter" class="form-select form-select-sm" style="width: 160px;">
+                                <option value="">Select Currency</option>
+                                <option value="EUR">EUR</option>
+                                <option value="INR">INR</option>
+                            </select>
+                        </div>
+                        @endif
                         <div class="d-flex align-items-center gap-2">
                             <label class="mb-0 small fw-bold text-muted text-nowrap">TYPE:</label>
                             <select id="type-filter" class="form-select form-select-sm" style="width: 150px;">
@@ -181,6 +199,10 @@
                 return;
             }
 
+            const $currencyFilter = $('#currency-filter');
+            if ($currencyFilter.length && $currencyFilter.hasClass('select2-hidden-accessible')) {
+                $currencyFilter.select2('destroy');
+            }
             const $typeFilter = $('#type-filter');
             if ($typeFilter.hasClass('select2-hidden-accessible')) {
                 $typeFilter.select2('destroy');
@@ -196,6 +218,14 @@
             const $yearFilter = $('#year-filter');
             if ($yearFilter.hasClass('select2-hidden-accessible')) {
                 $yearFilter.select2('destroy');
+            }
+
+            if ($currencyFilter.length) {
+                $currencyFilter.select2({
+                    placeholder: 'Select Currency',
+                    allowClear: true,
+                    width: '160px'
+                });
             }
 
             $typeFilter.select2({
@@ -233,6 +263,9 @@
                     d.user_filter = $('#user-filter').val();
                     d.month_filter = $('#month-filter').val();
                     d.year_filter = $('#year-filter').val();
+                    if ($('#currency-filter').length) {
+                        d.currency_filter = $('#currency-filter').val();
+                    }
                 }
             },
             initComplete: function() {
@@ -277,6 +310,21 @@
             let container = $('#balances-cards-container');
             container.empty();
             
+            // Check if currency filter is present and unselected when country code is 'all'
+            const isAllCountry = "{{ session('admin_country', 'all') }}" === 'all';
+            const currencyVal = $('#currency-filter').length ? $('#currency-filter').val() : '';
+            
+            if (isAllCountry && !currencyVal) {
+                container.append(`
+                    <div class="col-12" id="currency-prompt-alert">
+                        <div class="alert alert-warning text-center fw-bold border-warning">
+                            <i class="fa fa-exclamation-triangle me-2"></i> Please select a currency from the filter dropdown below to load the transaction history and metrics.
+                        </div>
+                    </div>
+                `);
+                return;
+            }
+
             if (!overview || overview.length === 0) {
                 container.append('<div class="col-12"><div class="alert alert-light-primary text-center">No transactions found for the selected filters.</div></div>');
                 return;
@@ -312,17 +360,19 @@
             let user = $('#user-filter').val() || '';
             let month = $('#month-filter').val() || '';
             let year = $('#year-filter').val() || '';
+            let currency = $('#currency-filter').length ? ($('#currency-filter').val() || '') : '';
             let baseUrl = "{{ route('admin.financial.export') }}";
             let newUrl = baseUrl
                 + '?type_filter=' + encodeURIComponent(type)
                 + '&user_filter=' + encodeURIComponent(user)
                 + '&month_filter=' + encodeURIComponent(month)
-                + '&year_filter=' + encodeURIComponent(year);
+                + '&year_filter=' + encodeURIComponent(year)
+                + '&currency_filter=' + encodeURIComponent(currency);
             $('#export-excel-btn').attr('href', newUrl);
         }
 
         // Filter events
-        $('#type-filter, #user-filter, #month-filter, #year-filter').on('change', function() {
+        $('#type-filter, #user-filter, #month-filter, #year-filter, #currency-filter').on('change', function() {
             table.ajax.reload();
             updateExportUrl();
         });
@@ -332,6 +382,9 @@
             $('#user-filter').val('');
             $('#month-filter').val('');
             $('#year-filter').val('');
+            if ($('#currency-filter').length) {
+                $('#currency-filter').val('');
+            }
             if ($('#type-filter').hasClass('select2-hidden-accessible')) {
                 $('#type-filter').trigger('change.select2');
             }
@@ -343,6 +396,9 @@
             }
             if ($('#year-filter').hasClass('select2-hidden-accessible')) {
                 $('#year-filter').trigger('change.select2');
+            }
+            if ($('#currency-filter').length && $('#currency-filter').hasClass('select2-hidden-accessible')) {
+                $('#currency-filter').trigger('change.select2');
             }
             table.ajax.reload();
             updateExportUrl();
