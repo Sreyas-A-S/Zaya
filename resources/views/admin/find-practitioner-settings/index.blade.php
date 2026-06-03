@@ -158,6 +158,22 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
+        // Handle hash navigation
+        function activateTabFromHash() {
+            let hash = window.location.hash;
+            if (hash) {
+                let tabBtn = $(`button[data-bs-target="${hash}"]`);
+                if (tabBtn.length) {
+                    tabBtn.trigger('click');
+                }
+            }
+        }
+
+        activateTabFromHash();
+        $(window).on('hashchange', function() {
+            activateTabFromHash();
+        });
+
         $('#findPractitionerSettingsForm').on('submit', function(e) {
             e.preventDefault();
 

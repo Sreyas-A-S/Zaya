@@ -284,23 +284,99 @@
                 </a>
                 <ul class="sidebar-submenu">
                     @if(auth()->user()->hasPermission('home-page-view'))
-                    <li> <a href="{{ route('admin.homepage-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_homepage_settings'] ?? 'Homepage Settings' }}</a></li>
+                    <li>
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
+                            <span>{{ str_ireplace([' settings', ' setting'], '', $adminPanelSettings['admin_panel_sidebar_homepage_settings'] ?? 'Homepage') }}</span>
+                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                        </a>
+                        <ul class="according-submenu ps-3" style="display: none;">
+                            <li><a href="{{ route('admin.homepage-settings.index') }}#v-pills-hero">Hero</a></li>
+                            <li><a href="{{ route('admin.homepage-settings.index') }}#v-pills-services">Services</a></li>
+                            <li><a href="{{ route('admin.homepage-settings.index') }}#v-pills-practitioners">Practitioners</a></li>
+                            <li><a href="{{ route('admin.homepage-settings.index') }}#v-pills-cta">Cta</a></li>
+                            <li><a href="{{ route('admin.homepage-settings.index') }}#v-pills-testimonials">Testimonials</a></li>
+                            <li><a href="{{ route('admin.homepage-settings.index') }}#v-pills-blog">Blog</a></li>
+                            <li><a href="{{ route('admin.homepage-settings.index') }}#v-pills-contact_page">Contact Page</a></li>
+                            <li><a href="{{ route('admin.homepage-settings.index') }}#v-pills-find_practitioner_page">Find Practitioner Page</a></li>
+                            <li><a href="{{ route('admin.homepage-settings.index') }}#v-pills-practitioner_page">Practitioner Page</a></li>
+                            <li><a href="{{ route('admin.homepage-settings.index') }}#v-pills-quick_links">Quick Links</a></li>
+                        </ul>
+                    </li>
                     @endif
                     @if(auth()->user()->hasPermission('about-page-view'))
-                    <li> <a href="{{ route('admin.about-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_about_settings'] ?? 'About Us Settings' }}</a></li>
+                    <li>
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
+                            <span>{{ str_ireplace([' settings', ' setting'], '', $adminPanelSettings['admin_panel_sidebar_about_settings'] ?? 'About Us') }}</span>
+                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                        </a>
+                        <ul class="according-submenu ps-3" style="display: none;">
+                            <li><a href="{{ route('admin.about-settings.index') }}#v-pills-general">General</a></li>
+                            <li><a href="{{ route('admin.about-settings.index') }}#v-pills-banner">Banner</a></li>
+                            <li><a href="{{ route('admin.about-settings.index') }}#v-pills-team">Team</a></li>
+                        </ul>
+                    </li>
                     @endif
                     @if(auth()->user()->hasPermission('services-page-view'))
-                    <li> <a href="{{ route('admin.services-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_services_page_settings'] ?? 'Services Page Settings' }}</a></li>
+                    <li>
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
+                            <span>{{ str_ireplace([' settings', ' setting'], '', $adminPanelSettings['admin_panel_sidebar_services_page_settings'] ?? 'Services Page') }}</span>
+                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                        </a>
+                        <ul class="according-submenu ps-3" style="display: none;">
+                            <li><a href="{{ route('admin.services-settings.index') }}#v-pills-general">General</a></li>
+                            <li><a href="{{ route('admin.services-settings.index') }}#v-pills-stats">Statistics</a></li>
+                        </ul>
+                    </li>
                     @endif
                     @if(auth()->user()->hasPermission('gallery-page-view'))
-                    <li> <a href="{{ route('admin.gallery-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_gallery_settings'] ?? 'Gallery Settings' }}</a></li>
+                    <li>
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
+                            <span>{{ str_ireplace([' settings', ' setting'], '', $adminPanelSettings['admin_panel_sidebar_gallery_settings'] ?? 'Gallery') }}</span>
+                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                        </a>
+                        <ul class="according-submenu ps-3" style="display: none;">
+                            <li><a href="{{ route('admin.gallery-settings.index') }}#v-pills-general">General & CTA</a></li>
+                            <li><a href="{{ route('admin.gallery-settings.index') }}#v-pills-sanctuary">The Sanctuary</a></li>
+                            <li><a href="{{ route('admin.gallery-settings.index') }}#v-pills-movement">Sacred Movement</a></li>
+                            <li><a href="{{ route('admin.gallery-settings.index') }}#v-pills-rituals">Ayurvedic Rituals</a></li>
+                            <li><a href="{{ route('admin.gallery-settings.index') }}#v-pills-retreats">Community Retreats</a></li>
+                        </ul>
+                    </li>
                     @endif
                     @if(auth()->user()->hasPermission('home-page-view'))
-                    <li> <a href="{{ route('admin.find-practitioner-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_find_practitioner_settings'] ?? 'Find Practitioner Settings' }}</a></li>
+                    <li>
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
+                            <span>{{ str_ireplace([' settings', ' setting'], '', $adminPanelSettings['admin_panel_sidebar_find_practitioner_settings'] ?? 'Find Practitioner') }}</span>
+                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                        </a>
+                        <ul class="according-submenu ps-3" style="display: none;">
+                            <li><a href="{{ route('admin.find-practitioner-settings.index') }}#v-pills-hero">Hero Section</a></li>
+                            <li><a href="{{ route('admin.find-practitioner-settings.index') }}#v-pills-search">Search & Filters</a></li>
+                            <li><a href="{{ route('admin.find-practitioner-settings.index') }}#v-pills-results">Results</a></li>
+                        </ul>
+                    </li>
                     @endif
 
                     @if(auth()->user()->hasPermission('settings-view'))
-                    <li> <a href="{{ route('admin.contact-us.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_contact_us_settings'] ?? 'Contact Us Settings' }}</a></li>
+                    <li>
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
+                            <span>{{ str_ireplace([' settings', ' setting'], '', $adminPanelSettings['admin_panel_sidebar_contact_us_settings'] ?? 'Contact Us') }}</span>
+                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                        </a>
+                        <ul class="according-submenu ps-3" style="display: none;">
+                            <li><a href="{{ route('admin.contact-us.index') }}#v-pills-hero_banner">Hero Banner</a></li>
+                            <li><a href="{{ route('admin.contact-us.index') }}#v-pills-contact_information">Contact Info</a></li>
+                            <li><a href="{{ route('admin.contact-us.index') }}#v-pills-message_form">Message Form</a></li>
+                            <li><a href="{{ route('admin.contact-us.index') }}#v-pills-support_section">Support Desk</a></li>
+                            <li><a href="{{ route('admin.contact-us.index') }}#v-pills-faqs">FAQ Section</a></li>
+                        </ul>
+                    </li>
                     @endif
 
                     @if(auth()->user()->hasPermission('admin-panel-settings-view'))
