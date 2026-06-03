@@ -150,12 +150,23 @@
             const data = await response.json();
             if (response.ok) {
                 closeDataAccessRequestModal();
-                if (window.showZayaToast) showZayaToast('Access Granted!', 'Success');
-                
-                if (typeof dataAccessOnSuccess === 'function') {
-                    dataAccessOnSuccess(currentDataAccessClientId);
+                if (data.requires_otp) {
+                    if (window.showZayaToast) showZayaToast('OTP Sent!', 'Success');
+                    // Open OTP Modal
+                    document.getElementById('data-access-otp-modal').classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                    const otpInput = document.getElementById('data-access-otp-input');
+                    if (otpInput) {
+                        otpInput.value = '';
+                        otpInput.focus();
+                    }
                 } else {
-                    location.reload();
+                    if (window.showZayaToast) showZayaToast('Access Granted!', 'Success');
+                    if (typeof dataAccessOnSuccess === 'function') {
+                        dataAccessOnSuccess(currentDataAccessClientId);
+                    } else {
+                        location.reload();
+                    }
                 }
             } else {
                 alert(data.error || 'Failed to request access.');

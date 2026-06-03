@@ -25,7 +25,10 @@ class DataAccessController extends Controller
         $type = $request->input('type', 'access');
         $meta = $request->input('meta'); // array of names or similar
 
-        // Create or update request - instantly approved!
+        // Generate 6-digit OTP
+        $otp = rand(100000, 999999);
+
+        // Create or update request
         $accessRequest = DataAccessRequest::updateOrCreate(
             [
                 'requester_id' => $practitioner->id,
@@ -34,15 +37,29 @@ class DataAccessController extends Controller
                 'type' => $type,
             ],
             [
-                'otp' => null,
+                'otp' => $otp,
                 'meta' => $meta,
-                'status' => 'approved',
-                'expires_at' => Carbon::now()->addYears(1),
-                'approved_at' => Carbon::now(),
+                'status' => 'pending',
+                'expires_at' => Carbon::now()->addMinutes(15),
+                'approved_at' => null,
             ]
         );
 
-        return response()->json(['success' => 'Access granted successfully!']);
+        try {
+            if ($type === 'referral' && !empty($meta)) {
+                $proNames = is_array($meta) ? implode(', ', $meta) : $meta;
+                Mail::to($client->email)->send(new ReferralOTPMail($otp, $practitioner->name, $proNames));
+            } else {
+                Mail::to($client->email)->send(new DataAccessOTPMail($otp, $practitioner->name));
+            }
+            return response()->json([
+                'requires_otp' => true,
+                'success' => 'OTP has been sent to the client\'s email.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Data Access OTP Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to send OTP email. Please try again.'], 500);
+        }
     }
 
     /**

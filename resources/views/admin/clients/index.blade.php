@@ -486,17 +486,6 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Payout Currency <span class="text-danger">*</span></label>
-                            <select class="form-select" name="payout_currency" id="client_payout_currency" required>
-                                <option value="INR">INR - Indian Rupee</option>
-                                <option value="USD">USD - US Dollar</option>
-                                <option value="EUR">EUR - Euro</option>
-                                <option value="GBP">GBP - British Pound</option>
-                                <option value="AED">AED - UAE Dirham</option>
-                            </select>
-                        </div>
-                        
                     </div>
                 </div>
 
@@ -1354,7 +1343,7 @@
                     $('input[name="state"]').val(data.patient.state);
                     $('input[name="zip_code"]').val(data.patient.zip_code);
                     $('select[name="country"]').val(data.patient.country || 'India');
-                    $('#client_payout_currency').val(data.patient.payout_currency || 'INR');
+
 
                     if (data.patient.dob) {
                         let dobDate = data.patient.dob.substring(0, 10);
@@ -1370,8 +1359,7 @@
                     $('select[name="referral_type"]').val(data.patient.referral_type).trigger('change');
                     $('input[name="referrer_name"]').val(data.patient.referrer_name);
                     
-                    // Always allow changing payout currency and remove any disabled state
-                    $('#client_payout_currency').val(data.patient.payout_currency || 'INR').css({'pointer-events': 'auto', 'background-color': '#ffffff'}).removeAttr('tabindex');
+
                     
                     if (data.patient.consultation_preferences) {
                         $('.pref-checkbox').prop('checked', false);
@@ -1576,7 +1564,7 @@
         $('#form-modal-title').text('Register New Client');
         $('#form-method').val('POST');
         $('#client_id_hidden').val('');
-        $('#client_payout_currency').css({'pointer-events': 'auto', 'background-color': '#fff'}).attr('tabindex', '0');
+
         $('#age_display').val('');
         $('#referrer_name_div').addClass('d-none');
         $('#password-hint').text('(Required for new clients)');

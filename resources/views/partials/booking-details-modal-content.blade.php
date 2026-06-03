@@ -229,7 +229,7 @@
             <p class="text-xs text-blue-700 mb-4 leading-relaxed">To view this client's full profile, health history, and previous recordings, you need to request access.</p>
             
             <div id="otp-request-box">
-                <button onclick="requestDataAccess({{ $booking->user_id }})" id="request-otp-btn" class="w-full py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md shadow-blue-200">
+                <button onclick="openDataAccessRequestModal({{ $booking->user_id }}, {{ $booking->id }}, function() { if (typeof viewBookingDetails === 'function') { viewBookingDetails({{ $booking->id }}); } else { location.reload(); } })" id="request-otp-btn" class="w-full py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md shadow-blue-200">
                     Request Access
                 </button>
             </div>
@@ -254,44 +254,5 @@
             Refer to Peer
         </button>
     </div>
-
-    <script>
-        async function requestDataAccess(clientId) {
-            const btn = document.getElementById('request-otp-btn');
-            if (!btn) return;
-            btn.disabled = true;
-            btn.innerText = 'Requesting Access...';
-
-            try {
-                const response = await fetch('{{ route("data-access.request") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ client_id: clientId })
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    alert(result.success);
-                    // Refresh modal content to show "Access Granted"
-                    if (typeof viewBookingDetails === 'function') {
-                        viewBookingDetails({{ $booking->id }});
-                    } else {
-                        location.reload();
-                    }
-                } else {
-                    alert(result.error || 'Failed to request access.');
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Error requesting access.');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'Request Access';
-            }
-        }
-    </script>
     @endif
 </div>
