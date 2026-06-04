@@ -380,19 +380,69 @@
                     @endif
 
                     @if(auth()->user()->hasPermission('admin-panel-settings-view'))
-                    <li> <a href="{{ route('admin.admin-panel-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_admin_panel_settings'] ?? 'Admin Panel Settings' }}</a></li>
+                    <li>
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
+                            <span>{{ $adminPanelSettings['admin_panel_sidebar_admin_panel_settings'] ?? 'Admin Panel Settings' }}</span>
+                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                        </a>
+                        <ul class="according-submenu ps-3" style="display: none;">
+                            <li><a href="{{ route('admin.admin-panel-settings.index') }}#v-pills-general">General</a></li>
+                            <li><a href="{{ route('admin.admin-panel-settings.index') }}#v-pills-sidebar">Sidebar</a></li>
+                            <li><a href="{{ route('admin.admin-panel-settings.index') }}#v-pills-stats">Statistics</a></li>
+                        </ul>
+                    </li>
                     @endif
                     
                     @if(auth()->user()->hasPermission('footer-page-view'))
-                    <li> <a href="{{ route('admin.footer-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_footer_settings'] ?? 'Footer Page Settings' }}</a></li>
+                    <li>
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
+                            <span>{{ $adminPanelSettings['admin_panel_sidebar_footer_settings'] ?? 'Footer Page Settings' }}</span>
+                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                        </a>
+                        <ul class="according-submenu ps-3" style="display: none;">
+                            <li><a href="{{ route('admin.footer-settings.index') }}#v-pills-general">General</a></li>
+                            <li><a href="{{ route('admin.footer-settings.index') }}#v-pills-newsletter">Newsletter</a></li>
+                            <li><a href="{{ route('admin.footer-settings.index') }}#v-pills-headings">Section Headings</a></li>
+                            <li><a href="{{ route('admin.footer-settings.index') }}#v-pills-quick-links">Quick Links</a></li>
+                            <li><a href="{{ route('admin.footer-settings.index') }}#v-pills-social">Social Links</a></li>
+                            <li><a href="{{ route('admin.footer-settings.index') }}#v-pills-legal">Legal Links</a></li>
+                        </ul>
+                    </li>
                     @endif
                     
                     @if(auth()->user()->hasPermission('client-panel-settings-view'))
-                    <li> <a href="{{ route('admin.client-pannel-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_client_pannel_settings'] ?? 'Client Pannel Settings' }}</a></li>
+                    <li>
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
+                            <span>{{ $adminPanelSettings['admin_panel_sidebar_client_pannel_settings'] ?? 'Client Pannel Settings' }}</span>
+                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                        </a>
+                        <ul class="according-submenu ps-3" style="display: none;">
+                            <li><a href="{{ route('admin.client-pannel-settings.index') }}#v-pills-general">General</a></li>
+                            <li><a href="{{ route('admin.client-pannel-settings.index') }}#v-pills-identity">Identity Hub</a></li>
+                            <li><a href="{{ route('admin.client-pannel-settings.index') }}#v-pills-consultations">Consultations</a></li>
+                            <li><a href="{{ route('admin.client-pannel-settings.index') }}#v-pills-documents">Document Portal</a></li>
+                            <li><a href="{{ route('admin.client-pannel-settings.index') }}#v-pills-transactions">Transactions</a></li>
+                            <li><a href="{{ route('admin.client-pannel-settings.index') }}#v-pills-reviews">Reviews</a></li>
+                            <li><a href="{{ route('admin.client-pannel-settings.index') }}#v-pills-gdpr">Privacy/GDPR</a></li>
+                            <li><a href="{{ route('admin.client-pannel-settings.index') }}#v-pills-sidebar">Sidebar</a></li>
+                        </ul>
+                    </li>
                     @endif
                     
                     @if(auth()->user()->hasPermission('invoice-settings-view'))
-                    <li> <a href="{{ route('admin.invoice-settings.index') }}">{{ $adminPanelSettings['admin_panel_sidebar_invoice_settings'] ?? 'Invoice Settings' }}</a></li>
+                    <li>
+                        <a class="submenu-title mt-2 d-flex justify-content-between" href="javascript:void(0)"
+                            style="letter-spacing: 0.5px;">
+                            <span>{{ $adminPanelSettings['admin_panel_sidebar_invoice_settings'] ?? 'Invoice Settings' }}</span>
+                            <div class="according-menu"><i class="fa fa-angle-right"></i></div>
+                        </a>
+                        <ul class="according-submenu ps-3" style="display: none;">
+                            <li><a href="{{ route('admin.invoice-settings.index') }}#v-pills-general">General Invoice</a></li>
+                        </ul>
+                    </li>
                     @endif
 
                 </ul>
