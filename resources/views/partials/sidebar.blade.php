@@ -484,13 +484,16 @@
         function getScrollContainer(el) {
             let node = el;
             while (node && node !== document.body) {
+                if (node.classList.contains('simplebar-content-wrapper')) {
+                    return node;
+                }
                 const style = window.getComputedStyle(node);
                 if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && node.scrollHeight > node.clientHeight) {
                     return node;
                 }
                 node = node.parentElement;
             }
-            return document.scrollingElement || document.documentElement;
+            return null;
         }
 
         function bringIntoView(el) {
