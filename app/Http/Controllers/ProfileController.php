@@ -992,7 +992,8 @@ class ProfileController extends Controller
     public function updateReminderSettings(Request $request)
     {
         $request->validate([
-            'reminder_lead_time' => 'required|integer|min:5|max:1440',
+            'reminder_lead_times' => 'required|array|min:1|max:3',
+            'reminder_lead_times.*' => 'required|integer|min:5|max:1440',
         ]);
 
         $user = Auth::user();
@@ -1002,11 +1003,15 @@ class ProfileController extends Controller
             return back()->with('error', 'Profile not found.');
         }
 
+        $times = array_values(array_unique(array_map('intval', $request->reminder_lead_times)));
+        rsort($times);
+
         $profile->update([
-            'reminder_lead_time' => $request->reminder_lead_time
+            'reminder_lead_time' => $times
         ]);
 
-        return back()->with('status', "Reminder timing updated to {$request->reminder_lead_time} minutes before the session.");
+        $timesStr = implode(', ', $times);
+        return back()->with('status', "Reminder timings updated to {$timesStr} minutes before the session.");
     }
 
     public function getAvailableServices()

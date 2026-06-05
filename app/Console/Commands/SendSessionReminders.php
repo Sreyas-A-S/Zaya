@@ -35,28 +35,41 @@ class SendSessionReminders extends Command
         $this->info("Starting session reminders check at " . $nowServer->toDateTimeString() . " (" . config('app.timezone') . ")");
 
         // ── Load global reminder lead times ─────────────────────────────────
-        $globalSettings = \App\Models\HomepageSetting::whereIn('key', [
-            'reminder_mail_advance',
-            'reminder_mail_one_hour',
-            'reminder_mail_final',
-        ])->pluck('value', 'key');
+        $globalSetting = \App\Models\HomepageSetting::where('key', 'global_reminder_lead_times')->first();
+        if ($globalSetting) {
+            $globalLeadTimes = json_decode($globalSetting->value, true) ?: [1440, 60, 10];
+        } else {
+            // Fallback: check if old settings exist
+            $legacySettings = \App\Models\HomepageSetting::whereIn('key', [
+                'reminder_mail_advance',
+                'reminder_mail_one_hour',
+                'reminder_mail_final',
+            ])->pluck('value', 'key');
 
-        // Advance reminder: stored in minutes (default 1440 = 24 hours)
-        $advanceLeadTime = isset($globalSettings['reminder_mail_advance']) && $globalSettings['reminder_mail_advance'] !== ''
-            ? (int) $globalSettings['reminder_mail_advance']
-            : 1440;
+            $globalLeadTimes = [];
+            if (isset($legacySettings['reminder_mail_advance']) && $legacySettings['reminder_mail_advance'] !== '') {
+                $globalLeadTimes[] = (int) $legacySettings['reminder_mail_advance'];
+            } else {
+                $globalLeadTimes[] = 1440;
+            }
 
-        // 1-Hour reminder: stored in minutes (default 60 = 1 hour)
-        $oneHourLeadTime = isset($globalSettings['reminder_mail_one_hour']) && $globalSettings['reminder_mail_one_hour'] !== ''
-            ? (int) $globalSettings['reminder_mail_one_hour']
-            : 60;
+            if (isset($legacySettings['reminder_mail_one_hour']) && $legacySettings['reminder_mail_one_hour'] !== '') {
+                $globalLeadTimes[] = (int) $legacySettings['reminder_mail_one_hour'];
+            } else {
+                $globalLeadTimes[] = 60;
+            }
 
-        // Final reminder: stored in minutes (default 10 minutes)
-        $finalLeadTime = isset($globalSettings['reminder_mail_final']) && $globalSettings['reminder_mail_final'] !== ''
-            ? (int) $globalSettings['reminder_mail_final']
-            : 10;
+            if (isset($legacySettings['reminder_mail_final']) && $legacySettings['reminder_mail_final'] !== '') {
+                $globalLeadTimes[] = (int) $legacySettings['reminder_mail_final'];
+            } else {
+                $globalLeadTimes[] = 10;
+            }
 
-        $this->info("Advance: {$advanceLeadTime} min | 1-Hour: {$oneHourLeadTime} min | Final: {$finalLeadTime} min");
+            $globalLeadTimes = array_values(array_unique($globalLeadTimes));
+            rsort($globalLeadTimes);
+        }
+
+        $this->info("Global Lead Times: " . implode(', ', $globalLeadTimes) . " min");
 
         // ── Fetch eligible bookings ──────────────────────────────────────────
         $bookings = Booking::with(['user', 'practitioner.user', 'translator.user'])
@@ -117,72 +130,59 @@ class SendSessionReminders extends Command
                         $recipients[] = ['email' => $booking->translator->user->email, 'type' => 'translator'];
                     }
 
-                    // ── 1. ADVANCE REMINDER ──────────────────────────────────
-                    // Window: ±5 minutes around the advance lead time
-                    $advanceSubject = "Session Advance Reminder: #{$booking->invoice_no} ({$sessionIdStr})";
-                    $inAdvanceWindow = $startTime->isFuture()
-                        && $diff >= ($advanceLeadTime - 5)
-                        && $diff <= ($advanceLeadTime + 5);
-
-                    if ($inAdvanceWindow) {
-                        $sentTotal += $this->dispatchToRecipients(
-                            $recipients, $booking, $session, $videoLink,
-                            $advanceSubject, $sessionIdStr, false
-                        );
-                    } elseif ($startTime->isFuture() && $diff > ($advanceLeadTime + 5)) {
-                        // Still far in the future — booking not complete yet
-                        $allSessionsSentOrPassed = false;
+                    // Determine lead times to use: practitioner-custom or global fallback
+                    $rawLeadTime = $booking->practitioner ? $booking->practitioner->getRawOriginal('reminder_lead_time') : null;
+                    if (!empty($rawLeadTime)) {
+                        $leadTimes = $booking->practitioner->reminder_lead_time;
+                    } else {
+                        $leadTimes = $globalLeadTimes;
                     }
 
-                    // ── 2. 1-HOUR REMINDER ───────────────────────────────────
-                    // Window: ±5 minutes around the 1-hour lead time
-                    $oneHourSubject = "Session 1-Hour Reminder: #{$booking->invoice_no} ({$sessionIdStr})";
-                    $inOneHourWindow = $startTime->isFuture()
-                        && $diff >= ($oneHourLeadTime - 5)
-                        && $diff <= ($oneHourLeadTime + 5);
-
-                    if ($inOneHourWindow) {
-                        $sentTotal += $this->dispatchToRecipients(
-                            $recipients, $booking, $session, $videoLink,
-                            $oneHourSubject, $sessionIdStr, false
-                        );
-                    } elseif ($startTime->isFuture() && $diff > ($oneHourLeadTime + 5)) {
-                        // Still far in the future for 1-hour reminder
-                        $allSessionsSentOrPassed = false;
-                    }
-
-                    // ── 3. FINAL REMINDER ────────────────────────────────────
-                    // Window: from finalLeadTime+1 down to -15 minutes (catches cron delays)
-                    $finalSubject = "Session Final Reminder: #{$booking->invoice_no} ({$sessionIdStr})";
-
-                    $isMissedRetry = false;
-
-                    if ($diff < -15) {
-                        // Session passed — retry only if there were failures, within 24 h
-                        $failedAttempts = \App\Models\EmailLog::where('booking_id', $booking->id)
-                            ->where('to', $booking->user->email)
-                            ->where('subject', $finalSubject)
-                            ->where('status', 'error')
-                            ->count();
-
-                        if ($failedAttempts > 0 && $diff > -1440) {
-                            $isMissedRetry = true;
-                        } else {
-                            // Session fully passed with no retry needed
-                            continue;
+                    foreach ($leadTimes as $leadTime) {
+                        $customSubject = "Session Reminder ({$leadTime} Min): #{$booking->invoice_no} ({$sessionIdStr})";
+                        if ($leadTime >= 60 && $leadTime % 60 === 0) {
+                            $hrs = $leadTime / 60;
+                            if ($hrs >= 24 && $hrs % 24 === 0) {
+                                $days = $hrs / 24;
+                                $customSubject = "Session Reminder ({$days} Day" . ($days != 1 ? 's' : '') . "): #{$booking->invoice_no} ({$sessionIdStr})";
+                            } else {
+                                $customSubject = "Session Reminder ({$hrs} Hour" . ($hrs != 1 ? 's' : '') . "): #{$booking->invoice_no} ({$sessionIdStr})";
+                            }
                         }
-                    }
+                        
+                        $isFinal = ($leadTime === min($leadTimes));
 
-                    $inFinalWindow = ($diff <= ($finalLeadTime + 1) && $diff >= -15) || $isMissedRetry;
+                        $isMissedRetry = false;
+                        if ($isFinal && $diff < -15) {
+                            // Session passed — retry only if there were failures, within 24 h
+                            $failedAttempts = \App\Models\EmailLog::where('booking_id', $booking->id)
+                                ->where('to', $booking->user->email)
+                                ->where('subject', $customSubject)
+                                ->where('status', 'error')
+                                ->count();
 
-                    if ($inFinalWindow) {
-                        $sentTotal += $this->dispatchToRecipients(
-                            $recipients, $booking, $session, $videoLink,
-                            $finalSubject, $sessionIdStr, $isMissedRetry
-                        );
-                    } elseif ($startTime->isFuture() && $diff > ($finalLeadTime + 1)) {
-                        // Final reminder window hasn't arrived yet
-                        $allSessionsSentOrPassed = false;
+                            if ($failedAttempts > 0 && $diff > -1440) {
+                                $isMissedRetry = true;
+                            } else {
+                                continue;
+                            }
+                        }
+
+                        if ($isFinal) {
+                            $inWindow = ($diff <= ($leadTime + 1) && $diff >= -15) || $isMissedRetry;
+                        } else {
+                            $inWindow = ($diff >= ($leadTime - 5) && $diff <= ($leadTime + 5));
+                        }
+
+                        if ($inWindow) {
+                            $sentTotal += $this->dispatchToRecipients(
+                                $recipients, $booking, $session, $videoLink,
+                                $customSubject, $sessionIdStr, $isMissedRetry
+                            );
+                        } elseif ($startTime->isFuture() && $diff > ($leadTime + ($isFinal ? 1 : 5))) {
+                            // Reminder window hasn't arrived yet
+                            $allSessionsSentOrPassed = false;
+                        }
                     }
                 }
 

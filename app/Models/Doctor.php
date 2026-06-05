@@ -53,7 +53,6 @@ class Doctor extends Model
         'confidentiality_consented' => 'boolean',
         'booking_window_days' => 'integer',
         'default_slot_duration' => 'integer',
-        'reminder_lead_time' => 'integer',
     ];
 
     public function user()
@@ -183,4 +182,32 @@ class Doctor extends Model
     {
         return $value ?? ($this->attributes['cancelled_cheque_path'] ?? null);
     }
+
+    public function getReminderLeadTimeAttribute($value)
+    {
+        if (empty($value)) {
+            return [60];
+        }
+        if (is_array($value)) {
+            return $value;
+        }
+        $decoded = json_decode($value, true);
+        if (is_array($decoded)) {
+            return array_map('intval', $decoded);
+        }
+        if (is_string($value) && strpos($value, ',') !== false) {
+            return array_map('intval', explode(',', $value));
+        }
+        return [(int) $value];
+    }
+
+    public function setReminderLeadTimeAttribute($value)
+    {
+        if (is_array($value)) {
+            $this->attributes['reminder_lead_time'] = json_encode(array_values(array_unique(array_map('intval', $value))));
+        } else {
+            $this->attributes['reminder_lead_time'] = $value;
+        }
+    }
 }
+

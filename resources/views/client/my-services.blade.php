@@ -258,8 +258,8 @@
                         <p class="text-sm text-gray-500">Links are generated per confirmed online booking and emailed automatically.</p>
                     @endif
                 </div>
-                <div class="px-4 py-2 rounded-xl bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-wide">
-                    Auto email sends {{ $reminderLeadTime }} min before
+                <div class="px-4 py-2 rounded-xl bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-wide text-right">
+                    Auto email sends {{ is_array($reminderLeadTime) ? implode(', ', $reminderLeadTime) : $reminderLeadTime }} min before
                 </div>
             </div>
 
@@ -273,12 +273,15 @@
 
                 @php
                     $startTime = null;
-                    $scheduledTime = null;
+                    $scheduledTimes = [];
                     if ($nextOnlineBooking) {
                         try {
                             $timezone = derive_timezone_from_user($nextOnlineBooking->practitioner);
                             $startTime = \Carbon\Carbon::parse($nextOnlineBooking->booking_date->format('Y-m-d') . ' ' . $nextOnlineBooking->booking_time, $timezone);
-                            $scheduledTime = $startTime->copy()->subMinutes($reminderLeadTime);
+                            $leadTimes = is_array($reminderLeadTime) ? $reminderLeadTime : [$reminderLeadTime];
+                            foreach ($leadTimes as $time) {
+                                $scheduledTimes[] = $startTime->copy()->subMinutes($time);
+                            }
                         } catch (\Exception $e) {}
                     }
                 @endphp
@@ -291,10 +294,10 @@
                         <div>
                             <p class="text-xs font-black text-secondary uppercase tracking-tight mb-0.5">Scheduled for Dispatch</p>
                             <p class="text-sm font-bold text-gray-500">
-                                @if($scheduledTime)
-                                    Estimated: {{ $scheduledTime->format('M d, h:i A') }}
+                                @if(!empty($scheduledTimes))
+                                    Estimated: {{ collect($scheduledTimes)->map(fn($t) => $t->format('M d, h:i A'))->implode(' & ') }}
                                 @else
-                                    Calculating based on lead time...
+                                    Calculating based on lead times...
                                 @endif
                             </p>
                             <p class="text-[9px] text-gray-400 font-medium mt-1">Participants will receive the secure link automatically at this time.</p>
@@ -355,21 +358,49 @@
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <p class="text-[11px] font-black text-secondary/50 uppercase tracking-[0.2em] mb-1">Reminder Settings</p>
-                    <h3 class="text-xl font-black text-secondary">Video link reminder timing</h3>
-                    <p class="text-sm text-gray-500 mt-1">The system will email the secure video session link to you and the client at your preferred time before an online booking.</p>
+                    <h3 class="text-xl font-black text-secondary flex items-center gap-2">
+                        <span>Video link reminder timing</span>
+                    </h3>
+                    <p class="text-sm text-gray-500 mt-1">The system will email the secure video session link to you and the client at your preferred times before an online booking.</p>
                 </div>
             </div>
             <div class="max-w-xl">
-                <form action="{{ route('my-services.reminder') }}" method="POST" class="flex flex-col sm:flex-row gap-4 items-center">
+                <form action="{{ route('my-services.reminder') }}" method="POST" class="space-y-4">
                     @csrf
-                    <div class="relative w-full sm:w-64">
-                        <input type="number" name="reminder_lead_time" value="{{ $reminderLeadTime }}" min="5" max="1440" required
-                               class="w-full border border-gray-200 rounded-2xl px-5 py-4 font-bold text-secondary bg-[#F9FBF9] focus:border-secondary focus:ring-4 focus:ring-secondary/5 outline-none transition-all">
-                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-black uppercase tracking-widest">Minutes</span>
+                    <div id="reminder-inputs-container" class="space-y-3">
+                        @php
+                            $leadTimesList = is_array($reminderLeadTime) ? $reminderLeadTime : [$reminderLeadTime];
+                        @endphp
+                        @foreach($leadTimesList as $index => $time)
+                            <div class="flex items-center gap-3 reminder-row">
+                                <div class="relative flex-1 sm:flex-initial sm:w-64">
+                                    <input type="number" name="reminder_lead_times[]" value="{{ $time }}" min="5" max="1440" required
+                                           class="w-full border border-gray-200 rounded-2xl px-5 py-4 font-bold text-secondary bg-[#F9FBF9] focus:border-secondary focus:ring-4 focus:ring-secondary/5 outline-none transition-all">
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-black uppercase tracking-widest">Minutes</span>
+                                </div>
+                                @if(count($leadTimesList) > 1)
+                                    <button type="button" onclick="removeReminderRow(this)" class="w-12 h-12 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all border border-red-100 flex-shrink-0">
+                                        <i class="ri-delete-bin-fill text-lg"></i>
+                                    </button>
+                                @else
+                                    <button type="button" onclick="removeReminderRow(this)" class="w-12 h-12 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all border border-red-100 flex-shrink-0 hidden">
+                                        <i class="ri-delete-bin-fill text-lg"></i>
+                                    </button>
+                                @endif
+                            </div>
+                        @endforeach
                     </div>
-                    <button type="submit" class="w-full sm:w-auto px-8 py-4 bg-secondary text-white rounded-2xl font-black text-sm hover:bg-primary transition-all shadow-xl shadow-secondary/20 uppercase tracking-[0.2em]">
-                        Save Preference
+
+                    <button type="button" id="addReminderBtn" onclick="addReminderRow()" class="mt-2 bg-white border border-dashed border-secondary/30 text-secondary px-5 py-3 rounded-xl font-black text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-secondary hover:text-white hover:border-secondary transition-all duration-300 shadow-sm {{ count($leadTimesList) >= 3 ? 'hidden' : '' }}">
+                        <i class="ri-add-line text-lg"></i>
+                        Add Reminder Time
                     </button>
+
+                    <div class="pt-4 border-t border-gray-100 mt-4">
+                        <button type="submit" class="w-full sm:w-auto px-8 py-4 bg-secondary text-white rounded-2xl font-black text-sm hover:bg-primary transition-all shadow-xl shadow-secondary/20 uppercase tracking-[0.2em]">
+                            Save Preference
+                        </button>
+                    </div>
                 </form>
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-4 flex items-center gap-2">
                     <i class="ri-information-line text-secondary text-sm"></i>
@@ -1009,6 +1040,62 @@ async function fetchAvailableServices() {
             if (window.showZayaToast) showZayaToast('Link copied to clipboard', 'Video Portal');
             else alert('Link copied to clipboard');
         });
+    }
+
+    function addReminderRow() {
+        const container = document.getElementById('reminder-inputs-container');
+        const rows = container.querySelectorAll('.reminder-row');
+        if (rows.length >= 3) {
+            return;
+        }
+
+        const newRow = document.createElement('div');
+        newRow.className = 'flex items-center gap-3 reminder-row';
+        newRow.innerHTML = `
+            <div class="relative flex-1 sm:flex-initial sm:w-64">
+                <input type="number" name="reminder_lead_times[]" value="15" min="5" max="1440" required
+                       class="w-full border border-gray-200 rounded-2xl px-5 py-4 font-bold text-secondary bg-[#F9FBF9] focus:border-secondary focus:ring-4 focus:ring-secondary/5 outline-none transition-all">
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-black uppercase tracking-widest">Minutes</span>
+            </div>
+            <button type="button" onclick="removeReminderRow(this)" class="w-12 h-12 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all border border-red-100 flex-shrink-0">
+                <i class="ri-delete-bin-fill text-lg"></i>
+            </button>
+        `;
+        container.appendChild(newRow);
+        updateReminderRowButtons();
+    }
+
+    function removeReminderRow(button) {
+        const container = document.getElementById('reminder-inputs-container');
+        const rows = container.querySelectorAll('.reminder-row');
+        if (rows.length > 1) {
+            button.closest('.reminder-row').remove();
+            updateReminderRowButtons();
+        }
+    }
+
+    function updateReminderRowButtons() {
+        const container = document.getElementById('reminder-inputs-container');
+        const rows = container.querySelectorAll('.reminder-row');
+        rows.forEach(row => {
+            const deleteBtn = row.querySelector('button');
+            if (deleteBtn) {
+                if (rows.length > 1) {
+                    deleteBtn.classList.remove('hidden');
+                } else {
+                    deleteBtn.classList.add('hidden');
+                }
+            }
+        });
+
+        const addBtn = document.getElementById('addReminderBtn');
+        if (addBtn) {
+            if (rows.length >= 3) {
+                addBtn.classList.add('hidden');
+            } else {
+                addBtn.classList.remove('hidden');
+            }
+        }
     }
 </script>
 @endpush

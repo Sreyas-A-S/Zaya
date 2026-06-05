@@ -62,6 +62,13 @@ class GeneralSettingSeeder extends Seeder
                 'section' => 'general',
                 'max_length' => null
             ],
+            [
+                'key' => 'global_reminder_lead_times',
+                'value' => '[1440, 60, 10]',
+                'type' => 'array',
+                'section' => 'general',
+                'max_length' => null
+            ],
         ];
 
         foreach ($settings as $setting) {

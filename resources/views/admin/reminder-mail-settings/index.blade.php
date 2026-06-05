@@ -41,262 +41,55 @@
             </div>
 
             {{-- Settings card --}}
-            <div class="card shadow-sm" style="border-radius:14px; border:1px solid #e8ecf1;">
-                <div class="card-header pb-0 card-no-border"
-                     style="border-bottom:1px solid #f0f0f0; padding:22px 28px 16px;">
-                    <div class="d-flex align-items-center gap-3">
-                        <div style="width:42px;height:42px;
-                                    background:linear-gradient(135deg,#4a6cf7,#7c3aed);
-                                    border-radius:10px;display:flex;align-items:center;
-                                    justify-content:center;flex-shrink:0;">
-                            <i class="fa-solid fa-envelope-clock" style="color:#fff;font-size:17px;"></i>
-                        </div>
-                        <div>
-                            <h5 class="mb-0 fw-bold">Session Reminder Timings</h5>
-                            <p class="mb-0 text-muted" style="font-size:13px;">
-                                Set when each reminder email is dispatched before a session starts
-                            </p>
-                        </div>
+            <div class="card shadow-sm" style="border-radius:28px; border:1px solid rgba(46,75,61,0.12);">
+                <div class="card-header pb-0 card-no-border bg-white"
+                     style="border-bottom:1px solid #f0f0f0; padding:28px 28px 16px; border-top-left-radius: 28px; border-top-right-radius: 28px;">
+                    <div>
+                        <p class="text-uppercase fw-bold text-muted mb-1" style="font-size: 11px; letter-spacing: 2px; color: rgba(46, 75, 61, 0.5) !important;">REMINDER SETTINGS</p>
+                        <h3 class="fw-bold mb-1" style="color: #2E4B3D; font-size: 20px;">Video link reminder timing</h3>
+                        <p class="text-muted mt-1 mb-0" style="font-size: 14px;">The system will email the secure video session link to clients, practitioners, and translators at these preferred times before an online booking.</p>
                     </div>
                 </div>
 
-                <div class="card-body" style="padding:28px;">
+                <div class="card-body" style="padding:28px; border-bottom-left-radius: 28px; border-bottom-right-radius: 28px;">
                     <form id="reminderMailForm"
                           action="{{ route('admin.reminder-mail-settings.update') }}"
                           method="POST">
                         @csrf
 
-                        <div class="row g-4">
-
-                            {{-- ── 1. Advance Reminder (hours) ── --}}
-                            <div class="col-lg-4 col-md-6">
-                                <div style="background:#f8f9ff; border:1px solid #d6dfff;
-                                            border-radius:12px; padding:22px 20px; height: 100%;">
-
-                                    <div class="d-flex align-items-center gap-2 mb-3">
-                                        <div style="width:32px;height:32px;background:#4a6cf7;
-                                                    border-radius:8px;display:flex;align-items:center;
-                                                    justify-content:center;flex-shrink:0;">
-                                            <i class="fa-solid fa-bell" style="color:#fff;font-size:13px;"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0 fw-bold" style="font-size:14px;">Advance Reminder</h6>
-                                            <span class="text-muted" style="font-size:11px;">First reminder — hours before</span>
-                                        </div>
+                        <div id="reminder-inputs-container" class="mb-3">
+                            @foreach($leadTimes as $index => $time)
+                                <div class="d-flex align-items-center mb-3 reminder-row">
+                                    <div class="position-relative flex-grow-1" style="max-width: 260px;">
+                                        <input type="number" name="reminder_lead_times[]" value="{{ $time }}" min="5" max="10080" required
+                                               class="form-control fw-bold" style="border-radius:16px; padding: 14px 20px; background: #F9FBF9; border: 1px solid #e2e8f0; font-size: 16px; padding-right: 90px; color: #2E4B3D;">
+                                        <span class="position-absolute end-0 top-50 translate-middle-y me-3 text-uppercase fw-bold" style="font-size:10px; letter-spacing:1px; pointer-events: none; color: #9ca3af;">MINUTES</span>
                                     </div>
-
-                                    <label class="form-label fw-semibold mb-1" for="reminder_mail_advance_hr"
-                                           style="font-size:13px;">Hours before session</label>
-
-                                    <div class="input-group mb-3">
-                                        <input type="number"
-                                               id="reminder_mail_advance_hr"
-                                               name="reminder_mail_advance_hr"
-                                               value="{{ $advanceHours }}"
-                                               min="1" max="168"
-                                               class="form-control"
-                                               placeholder="e.g. 24"
-                                               style="border-radius:8px 0 0 8px; font-size:15px; font-weight:600;">
-                                        <span class="input-group-text fw-semibold"
-                                              style="border-radius:0 8px 8px 0;
-                                                     background:#eef1ff; color:#4a6cf7; border-left:0;">
-                                            hours
-                                        </span>
-                                    </div>
-
-                                    {{-- Quick-select chips – Advance --}}
-                                    <p class="mb-2" style="font-size:11px; font-weight:700;
-                                       text-transform:uppercase; letter-spacing:.6px; color:#6b7280;">
-                                        Quick Select
-                                    </p>
-                                    <div class="d-flex flex-wrap gap-2 mb-3" id="advChips">
-                                        @php
-                                            $advChips = [12=>'12 hrs', 24=>'24 hrs', 36=>'36 hrs', 48=>'2 days', 72=>'3 days'];
-                                        @endphp
-                                        @foreach($advChips as $val => $label)
-                                        <button type="button"
-                                                class="btn btn-sm adv-chip
-                                                       {{ $advanceHours == $val ? 'adv-chip-active' : 'adv-chip-idle' }}"
-                                                data-val="{{ $val }}">
-                                            {{ $label }}
-                                        </button>
-                                        @endforeach
-                                    </div>
-
-                                    @error('reminder_mail_advance_hr')
-                                        <div class="text-danger mb-2" style="font-size:12px;">{{ $message }}</div>
-                                    @enderror
-
-                                    <div class="mt-1 p-2"
-                                         style="background:#fff;border:1px dashed #b0c0ff;
-                                                border-radius:8px;font-size:12.5px;">
-                                        <i class="fa-solid fa-clock me-1" style="color:#4a6cf7;"></i>
-                                        Currently:
-                                        <strong id="advancePreview">{{ $advanceHours }} hour{{ $advanceHours != 1 ? 's' : '' }}</strong>
-                                        before
-                                    </div>
+                                    <button type="button" onclick="removeReminderRow(this)" class="btn remove-btn ms-2 {{ count($leadTimes) <= 1 ? 'd-none' : '' }}"
+                                            style="border-radius:16px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; background-color: #fdf2f2; border: 1px solid #fee2e2; color: #dc3545; padding: 0;">
+                                        <i class="fa-solid fa-trash-can" style="font-size: 16px;"></i>
+                                    </button>
                                 </div>
-                            </div>
-
-                            {{-- ── 2. 1-Hour Reminder (hours) ── --}}
-                            <div class="col-lg-4 col-md-6">
-                                <div style="background:#f5f3ff; border:1px solid #ddd6fe;
-                                            border-radius:12px; padding:22px 20px; height: 100%;">
-
-                                    <div class="d-flex align-items-center gap-2 mb-3">
-                                        <div style="width:32px;height:32px;background:#7c3aed;
-                                                    border-radius:8px;display:flex;align-items:center;
-                                                    justify-content:center;flex-shrink:0;">
-                                            <i class="fa-solid fa-envelope" style="color:#fff;font-size:13px;"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0 fw-bold" style="font-size:14px;">1 Hour Reminder</h6>
-                                            <span class="text-muted" style="font-size:11px;">Second reminder — mid timing</span>
-                                        </div>
-                                    </div>
-
-                                    <label class="form-label fw-semibold mb-1" for="reminder_mail_one_hour_hr"
-                                           style="font-size:13px;">Hours before session</label>
-
-                                    <div class="input-group mb-3">
-                                        <input type="number"
-                                               id="reminder_mail_one_hour_hr"
-                                               name="reminder_mail_one_hour_hr"
-                                               value="{{ $oneHourHours }}"
-                                               min="1" max="168"
-                                               class="form-control"
-                                               placeholder="e.g. 1"
-                                               style="border-radius:8px 0 0 8px; font-size:15px; font-weight:600;">
-                                        <span class="input-group-text fw-semibold"
-                                              style="border-radius:0 8px 8px 0;
-                                                     background:#f3e8ff; color:#7c3aed; border-left:0;">
-                                            hours
-                                        </span>
-                                    </div>
-
-                                    {{-- Quick-select chips – 1-Hour --}}
-                                    <p class="mb-2" style="font-size:11px; font-weight:700;
-                                       text-transform:uppercase; letter-spacing:.6px; color:#6b7280;">
-                                        Quick Select
-                                    </p>
-                                    <div class="d-flex flex-wrap gap-2 mb-3" id="oneHourChips">
-                                        @php
-                                            $oneHourChips = [1=>'1 hr', 2=>'2 hrs', 3=>'3 hrs', 4=>'4 hrs', 6=>'6 hrs', 8=>'8 hrs'];
-                                        @endphp
-                                        @foreach($oneHourChips as $val => $label)
-                                        <button type="button"
-                                                class="btn btn-sm onehour-chip
-                                                       {{ $oneHourHours == $val ? 'onehour-chip-active' : 'onehour-chip-idle' }}"
-                                                data-val="{{ $val }}">
-                                            {{ $label }}
-                                        </button>
-                                        @endforeach
-                                    </div>
-
-                                    @error('reminder_mail_one_hour_hr')
-                                        <div class="text-danger mb-2" style="font-size:12px;">{{ $message }}</div>
-                                    @enderror
-
-                                    <div class="mt-1 p-2"
-                                         style="background:#fff;border:1px dashed #c084fc;
-                                                border-radius:8px;font-size:12.5px;">
-                                        <i class="fa-solid fa-clock me-1" style="color:#7c3aed;"></i>
-                                        Currently:
-                                        <strong id="oneHourPreview">{{ $oneHourHours }} hour{{ $oneHourHours != 1 ? 's' : '' }}</strong>
-                                        before
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- ── 3. Final Reminder (minutes) ── --}}
-                            <div class="col-lg-4 col-md-6">
-                                <div style="background:#fff9f0; border:1px solid #fdd9a0;
-                                            border-radius:12px; padding:22px 20px; height: 100%;">
-
-                                    <div class="d-flex align-items-center gap-2 mb-3">
-                                        <div style="width:32px;height:32px;background:#f59e0b;
-                                                    border-radius:8px;display:flex;align-items:center;
-                                                    justify-content:center;flex-shrink:0;">
-                                            <i class="fa-solid fa-bolt" style="color:#fff;font-size:13px;"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0 fw-bold" style="font-size:14px;">Final Reminder</h6>
-                                            <span class="text-muted" style="font-size:11px;">Third reminder — final minutes</span>
-                                        </div>
-                                    </div>
-
-                                    <label class="form-label fw-semibold mb-1" for="reminder_mail_final_min"
-                                           style="font-size:13px;">Minutes before session</label>
-
-                                    <div class="input-group mb-3">
-                                        <input type="number"
-                                               id="reminder_mail_final_min"
-                                               name="reminder_mail_final_min"
-                                               value="{{ $finalMinutes }}"
-                                               min="1" max="1440"
-                                               class="form-control"
-                                               placeholder="e.g. 10"
-                                               style="border-radius:8px 0 0 8px; font-size:15px; font-weight:600;">
-                                        <span class="input-group-text fw-semibold"
-                                              style="border-radius:0 8px 8px 0;
-                                                     background:#fef3dd; color:#d97706; border-left:0;">
-                                            minutes
-                                        </span>
-                                    </div>
-
-                                    {{-- Quick-select chips – Final --}}
-                                    <p class="mb-2" style="font-size:11px; font-weight:700;
-                                       text-transform:uppercase; letter-spacing:.6px; color:#6b7280;">
-                                        Quick Select
-                                    </p>
-                                    <div class="d-flex flex-wrap gap-2 mb-3" id="finChips">
-                                        @php
-                                            $finChips = [5=>'5 min', 10=>'10 min', 15=>'15 min', 30=>'30 min', 45=>'45 min'];
-                                        @endphp
-                                        @foreach($finChips as $val => $label)
-                                        <button type="button"
-                                                class="btn btn-sm fin-chip
-                                                       {{ $finalMinutes == $val ? 'fin-chip-active' : 'fin-chip-idle' }}"
-                                                data-val="{{ $val }}">
-                                            {{ $label }}
-                                        </button>
-                                        @endforeach
-                                    </div>
-
-                                    @error('reminder_mail_final_min')
-                                        <div class="text-danger mb-2" style="font-size:12px;">{{ $message }}</div>
-                                    @enderror
-
-                                    <div class="mt-1 p-2"
-                                         style="background:#fff;border:1px dashed #fbbf24;
-                                                border-radius:8px;font-size:12.5px;">
-                                        <i class="fa-solid fa-clock me-1" style="color:#f59e0b;"></i>
-                                        Currently:
-                                        <strong id="finalPreview">{{ $finalMinutes }} minute{{ $finalMinutes != 1 ? 's' : '' }}</strong>
-                                        before
-                                    </div>
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
 
-                        {{-- Timeline summary --}}
-                        <div class="mt-4 p-3"
-                             style="background:#f0fdf4; border:1px solid #bbf7d0;
-                                    border-radius:10px; font-size:13.5px;">
-                            <i class="fa-solid fa-timeline me-2" style="color:#16a34a;"></i>
-                            <strong>Email Schedule Sequence:</strong>
-                            1st Reminder: <span class="badge" style="background:#dbeafe;color:#1d4ed8;" id="summaryAdvance">{{ $advanceHours }}h</span> before
-                            ➔ 2nd Reminder: <span class="badge" style="background:#ebd5ff;color:#6b21a8;" id="summaryOneHour">{{ $oneHourHours }}h</span> before
-                            ➔ 3rd Reminder: <span class="badge" style="background:#fef9c3;color:#854d0e;" id="summaryFinal">{{ $finalMinutes }}min</span> before session starts.
-                        </div>
+                        <button type="button" id="addReminderBtn" onclick="addReminderRow()" class="btn btn-outline-dashed mt-2 mb-4 d-flex align-items-center gap-2 {{ count($leadTimes) >= 3 ? 'd-none' : '' }}"
+                                style="border: 1px dashed rgba(46,75,61,0.3); color: #2E4B3D; background: transparent; border-radius: 12px; font-weight: 700; padding: 12px 20px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">
+                            <i class="fa-solid fa-plus"></i> Add Reminder Time
+                        </button>
 
-                        <div class="text-end mt-4">
-                            <button type="submit" id="saveReminderBtn" class="btn btn-primary px-5"
-                                    style="border-radius:10px; font-weight:600;">
-                                <i class="fa-solid fa-save me-2"></i> Save Settings
+                        <div class="pt-4 border-t border-gray-100 mt-4">
+                            <button type="submit" id="saveReminderBtn" class="btn text-white px-5 py-3"
+                                    style="background: #2E4B3D; border-radius: 16px; font-weight: 700; font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase; box-shadow: 0 10px 15px -3px rgba(46,75,61,0.2); border: none;">
+                                Save Preference
                             </button>
                         </div>
                     </form>
+
+                    <p class="text-uppercase fw-bold text-muted mt-4 d-flex align-items-center gap-2 mb-0" style="font-size: 10px; letter-spacing: 1px; margin-top: 24px;">
+                        <i class="fa-solid fa-circle-info" style="color: #2E4B3D; font-size: 14px;"></i>
+                        DEFAULT IS 60 MINUTES. MAXIMUM 7 DAYS (10080 MIN). AT LEAST 1 IS MANDATORY.
+                    </p>
                 </div>
             </div>
 
@@ -306,135 +99,71 @@
 @endsection
 
 @section('scripts')
-<style>
-    /* Advance chips */
-    .adv-chip { border-radius: 20px; font-size: 12px; padding: 4px 13px; transition: all .15s; }
-    .adv-chip-idle   { border: 1px solid #c7d2fe; color: #4a6cf7; background: #fff; }
-    .adv-chip-idle:hover { background: #eef1ff; }
-    .adv-chip-active { background: #4a6cf7; color: #fff; border: 1px solid #4a6cf7; }
-
-    /* 1-Hour chips */
-    .onehour-chip { border-radius: 20px; font-size: 12px; padding: 4px 13px; transition: all .15s; }
-    .onehour-chip-idle   { border: 1px solid #ddd6fe; color: #7c3aed; background: #fff; }
-    .onehour-chip-idle:hover { background: #f3e8ff; }
-    .onehour-chip-active { background: #7c3aed; color: #fff; border: 1px solid #7c3aed; }
-
-    /* Final chips */
-    .fin-chip { border-radius: 20px; font-size: 12px; padding: 4px 13px; transition: all .15s; }
-    .fin-chip-idle   { border: 1px solid #fcd34d; color: #d97706; background: #fff; }
-    .fin-chip-idle:hover { background: #fffbeb; }
-    .fin-chip-active { background: #f59e0b; color: #fff; border: 1px solid #f59e0b; }
-</style>
-
 <script>
-$(document).ready(function () {
-
-    // ── Advance chips ────────────────────────────────────────────
-    $(document).on('click', '.adv-chip', function () {
-        const val = parseInt($(this).data('val'));
-        $('#reminder_mail_advance_hr').val(val);
-        updateAdvancePreview(val);
-        setActiveChip('.adv-chip', $(this), 'adv-chip-active', 'adv-chip-idle');
-    });
-
-    $('#reminder_mail_advance_hr').on('input', function () {
-        const val = parseInt($(this).val()) || 0;
-        updateAdvancePreview(val);
-        syncChipSelection('.adv-chip', val, 'adv-chip-active', 'adv-chip-idle');
-    });
-
-    function updateAdvancePreview(val) {
-        val = parseInt(val) || 0;
-        $('#advancePreview').text(val + ' hour' + (val !== 1 ? 's' : ''));
-        $('#summaryAdvance').text(val + 'h');
+function addReminderRow() {
+    const container = document.getElementById('reminder-inputs-container');
+    const rows = container.querySelectorAll('.reminder-row');
+    if (rows.length >= 3) {
+        return;
     }
 
-    // ── 1-Hour chips ─────────────────────────────────────────────
-    $(document).on('click', '.onehour-chip', function () {
-        const val = parseInt($(this).data('val'));
-        $('#reminder_mail_one_hour_hr').val(val);
-        updateOneHourPreview(val);
-        setActiveChip('.onehour-chip', $(this), 'onehour-chip-active', 'onehour-chip-idle');
-    });
+    const newRow = document.createElement('div');
+    newRow.className = 'd-flex align-items-center mb-3 reminder-row';
+    newRow.innerHTML = `
+        <div class="position-relative flex-grow-1" style="max-width: 260px;">
+            <input type="number" name="reminder_lead_times[]" value="15" min="5" max="10080" required
+                   class="form-control fw-bold" style="border-radius:16px; padding: 14px 20px; background: #F9FBF9; border: 1px solid #e2e8f0; font-size: 16px; padding-right: 90px; color: #2E4B3D;">
+            <span class="position-absolute end-0 top-50 translate-middle-y me-3 text-uppercase fw-bold" style="font-size:10px; letter-spacing:1px; pointer-events: none; color: #9ca3af;">MINUTES</span>
+        </div>
+        <button type="button" onclick="removeReminderRow(this)" class="btn remove-btn ms-2"
+                style="border-radius:16px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; background-color: #fdf2f2; border: 1px solid #fee2e2; color: #dc3545; padding: 0;">
+            <i class="fa-solid fa-trash-can" style="font-size: 16px;"></i>
+        </button>
+    `;
+    container.appendChild(newRow);
+    updateRemoveButtons();
+}
 
-    $('#reminder_mail_one_hour_hr').on('input', function () {
-        const val = parseInt($(this).val()) || 0;
-        updateOneHourPreview(val);
-        syncChipSelection('.onehour-chip', val, 'onehour-chip-active', 'onehour-chip-idle');
-    });
-
-    function updateOneHourPreview(val) {
-        val = parseInt(val) || 0;
-        $('#oneHourPreview').text(val + ' hour' + (val !== 1 ? 's' : ''));
-        $('#summaryOneHour').text(val + 'h');
+function removeReminderRow(button) {
+    const container = document.getElementById('reminder-inputs-container');
+    const rows = container.querySelectorAll('.reminder-row');
+    if (rows.length > 1) {
+        button.closest('.reminder-row').remove();
+        updateRemoveButtons();
     }
+}
 
-    // ── Final chips ──────────────────────────────────────────────
-    $(document).on('click', '.fin-chip', function () {
-        const val = parseInt($(this).data('val'));
-        $('#reminder_mail_final_min').val(val);
-        updateFinalPreview(val);
-        setActiveChip('.fin-chip', $(this), 'fin-chip-active', 'fin-chip-idle');
-    });
-
-    $('#reminder_mail_final_min').on('input', function () {
-        const val = parseInt($(this).val()) || 0;
-        updateFinalPreview(val);
-        syncChipSelection('.fin-chip', val, 'fin-chip-active', 'fin-chip-idle');
-    });
-
-    function updateFinalPreview(val) {
-        val = parseInt(val) || 0;
-        let label = val + ' minute' + (val !== 1 ? 's' : '');
-        if (val >= 60 && val % 60 === 0) {
-            const h = val / 60;
-            label = h + ' hour' + (h !== 1 ? 's' : '') + ' (' + val + ' min)';
-        }
-        $('#finalPreview').text(label);
-        $('#summaryFinal').text(val + 'min');
-    }
-
-    // ── Helpers ──────────────────────────────────────────────────
-    function setActiveChip(selector, $clicked, activeClass, idleClass) {
-        $(selector).removeClass(activeClass).addClass(idleClass);
-        $clicked.removeClass(idleClass).addClass(activeClass);
-    }
-
-    function syncChipSelection(selector, val, activeClass, idleClass) {
-        $(selector).each(function () {
-            if (parseInt($(this).data('val')) === val) {
-                $(this).removeClass(idleClass).addClass(activeClass);
+function updateRemoveButtons() {
+    const container = document.getElementById('reminder-inputs-container');
+    const rows = container.querySelectorAll('.reminder-row');
+    rows.forEach(row => {
+        const btn = row.querySelector('.remove-btn');
+        if (btn) {
+            if (rows.length > 1) {
+                btn.classList.remove('d-none');
             } else {
-                $(this).removeClass(activeClass).addClass(idleClass);
+                btn.classList.add('d-none');
             }
-        });
-    }
+        }
+    });
 
+    const addBtn = document.getElementById('addReminderBtn');
+    if (addBtn) {
+        if (rows.length >= 3) {
+            addBtn.classList.add('d-none');
+        } else {
+            addBtn.classList.remove('d-none');
+        }
+    }
+}
+
+$(document).ready(function () {
     // ── AJAX save ────────────────────────────────────────────────
     $('#reminderMailForm').on('submit', function (e) {
         e.preventDefault();
 
         const form = $(this);
         const btn  = $('#saveReminderBtn');
-        const adv  = parseInt($('#reminder_mail_advance_hr').val());
-        const mid  = parseInt($('#reminder_mail_one_hour_hr').val());
-        const fin  = parseInt($('#reminder_mail_final_min').val());
-
-        if (!adv || adv < 1 || adv > 168) {
-            showError('Advance reminder must be between 1 and 168 hours.'); return;
-        }
-        if (!mid || mid < 1 || mid > 168) {
-            showError('1-Hour reminder must be between 1 and 168 hours.'); return;
-        }
-        if (!fin || fin < 1 || fin > 1440) {
-            showError('Final reminder must be between 1 and 1440 minutes.'); return;
-        }
-        if (mid >= adv) {
-            showError('1-Hour reminder timing must be shorter than the advance reminder.'); return;
-        }
-        if (fin >= mid * 60) {
-            showError('Final reminder timing must be shorter than the 1-Hour reminder.'); return;
-        }
 
         btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i> Saving...');
 
@@ -454,7 +183,7 @@ $(document).ready(function () {
                 showError(msg);
             },
             complete: function () {
-                btn.prop('disabled', false).html('<i class="fa-solid fa-save me-2"></i> Save Settings');
+                btn.prop('disabled', false).html('Save Preference');
             }
         });
     });

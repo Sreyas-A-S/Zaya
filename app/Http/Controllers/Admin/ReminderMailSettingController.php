@@ -10,67 +10,64 @@ class ReminderMailSettingController extends Controller
 {
     public function index()
     {
-        // 1. Advance reminder stored in minutes (default 1440 = 24 hours)
-        $advanceSetting = HomepageSetting::where('key', 'reminder_mail_advance')->first();
-        $advanceMinutes = $advanceSetting ? (int) $advanceSetting->value : 1440;
-        $advanceHours   = (int) round($advanceMinutes / 60);
+        $setting = HomepageSetting::where('key', 'global_reminder_lead_times')->first();
+        if ($setting) {
+            $leadTimes = json_decode($setting->value, true) ?: [1440, 60, 10];
+        } else {
+            // Fallback: check if old settings exist
+            $adv = HomepageSetting::where('key', 'reminder_mail_advance')->first();
+            $mid = HomepageSetting::where('key', 'reminder_mail_one_hour')->first();
+            $fin = HomepageSetting::where('key', 'reminder_mail_final')->first();
+            if ($adv || $mid || $fin) {
+                $leadTimes = [];
+                if ($adv) $leadTimes[] = (int) $adv->value;
+                if ($mid) $leadTimes[] = (int) $mid->value;
+                if ($fin) $leadTimes[] = (int) $fin->value;
+                $leadTimes = array_values(array_unique($leadTimes));
+                rsort($leadTimes);
+            } else {
+                $leadTimes = [1440, 60, 10];
+            }
+        }
 
-        // 2. 1-Hour Reminder stored in minutes (default 60 = 1 hour)
-        $oneHourSetting = HomepageSetting::where('key', 'reminder_mail_one_hour')->first();
-        $oneHourMinutes = $oneHourSetting ? (int) $oneHourSetting->value : 60;
-        $oneHourHours   = (int) round($oneHourMinutes / 60);
-
-        // 3. Final reminder stored in minutes (default 10)
-        $finalSetting   = HomepageSetting::where('key', 'reminder_mail_final')->first();
-        $finalMinutes   = $finalSetting ? (int) $finalSetting->value : 10;
-
-        return view('admin.reminder-mail-settings.index', compact('advanceHours', 'oneHourHours', 'finalMinutes'));
+        return view('admin.reminder-mail-settings.index', compact('leadTimes'));
     }
 
     public function update(Request $request)
     {
         $request->validate([
-            'reminder_mail_advance_hr'   => 'required|integer|min:1|max:168',
-            'reminder_mail_one_hour_hr'  => 'required|integer|min:1|max:168',
-            'reminder_mail_final_min'    => 'required|integer|min:1|max:1440',
+            'reminder_lead_times'   => 'required|array|min:1|max:3',
+            'reminder_lead_times.*' => 'required|integer|min:5|max:10080',
         ]);
 
-        $advanceMinutes = (int) $request->input('reminder_mail_advance_hr') * 60;
-        $oneHourMinutes = (int) $request->input('reminder_mail_one_hour_hr') * 60;
-        $finalMinutes   = (int) $request->input('reminder_mail_final_min');
+        $leadTimes = array_map('intval', $request->input('reminder_lead_times'));
+        $leadTimes = array_values(array_unique($leadTimes));
+        rsort($leadTimes);
 
-        // Validation: Advance > 1-Hour
-        if ($oneHourMinutes >= $advanceMinutes) {
-            $msg = 'The 1-hour reminder timing must be shorter than the advance reminder timing.';
-            if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => $msg], 422);
-            }
-            return redirect()->back()->withErrors(['reminder_mail_one_hour_hr' => $msg]);
+        HomepageSetting::updateOrCreate(
+            ['key' => 'global_reminder_lead_times'],
+            ['value' => json_encode($leadTimes), 'type' => 'array', 'section' => 'general']
+        );
+
+        // Also sync legacy settings for safety/fallback compatibility
+        if (isset($leadTimes[0])) {
+            HomepageSetting::updateOrCreate(
+                ['key' => 'reminder_mail_advance'],
+                ['value' => (string) $leadTimes[0], 'type' => 'number', 'section' => 'general']
+            );
         }
-
-        // Validation: 1-Hour > Final
-        if ($finalMinutes >= $oneHourMinutes) {
-            $msg = 'The final reminder timing must be shorter than the 1-hour reminder timing.';
-            if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => $msg], 422);
-            }
-            return redirect()->back()->withErrors(['reminder_mail_final_min' => $msg]);
+        if (isset($leadTimes[1])) {
+            HomepageSetting::updateOrCreate(
+                ['key' => 'reminder_mail_one_hour'],
+                ['value' => (string) $leadTimes[1], 'type' => 'number', 'section' => 'general']
+            );
         }
-
-        HomepageSetting::updateOrCreate(
-            ['key' => 'reminder_mail_advance'],
-            ['value' => (string) $advanceMinutes, 'type' => 'number', 'section' => 'general']
-        );
-
-        HomepageSetting::updateOrCreate(
-            ['key' => 'reminder_mail_one_hour'],
-            ['value' => (string) $oneHourMinutes, 'type' => 'number', 'section' => 'general']
-        );
-
-        HomepageSetting::updateOrCreate(
-            ['key' => 'reminder_mail_final'],
-            ['value' => (string) $finalMinutes, 'type' => 'number', 'section' => 'general']
-        );
+        if (isset($leadTimes[2])) {
+            HomepageSetting::updateOrCreate(
+                ['key' => 'reminder_mail_final'],
+                ['value' => (string) $leadTimes[2], 'type' => 'number', 'section' => 'general']
+            );
+        }
 
         if ($request->ajax()) {
             return response()->json([
