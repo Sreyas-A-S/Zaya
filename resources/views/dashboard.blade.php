@@ -120,8 +120,8 @@
                 <div>
                     <p class="text-base text-gray-400 mb-1">Source Languages (From)</p>
                     <div class="flex flex-wrap gap-2">
-                        @forelse($user->translator->source_languages ?? [] as $lang)
-                            <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md">{{ $lang }}</span>
+                        @forelse($user->translator->source_languages ?? [] as $key => $lang)
+                            <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md">{{ is_array($lang) ? ($lang['language'] ?? $key) : $lang }}</span>
                         @empty
                             <p class="text-base font-normal text-gray-800">Not set</p>
                         @endforelse
@@ -130,8 +130,8 @@
                 <div>
                     <p class="text-base text-gray-400 mb-1">Target Languages (To)</p>
                     <div class="flex flex-wrap gap-2">
-                        @forelse($user->translator->target_languages ?? [] as $lang)
-                            <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-md">{{ $lang }}</span>
+                        @forelse($user->translator->target_languages ?? [] as $key => $lang)
+                            <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-md">{{ is_array($lang) ? ($lang['language'] ?? $key) : $lang }}</span>
                         @empty
                             <p class="text-base font-normal text-gray-800">Not set</p>
                         @endforelse

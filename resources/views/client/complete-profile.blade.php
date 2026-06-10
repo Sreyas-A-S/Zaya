@@ -411,11 +411,15 @@
                     <!-- Multi-Select Specialities/Services -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         @if($user->role == 'translator')
+                        @php
+                            $sourceLangs = collect($profile->source_languages ?? [])->map(fn($item, $key) => is_array($item) ? ($item['language'] ?? $key) : $item)->toArray();
+                            $targetLangs = collect($profile->target_languages ?? [])->map(fn($item, $key) => is_array($item) ? ($item['language'] ?? $key) : $item)->toArray();
+                        @endphp
                         <div>
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Source Languages') }}</label>
                             <select id="source-languages-select" name="source_languages[]" multiple>
                                 @foreach($languages as $lang)
-                                    <option value="{{ $lang->display_name }}" {{ in_array($lang->display_name, (array)($profile->source_languages ?? [])) || in_array($lang->name, (array)($profile->source_languages ?? [])) || in_array($lang->code, (array)($profile->source_languages ?? [])) ? 'selected' : '' }}>
+                                    <option value="{{ $lang->display_name }}" {{ in_array($lang->display_name, $sourceLangs) || in_array($lang->name, $sourceLangs) || in_array($lang->code, $sourceLangs) ? 'selected' : '' }}>
                                         {{ $lang->display_name }}
                                     </option>
                                 @endforeach
@@ -423,9 +427,9 @@
                         </div>
                         <div>
                             <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{{ __('Target Languages') }}</label>
-                            <select id="source-languages-select" name="source_languages[]" multiple>
+                            <select id="target-languages-select" name="target_languages[]" multiple>
                                 @foreach($languages as $lang)
-                                    <option value="{{ $lang->display_name }}" {{ in_array($lang->display_name, (array)($profile->source_languages ?? [])) || in_array($lang->name, (array)($profile->source_languages ?? [])) || in_array($lang->code, (array)($profile->source_languages ?? [])) ? 'selected' : '' }}>
+                                    <option value="{{ $lang->display_name }}" {{ in_array($lang->display_name, $targetLangs) || in_array($lang->name, $targetLangs) || in_array($lang->code, $targetLangs) ? 'selected' : '' }}>
                                         {{ $lang->display_name }}
                                     </option>
                                 @endforeach
